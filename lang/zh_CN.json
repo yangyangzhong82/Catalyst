@@ -1,0 +1,18 @@
+{
+    "plugin.loaded": "插件已加载",
+    "plugin.unloaded": "插件已卸载",
+    "config.loaded": "配置已加载",
+    "config.saved": "配置已保存",
+    "config.not_found": "配置文件未找到，正在创建新文件: {}",
+    "config.parse_error": "解析配置文件失败: {}。请检查语法错误。",
+    "config.missing_keys": "您的配置文件缺少一些键。插件将使用默认值。",
+    "config.missing_keys_hint": "这不会影响功能，但您可能需要将它们添加到 config.json:",
+    "config.missing_key_item": "- {}",
+    "config.regenerate_hint": "您也可以删除 config.json，在下次启动时生成包含所有键的新文件。",
+    "config.save_error": "保存配置文件失败: {}",
+    "error.generic": "发生错误: {}",
+    "i18n.lang_dir_not_found": "语言目录未找到，已创建: {}",
+    "i18n.loaded": "已加载语言: {}",
+    "i18n.load_error": "加载语言文件失败 {}: {}",
+    "i18n.lang_not_found": "语言 {} 未找到，使用默认语言: {}"
+}
