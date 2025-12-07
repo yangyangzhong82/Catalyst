@@ -2,11 +2,8 @@
 
 #include "Config/ConfigManager.h"
 #include "I18n/I18n.h"
-#include "event/actor/player/PlayerEditSignEvent.h"
-#include "ll/api/event/EventBus.h"
-#include "ll/api/event/Listener.h"
 #include "ll/api/mod/RegisterHelper.h"
-
+#include "test/EventTest.h"
 
 namespace Catalyst {
 ll::io::Logger& logger = Entry::getInstance().getSelf().getLogger();
@@ -45,21 +42,9 @@ bool Entry::load() {
 
 bool Entry::enable() {
     getSelf().getLogger().debug("Enabling...");
-
-    // 测试监听 PlayerEditSignEvent
-    auto& bus = ll::event::EventBus::getInstance();
-    bus.emplaceListener<PlayerEditSignEvent>([](PlayerEditSignEvent& event) {
-        logger.info(
-            "PlayerEditSignEvent: player={}, pos=({},{},{}), oldFront='{}', newFront='{}'",
-            event.self().getRealName(),
-            event.pos().x,
-            event.pos().y,
-            event.pos().z,
-            event.oldFrontText(),
-            event.newFrontText()
-        );
-    });
-
+    if (config.enableTest) {
+        Test::registerEventTests();
+    }
     return true;
 }
 
@@ -68,7 +53,6 @@ bool Entry::disable() {
     logger.info(tr("plugin.unloaded"));
     return true;
 }
-
 
 } // namespace Catalyst
 

@@ -1,6 +1,7 @@
 
 #include "PlayerEditSignEvent.h"
 
+#include "ll/api/event/Emitter.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/network/ServerNetworkHandler.h"
@@ -10,7 +11,9 @@
 #include "mc/world/level/block/actor/SignBlockActor.h"
 
 #include "mod/Gloabl.h"
+
 namespace Catalyst {
+
 LL_AUTO_TYPE_INSTANCE_HOOK(
     PlayerEditSignEventHook,
     HookPriority::Normal,
@@ -20,62 +23,63 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     NetworkIdentifier const&              source,
     std::shared_ptr<BlockActorDataPacket> packet
 ) {
-    {
-        logger.debug("PlayerEditSignEventHook::hook: 尝试获取 NBT 数据.");
-        auto& nbtData = packet->mData.get();
-        if (nbtData.contains("id", Tag::Type::String)) {
-            std::string id = nbtData["id"].get<StringTag>();
-            logger.debug("PlayerEditSignEventHook::hook: NBT 数据包含 'id' 字段, id: {}", id);
-            if (id == "Sign" || id == "HangingSign") {
-                logger.debug("PlayerEditSignEventHook::hook: 'id' 为 'Sign' 或 'HangingSign'.");
-                auto* player = thisFor<NetEventCallback>()->_getServerPlayer(source, packet->mSenderSubId);
-                if (player) {
-                    logger.debug("PlayerEditSignEventHook::hook: 成功获取到玩家对象.");
-                    auto* signActor =
-                        static_cast<SignBlockActor*>(player->getDimensionBlockSource().getBlockEntity(packet->mPos));
-                    if (signActor) {
-                        logger.debug("PlayerEditSignEventHook::hook: 成功获取到告示牌实体.");
-                        const auto& oldFrontText = signActor->mTextFront->getMessage();
-                        const auto& oldBackText  = signActor->mTextBack->getMessage();
-                        logger.debug(
-                            "PlayerEditSignEventHook::hook: 旧的前面文本: '{}', 旧的背面文本: '{}'",
-                            oldFrontText,
-                            oldBackText
-                        );
-
-                        const auto& newFrontTextData = nbtData["FrontText"].get<CompoundTag>();
-                        const auto& newBackTextData  = nbtData["BackText"].get<CompoundTag>();
-
-                        std::string newFrontText = newFrontTextData["Text"].get<StringTag>();
-                        std::string newBackText  = newBackTextData["Text"].get<StringTag>();
-                        logger.debug(
-                            "PlayerEditSignEventHook::hook: 新的前面文本: '{}', 新的背面文本: '{}'",
-                            newFrontText,
-                            newBackText
-                        );
-
-                        PlayerEditSignEvent
-                            event(*player, packet->mPos, oldFrontText, oldBackText, newFrontText, newBackText);
-                        ll::event::EventBus::getInstance().publish(event);
-
-                        origin(source, packet);
-                        logger.debug("PlayerEditSignEventHook::hook: PlayerEditSignEvent 发布完成.");
-                        return;
-                    } else {
-                        logger.warn("PlayerEditSignEventHook::hook: 未能获取到告示牌实体.");
-                    }
-                } else {
-                    logger.warn("PlayerEditSignEventHook::hook: 未能获取到玩家对象.");
-                }
-            } else {
-                logger.debug("PlayerEditSignEventHook::hook: 'id' 不是 'Sign' 或 'HangingSign'.");
-            }
-        } else {
-            logger.debug("PlayerEditSignEventHook::hook: NBT 数据不包含 'id' 字段.");
-        }
-
-        logger.debug("PlayerEditSignEventHook::hook: 最终调用原始处理函数 (如果之前没有返回).");
-        origin(source, packet);
+    auto& nbtData = packet->mData.get();
+    if (!nbtData.contains("id", Tag::Type::String)) {
+        return origin(source, packet);
     }
+
+    std::string id = nbtData["id"].get<StringTag>();
+    if (id != "Sign" && id != "HangingSign") {
+        return origin(source, packet);
+    }
+
+    auto* player = thisFor<NetEventCallback>()->_getServerPlayer(source, packet->mSenderSubId);
+    if (!player) {
+        return origin(source, packet);
+    }
+
+    auto* signActor = static_cast<SignBlockActor*>(player->getDimensionBlockSource().getBlockEntity(packet->mPos));
+    if (!signActor) {
+        return origin(source, packet);
+    }
+
+    const auto& oldFrontText     = signActor->mTextFront->getMessage();
+    const auto& oldBackText      = signActor->mTextBack->getMessage();
+    const auto& newFrontTextData = nbtData["FrontText"].get<CompoundTag>();
+    const auto& newBackTextData  = nbtData["BackText"].get<CompoundTag>();
+    std::string newFrontText     = newFrontTextData["Text"].get<StringTag>();
+    std::string newBackText      = newBackTextData["Text"].get<StringTag>();
+
+    if (oldFrontText == newFrontText && oldBackText == newBackText) {
+        return origin(source, packet);
+    }
+
+    auto& bus = ll::event::EventBus::getInstance();
+
+    PlayerEditSignBeforeEvent beforeEvent(*player, packet->mPos, oldFrontText, oldBackText, newFrontText, newBackText);
+    bus.publish(beforeEvent);
+    if (beforeEvent.isCancelled()) {
+        return;
+    }
+
+    origin(source, packet);
+
+    PlayerEditSignAfterEvent afterEvent(*player, packet->mPos, oldFrontText, oldBackText, newFrontText, newBackText);
+    bus.publish(afterEvent);
 }
+
+static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
+class PlayerEditSignBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, PlayerEditSignBeforeEvent> {
+    ll::memory::HookRegistrar<PlayerEditSignEventHook> hook;
+};
+static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
+    return std::make_unique<PlayerEditSignBeforeEventEmitter>();
+}
+
+static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
+class PlayerEditSignAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerEditSignAfterEvent> {};
+static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
+    return std::make_unique<PlayerEditSignAfterEventEmitter>();
+}
+
 } // namespace Catalyst
