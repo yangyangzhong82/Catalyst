@@ -9,7 +9,7 @@
 #include <nlohmann/json.hpp>
 #include <vector>
 
-namespace my_mod {
+namespace Catalyst {
 
 ConfigManager& ConfigManager::getInstance() {
     static ConfigManager instance;
@@ -63,7 +63,6 @@ bool ConfigManager::load(const std::string& path) {
     find_missing_keys(default_json, user_json, "", missing_keys);
 
     if (!missing_keys.empty()) {
-        auto& logger = Entry::getInstance().getSelf().getLogger();
         logger.warn(tr("config.missing_keys"));
         logger.warn(tr("config.missing_keys_hint"));
         for (const auto& key : missing_keys) {
@@ -95,4 +94,4 @@ Config& ConfigManager::get() { return *mConfig; }
 
 const Config& ConfigManager::get() const { return *mConfig; }
 
-} // namespace CT
+} // namespace Catalyst

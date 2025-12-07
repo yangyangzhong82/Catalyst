@@ -4,7 +4,7 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
-namespace my_mod {
+namespace Catalyst {
 
 I18n& I18n::getInstance() {
     static I18n instance;
@@ -87,4 +87,4 @@ const std::string& I18n::get(const std::string& key) const {
     return key;
 }
 
-} // namespace my_mod
+} // namespace Catalyst

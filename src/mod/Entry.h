@@ -2,7 +2,7 @@
 
 #include "ll/api/mod/NativeMod.h"
 
-namespace my_mod {
+namespace Catalyst {
 
 class Entry {
 
@@ -30,4 +30,4 @@ private:
     ll::mod::NativeMod& mSelf;
 };
 
-} // namespace my_mod
+} // namespace Catalyst

@@ -3,7 +3,7 @@
 #include "ll/api/io/LogLevel.h"
 #include <string>
 
-namespace my_mod {} // namespace my_mod
+namespace Catalyst {} // namespace Catalyst
 
 
 struct Config {
