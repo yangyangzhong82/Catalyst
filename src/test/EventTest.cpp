@@ -1,4 +1,5 @@
 #include "event/actor/player/PlayerAttackBlockEvent.h"
+#include "event/actor/player/PlayerChangeDimensionEvent.h"
 #include "event/actor/player/PlayerEditSignEvent.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/Listener.h"
@@ -49,6 +50,28 @@ void registerEventTests() {
             event.pos().x,
             event.pos().y,
             event.pos().z
+        );
+    });
+
+    bus.emplaceListener<PlayerChangeDimensionBeforeEvent>([](PlayerChangeDimensionBeforeEvent& event) {
+        logger.info(
+            "PlayerChangeDimensionBeforeEvent: player={}, from={}, to={}, respawn={}, usePortal={}",
+            event.self().getRealName(),
+            event.fromDimensionId(),
+            event.toDimensionId(),
+            event.isRespawn(),
+            event.isUsePortal()
+        );
+    });
+
+    bus.emplaceListener<PlayerChangeDimensionAfterEvent>([](PlayerChangeDimensionAfterEvent& event) {
+        logger.info(
+            "PlayerChangeDimensionAfterEvent: player={}, from={}, to={}, respawn={}, usePortal={}",
+            event.self().getRealName(),
+            event.fromDimensionId(),
+            event.toDimensionId(),
+            event.isRespawn(),
+            event.isUsePortal()
         );
     });
 }
