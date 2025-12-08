@@ -1,5 +1,6 @@
 #include "event/actor/player/PlayerAttackBlockEvent.h"
 #include "event/actor/player/PlayerChangeDimensionEvent.h"
+#include "event/actor/player/PlayerDropItemEvent.h"
 #include "event/actor/player/PlayerEditSignEvent.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/Listener.h"
@@ -72,6 +73,24 @@ void registerEventTests() {
             event.toDimensionId(),
             event.isRespawn(),
             event.isUsePortal()
+        );
+    });
+
+    bus.emplaceListener<PlayerDropItemBeforeEvent>([](PlayerDropItemBeforeEvent& event) {
+        logger.info(
+            "PlayerDropItemBeforeEvent: player={}, item={}, slot={}",
+            event.self().getRealName(),
+            event.item().getTypeName(),
+            event.slot()
+        );
+    });
+
+    bus.emplaceListener<PlayerDropItemAfterEvent>([](PlayerDropItemAfterEvent& event) {
+        logger.info(
+            "PlayerDropItemAfterEvent: player={}, item={}, slot={}",
+            event.self().getRealName(),
+            event.item().getTypeName(),
+            event.slot()
         );
     });
 }
