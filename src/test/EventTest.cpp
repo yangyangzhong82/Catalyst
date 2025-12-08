@@ -1,7 +1,10 @@
+#include "event/actor/player/PlayerArmorStandSwapItemEvent.h"
 #include "event/actor/player/PlayerAttackBlockEvent.h"
 #include "event/actor/player/PlayerChangeDimensionEvent.h"
+#include "event/actor/player/PlayerCompleteUsingItemEvent.h"
 #include "event/actor/player/PlayerDropItemEvent.h"
 #include "event/actor/player/PlayerEditSignEvent.h"
+#include "event/actor/player/PlayerUseFrameBlockEvent.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/Listener.h"
 #include "mod/Gloabl.h"
@@ -91,6 +94,59 @@ void registerEventTests() {
             event.self().getRealName(),
             event.item().getTypeName(),
             event.slot()
+        );
+    });
+
+    bus.emplaceListener<PlayerArmorStandSwapItemBeforeEvent>([](PlayerArmorStandSwapItemBeforeEvent& event) {
+        logger.info(
+            "PlayerArmorStandSwapItemBeforeEvent: player={}, slot={}",
+            event.self().getRealName(),
+            static_cast<int>(event.slot())
+        );
+    });
+
+    bus.emplaceListener<PlayerArmorStandSwapItemAfterEvent>([](PlayerArmorStandSwapItemAfterEvent& event) {
+        logger.info(
+            "PlayerArmorStandSwapItemAfterEvent: player={}, slot={}",
+            event.self().getRealName(),
+            static_cast<int>(event.slot())
+        );
+    });
+
+    bus.emplaceListener<PlayerCompleteUsingItemBeforeEvent>([](PlayerCompleteUsingItemBeforeEvent& event) {
+        logger.info(
+            "PlayerCompleteUsingItemBeforeEvent: player={}, item={}",
+            event.self().getRealName(),
+            event.item().getTypeName()
+        );
+        event.cancel();
+    });
+
+    bus.emplaceListener<PlayerCompleteUsingItemAfterEvent>([](PlayerCompleteUsingItemAfterEvent& event) {
+        logger.info(
+            "PlayerCompleteUsingItemAfterEvent: player={}, item={}",
+            event.self().getRealName(),
+            event.item().getTypeName()
+        );
+    });
+
+    bus.emplaceListener<PlayerUseFrameBlockBeforeEvent>([](PlayerUseFrameBlockBeforeEvent& event) {
+        logger.info(
+            "PlayerUseFrameBlockBeforeEvent: player={}, pos=({},{},{})",
+            event.self().getRealName(),
+            event.pos().x,
+            event.pos().y,
+            event.pos().z
+        );
+    });
+
+    bus.emplaceListener<PlayerUseFrameBlockAfterEvent>([](PlayerUseFrameBlockAfterEvent& event) {
+        logger.info(
+            "PlayerUseFrameBlockAfterEvent: player={}, pos=({},{},{})",
+            event.self().getRealName(),
+            event.pos().x,
+            event.pos().y,
+            event.pos().z
         );
     });
 }
