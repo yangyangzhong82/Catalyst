@@ -5,6 +5,9 @@
 #include "event/actor/player/PlayerDropItemEvent.h"
 #include "event/actor/player/PlayerEditSignEvent.h"
 #include "event/actor/player/PlayerUseFrameBlockEvent.h"
+#include "event/level/block/BlockPistonEvent.h"
+#include "event/level/block/MossGrowthEvent.h"
+#include "event/level/block/NetherPortalCreateEvent.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/Listener.h"
 #include "mod/Gloabl.h"
@@ -147,6 +150,77 @@ void registerEventTests() {
             event.pos().x,
             event.pos().y,
             event.pos().z
+        );
+    });
+
+    bus.emplaceListener<BlockPistonBeforeEvent>([](BlockPistonBeforeEvent& event) {
+        logger.info(
+            "BlockPistonBeforeEvent: pos=({},{},{}), action={}, direction={}",
+            event.pos().x,
+            event.pos().y,
+            event.pos().z,
+            event.action() == PistonAction::Extend ? "Extend" : "Retract",
+            event.direction()
+        );
+
+        if (event.pos().x == -10 && event.pos().z == 85) {
+            logger.warn("取消活塞动作 - 测试位置");
+            event.cancel();
+        }
+    });
+
+    bus.emplaceListener<BlockPistonAfterEvent>([](BlockPistonAfterEvent& event) {
+        logger.info(
+            "BlockPistonAfterEvent: pos=({},{},{}), action={}, direction={}",
+            event.pos().x,
+            event.pos().y,
+            event.pos().z,
+            event.action() == PistonAction::Extend ? "Extend" : "Retract",
+            event.direction()
+        );
+    });
+
+
+    bus.emplaceListener<NetherPortalCreateBeforeEvent>([](NetherPortalCreateBeforeEvent& event) {
+        logger.info(
+            "NetherPortalCreateBeforeEvent: pos=({},{},{}), radius={}",
+            event.pos().x,
+            event.pos().y,
+            event.pos().z,
+            event.radius()
+        );
+    });
+
+    bus.emplaceListener<NetherPortalCreateAfterEvent>([](NetherPortalCreateAfterEvent& event) {
+        logger.info(
+            "NetherPortalCreateAfterEvent: pos=({},{},{}), radius={}",
+            event.pos().x,
+            event.pos().y,
+            event.pos().z,
+            event.radius()
+        );
+    });
+
+    bus.emplaceListener<MossGrowthBeforeEvent>([](MossGrowthBeforeEvent& event) {
+        logger.info(
+            "MossGrowthBeforeEvent: origin=({},{},{}), xRadius={}, zRadius={}",
+            event.origin().x,
+            event.origin().y,
+            event.origin().z,
+            event.xRadius(),
+            event.zRadius()
+        );
+        event.cancel();
+    });
+
+    bus.emplaceListener<MossGrowthAfterEvent>([](MossGrowthAfterEvent& event) {
+        logger.info(
+            "MossGrowthAfterEvent: origin=({},{},{}), xRadius={}, zRadius={}",
+            event.origin().x,
+            event.origin().y,
+            event.origin().z,
+            event.xRadius(),
+            event.zRadius()
         );
     });
 }
