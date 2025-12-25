@@ -10,7 +10,7 @@
 
 namespace Catalyst {
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     SendMultiplePacketEventHook,
     ll::memory::HookPriority::Normal,
     NetworkSystem,
