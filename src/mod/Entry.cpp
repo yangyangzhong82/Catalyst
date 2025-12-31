@@ -54,6 +54,11 @@ bool Entry::disable() {
     return true;
 }
 
+bool Entry::unload() {
+    getSelf().getLogger().debug("Unloading...");
+    return true;
+}   
+
 } // namespace Catalyst
 
 LL_REGISTER_MOD(Catalyst::Entry, Catalyst::Entry::getInstance());

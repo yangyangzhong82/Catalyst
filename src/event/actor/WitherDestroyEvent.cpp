@@ -6,7 +6,7 @@
 
 namespace Catalyst {
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     WitherDestroyBlocksEventHook,
     ll::memory::HookPriority::Normal,
     WitherBoss,

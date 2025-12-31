@@ -8,7 +8,7 @@
 
 namespace Catalyst {
 
-LL_AUTO_STATIC_HOOK(
+LL_STATIC_HOOK(
     PlayerAttackBlockEventHook,
     HookPriority::Normal,
     &ServerPlayerBlockUseHandler::onStartDestroyBlock,

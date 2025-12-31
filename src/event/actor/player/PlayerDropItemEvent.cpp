@@ -42,7 +42,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 }
 */
 // Hook for inventory drag drop
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     PlayerDropItemEventHook2,
     HookPriority::Normal,
     ComplexInventoryTransaction,

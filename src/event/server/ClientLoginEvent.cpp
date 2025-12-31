@@ -7,7 +7,7 @@
 
 namespace Catalyst {
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     ClientLoginEventHook,
     ll::memory::HookPriority::Normal,
     ServerNetworkHandler,

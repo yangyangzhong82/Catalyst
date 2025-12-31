@@ -8,7 +8,7 @@
 
 namespace Catalyst {
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     PlayerCompleteUsingItemEventHook,
     HookPriority::Normal,
     Player,
