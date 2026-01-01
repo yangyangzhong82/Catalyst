@@ -34,7 +34,7 @@ class CATALYST_API ClientLoginAfterEvent final : public ll::event::Event {
     std::string                  mIp;
     std::string                  mServerAuthXuid;
     std::string                  mClientAuthXuid;
-    std::string                  mUuid;
+    ::mce::UUID                 mUuid;
     std::string                  mDeviceId;
 
 public:
@@ -45,7 +45,7 @@ public:
         std::string                  ip,
         std::string                  serverAuthXuid,
         std::string                  clientAuthXuid,
-        std::string                  uuid,
+        ::mce::UUID                  uuid,
         std::string                  deviceId
     )
     : Event(),
@@ -64,7 +64,7 @@ public:
     std::string const&           ip() const { return mIp; }
     std::string const&           serverAuthXuid() const { return mServerAuthXuid; }
     std::string const&           clientAuthXuid() const { return mClientAuthXuid; }
-    std::string const&           uuid() const { return mUuid; }
+    ::mce::UUID const&           uuid() const { return mUuid; }
     std::string const&           deviceId() const { return mDeviceId; }
 
     void disconnect(std::string const& message) const {

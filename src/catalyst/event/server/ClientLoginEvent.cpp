@@ -35,7 +35,7 @@ LL_TYPE_INSTANCE_HOOK(
             source.getIPAndPort(),
             connReq->mLegacyMultiplayerToken->getXuid(false),
             connReq->mLegacyMultiplayerToken->getXuid(true),
-            connReq->mLegacyMultiplayerToken->getIdentity().asString(),
+            connReq->mLegacyMultiplayerToken->getIdentity(),
             connReq->getDeviceId()
         );
         bus.publish(afterEvent);
