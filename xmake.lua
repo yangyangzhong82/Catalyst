@@ -33,7 +33,7 @@ target("Catalyst")
     set_kind("shared")
     set_languages("c++20")
     set_symbols("debug")
-    add_headerfiles("src/**.h")
+    add_headerfiles("src/(catalyst/**.h)")
     add_files("src/**.cpp")
     add_includedirs("src")
     
