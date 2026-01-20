@@ -1,0 +1,40 @@
+#pragma once
+
+#include "ll/api/event/Cancellable.h"
+#include "ll/api/event/entity/MobEvent.h"
+#include "mc/world/level/BlockPos.h"
+#include "mc/world/level/block/Block.h"
+
+#include "catalyst/Macros.h"
+
+namespace Catalyst {
+
+class CATALYST_API MobPlaceBlockBeforeEvent final : public ll::event::Cancellable<ll::event::entity::MobEvent> {
+    BlockPos     mPos;
+    Block const& mBlock;
+
+public:
+    MobPlaceBlockBeforeEvent(Mob& mob, BlockPos const& pos, Block const& block)
+    : Cancellable(mob),
+      mPos(pos),
+      mBlock(block) {}
+
+    BlockPos const& pos() const { return mPos; }
+    Block const&    block() const { return mBlock; }
+};
+
+class CATALYST_API MobPlaceBlockAfterEvent final : public ll::event::entity::MobEvent {
+    BlockPos     mPos;
+    Block const& mBlock;
+
+public:
+    MobPlaceBlockAfterEvent(Mob& mob, BlockPos const& pos, Block const& block)
+    : MobEvent(mob),
+      mPos(pos),
+      mBlock(block) {}
+
+    BlockPos const& pos() const { return mPos; }
+    Block const&    block() const { return mBlock; }
+};
+
+} // namespace Catalyst

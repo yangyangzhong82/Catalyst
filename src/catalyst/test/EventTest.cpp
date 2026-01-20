@@ -1,3 +1,4 @@
+#include "catalyst/event/actor/MobPlaceBlockEvent.h"
 #include "catalyst/event/actor/player/PlayerArmorStandSwapItemEvent.h"
 #include "catalyst/event/actor/player/PlayerAttackBlockEvent.h"
 #include "catalyst/event/actor/player/PlayerChangeDimensionEvent.h"
@@ -6,12 +7,12 @@
 #include "catalyst/event/actor/player/PlayerEditSignEvent.h"
 #include "catalyst/event/actor/player/PlayerUseFrameBlockEvent.h"
 
-#include "catalyst/mod/Gloabl.h"
 #include "catalyst/event/server/ReceivePacketEvent.h"
 #include "catalyst/event/world/block/BlockPistonEvent.h"
 #include "catalyst/event/world/block/MossGrowthEvent.h"
 #include "catalyst/event/world/block/NetherPortalCreateEvent.h"
 #include "catalyst/event/world/block/RedstoneUpdateEvent.h"
+#include "catalyst/mod/Gloabl.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/Listener.h"
 #include "mc/network/MinecraftPacketIds.h"
@@ -229,6 +230,35 @@ void registerEventTests() {
             event.origin().z,
             event.xRadius(),
             event.zRadius()
+        );
+    });
+
+    bus.emplaceListener<MobPlaceBlockBeforeEvent>([](MobPlaceBlockBeforeEvent& event) {
+        auto& pos = event.pos();
+        logger.info(
+            "MobPlaceBlockBeforeEvent: mob={}, pos=({},{},{}), block={}",
+            event.self().getTypeName(),
+            pos.x,
+            pos.y,
+            pos.z,
+            event.block().getTypeName()
+        );
+
+        // 在 (0,0,0) 到 (50,80,50) 范围内拦截
+        if (pos.x >= 0 && pos.x <= 50 && pos.y >= -64 && pos.y <= 80 && pos.z >= 0 && pos.z <= 50) {
+            logger.warn("拦截生物放置方块 - 测试保护区域");
+            event.cancel();
+        }
+    });
+
+    bus.emplaceListener<MobPlaceBlockAfterEvent>([](MobPlaceBlockAfterEvent& event) {
+        logger.info(
+            "MobPlaceBlockAfterEvent: mob={}, pos=({},{},{}), block={}",
+            event.self().getTypeName(),
+            event.pos().x,
+            event.pos().y,
+            event.pos().z,
+            event.block().getTypeName()
         );
     });
 }
