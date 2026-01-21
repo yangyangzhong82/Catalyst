@@ -1,0 +1,66 @@
+#pragma once
+
+#include "ll/api/event/Cancellable.h"
+#include "ll/api/event/player/PlayerEvent.h"
+#include "mc/deps/shared_types/legacy/ContainerType.h"
+#include "mc/legacy/ActorUniqueID.h"
+#include "mc/network/NetworkBlockPosition.h"
+#include "mc/world/ContainerID.h"
+
+#include "catalyst/Macros.h"
+
+namespace Catalyst {
+
+class CATALYST_API PlayerOpenContainerBeforeEvent final : public ll::event::Cancellable<ll::event::PlayerEvent> {
+    ContainerID                        mContainerId;
+    SharedTypes::Legacy::ContainerType mType;
+    NetworkBlockPosition               mPos;
+    ActorUniqueID                      mEntityUniqueID;
+
+public:
+    constexpr PlayerOpenContainerBeforeEvent(
+        Player&                            player,
+        ContainerID                        containerId,
+        SharedTypes::Legacy::ContainerType type,
+        NetworkBlockPosition const&        pos,
+        ActorUniqueID                      entityUniqueID
+    )
+    : Cancellable(player),
+      mContainerId(containerId),
+      mType(type),
+      mPos(pos),
+      mEntityUniqueID(entityUniqueID) {}
+
+    ContainerID                        containerId() const { return mContainerId; }
+    SharedTypes::Legacy::ContainerType type() const { return mType; }
+    NetworkBlockPosition const&        pos() const { return mPos; }
+    ActorUniqueID                      entityUniqueID() const { return mEntityUniqueID; }
+};
+
+class CATALYST_API PlayerOpenContainerAfterEvent final : public ll::event::PlayerEvent {
+    ContainerID                        mContainerId;
+    SharedTypes::Legacy::ContainerType mType;
+    NetworkBlockPosition               mPos;
+    ActorUniqueID                      mEntityUniqueID;
+
+public:
+    constexpr PlayerOpenContainerAfterEvent(
+        Player&                            player,
+        ContainerID                        containerId,
+        SharedTypes::Legacy::ContainerType type,
+        NetworkBlockPosition const&        pos,
+        ActorUniqueID                      entityUniqueID
+    )
+    : PlayerEvent(player),
+      mContainerId(containerId),
+      mType(type),
+      mPos(pos),
+      mEntityUniqueID(entityUniqueID) {}
+
+    ContainerID                        containerId() const { return mContainerId; }
+    SharedTypes::Legacy::ContainerType type() const { return mType; }
+    NetworkBlockPosition const&        pos() const { return mPos; }
+    ActorUniqueID                      entityUniqueID() const { return mEntityUniqueID; }
+};
+
+} // namespace Catalyst

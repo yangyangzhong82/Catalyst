@@ -1,5 +1,6 @@
 #include "SendPacketEvent.h"
 
+#include "catalyst/mod/Gloabl.h"
 #include "ll/api/event/Emitter.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
@@ -7,6 +8,7 @@
 #include "mc/network/NetworkSystem.h"
 #include "mc/network/ServerNetworkHandler.h"
 #include "mc/server/ServerPlayer.h"
+
 
 namespace Catalyst {
 
@@ -29,16 +31,27 @@ LL_TYPE_INSTANCE_HOOK(
     if (beforeEvent.isCancelled()) {
         return;
     }
-
+    logger.debug("发送数据包: packetId={}, recipientSubId={}", packet.getId(), static_cast<int>(recipientSubId));
     origin(id, packet, recipientSubId);
+
+    SendPacketAfterEvent afterEvent(id, packet, recipientSubId, player);
+    bus.publish(afterEvent);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> emitterFactory();
-class SendPacketBeforeEventEmitter : public ll::event::Emitter<emitterFactory, SendPacketBeforeEvent> {
+static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
+class SendPacketBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, SendPacketBeforeEvent> {
     ll::memory::HookRegistrar<SendPacketEventHook> hook;
 };
-static std::unique_ptr<ll::event::EmitterBase> emitterFactory() {
+static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
     return std::make_unique<SendPacketBeforeEventEmitter>();
+}
+
+static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
+class SendPacketAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, SendPacketAfterEvent> {
+    ll::memory::HookRegistrar<SendPacketEventHook> hook;
+};
+static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
+    return std::make_unique<SendPacketAfterEventEmitter>();
 }
 
 } // namespace Catalyst

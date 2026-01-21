@@ -35,4 +35,28 @@ public:
     Player*                  player() const { return mPlayer; }
 };
 
+class CATALYST_API SendPacketAfterEvent final : public ll::event::Event {
+    NetworkIdentifier const& mNetworkId;
+    Packet const&            mPacket;
+    SubClientId              mSubClientId;
+    Player*                  mPlayer;
+
+public:
+    constexpr SendPacketAfterEvent(
+        NetworkIdentifier const& networkId,
+        Packet const&            packet,
+        SubClientId              subClientId,
+        Player*                  player
+    )
+    : mNetworkId(networkId),
+      mPacket(packet),
+      mSubClientId(subClientId),
+      mPlayer(player) {}
+
+    NetworkIdentifier const& networkId() const { return mNetworkId; }
+    Packet const&            packet() const { return mPacket; }
+    SubClientId              subClientId() const { return mSubClientId; }
+    Player*                  player() const { return mPlayer; }
+};
+
 } // namespace Catalyst
