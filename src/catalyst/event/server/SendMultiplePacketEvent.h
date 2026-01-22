@@ -2,12 +2,12 @@
 
 #include "ll/api/event/Cancellable.h"
 #include "ll/api/event/Event.h"
-#include "mc/network/NetworkIdentifierWithSubId.h"
-#include "mc/network/Packet.h"
-#include "mc/server/ServerPlayer.h"
-
+#include <vector>
 #include "catalyst/Macros.h"
 
+struct NetworkIdentifierWithSubId;
+class ServerPlayer;
+class Packet;
 namespace Catalyst {
 
 class CATALYST_API SendMultiplePacketBeforeEvent final : public ll::event::Cancellable<ll::event::Event> {

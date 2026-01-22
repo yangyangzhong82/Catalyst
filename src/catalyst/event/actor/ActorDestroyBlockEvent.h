@@ -2,10 +2,11 @@
 
 #include "ll/api/event/Cancellable.h"
 #include "ll/api/event/entity/ActorEvent.h"
-#include "mc/deps/core/math/Vec3.h"
-#include "mc/world/level/block/Block.h"
 
 #include "catalyst/Macros.h"
+
+class Vec3;
+class Block;
 
 namespace Catalyst {
 

@@ -2,12 +2,11 @@
 
 #include "ll/api/event/Cancellable.h"
 #include "ll/api/event/world/WorldEvent.h"
-#include "mc/deps/core/math/Vec3.h"
-#include "mc/world/actor/Actor.h"
-#include "mc/world/actor/ActorDefinitionIdentifier.h"
 
 #include "catalyst/Macros.h"
-
+class Actor;
+class Vec3;
+struct ActorDefinitionIdentifier;
 namespace Catalyst {
 
 class CATALYST_API ProjectileSpawnBeforeEvent final : public ll::event::Cancellable<ll::event::world::WorldEvent> {

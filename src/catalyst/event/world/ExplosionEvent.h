@@ -2,11 +2,11 @@
 
 #include "ll/api/event/Cancellable.h"
 #include "ll/api/event/world/WorldEvent.h"
-#include "mc/deps/core/math/Vec3.h"
+
 #include "mc/world/level/Explosion.h"
 
 #include "catalyst/Macros.h"
-
+class Vec3;
 namespace Catalyst {
 
 class CATALYST_API ExplosionBeforeEvent final : public ll::event::Cancellable<ll::event::world::WorldEvent> {

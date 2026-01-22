@@ -3,14 +3,13 @@
 #include "ll/api/event/Cancellable.h"
 #include "ll/api/event/Event.h"
 #include "ll/api/service/Bedrock.h"
-#include "mc/network/ConnectionRequest.h"
-#include "mc/network/NetworkIdentifier.h"
 #include "mc/network/ServerNetworkHandler.h"
 #include "mc/network/connection/DisconnectFailReason.h"
 #include "mc/network/packet/LoginPacket.h"
 
-#include "catalyst/Macros.h"
 
+#include "catalyst/Macros.h"
+class NetworkIdentifier;
 namespace Catalyst {
 
 class CATALYST_API ClientLoginBeforeEvent final : public ll::event::Cancellable<ll::event::Event> {

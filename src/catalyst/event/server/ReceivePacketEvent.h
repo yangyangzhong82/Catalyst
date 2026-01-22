@@ -2,9 +2,11 @@
 
 #include "ll/api/event/Cancellable.h"
 #include "ll/api/event/Event.h"
-#include "mc/network/NetworkIdentifier.h"
-#include "mc/network/Packet.h"
-#include "mc/world/actor/player/Player.h"
+#include "mc/common/SubClientId.h"
+
+class Player;
+class Packet;
+class NetworkIdentifier;
 
 #include "catalyst/Macros.h"
 

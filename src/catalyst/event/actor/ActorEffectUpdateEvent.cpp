@@ -4,7 +4,7 @@
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/Actor.h"
-
+#include "mc/world/effect/MobEffectInstance.h"
 namespace Catalyst {
 
 LL_TYPE_INSTANCE_HOOK(

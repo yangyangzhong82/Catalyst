@@ -2,10 +2,12 @@
 
 #include "ll/api/event/Cancellable.h"
 #include "ll/api/event/entity/ActorEvent.h"
-#include "mc/entity/components_json_legacy/ProjectileComponent.h"
-#include "mc/world/phys/HitResult.h"
+
 
 #include "catalyst/Macros.h"
+
+class HitResult;
+class ProjectileComponent;
 
 namespace Catalyst {
 

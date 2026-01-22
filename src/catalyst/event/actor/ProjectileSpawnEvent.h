@@ -2,10 +2,10 @@
 
 #include "ll/api/event/Cancellable.h"
 #include "ll/api/event/entity/ActorEvent.h"
-#include "mc/deps/core/math/Vec3.h"
-#include "mc/world/actor/ActorDefinitionIdentifier.h"
-#include "mc/world/level/BlockSource.h"
 
+class Vec3;
+struct ActorDefinitionIdentifier;
+class BlockSource;
 #include "catalyst/Macros.h"
 
 namespace Catalyst {

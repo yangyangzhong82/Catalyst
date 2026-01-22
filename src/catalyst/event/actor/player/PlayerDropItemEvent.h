@@ -2,9 +2,12 @@
 
 #include "ll/api/event/Cancellable.h"
 #include "ll/api/event/player/PlayerEvent.h"
-#include "mc/world/item/ItemStack.h"
+
 
 #include "catalyst/Macros.h"
+
+class ItemStack;
+
 
 namespace Catalyst {
 

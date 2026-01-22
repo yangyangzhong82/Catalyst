@@ -2,11 +2,12 @@
 
 #include "ll/api/event/Cancellable.h"
 #include "ll/api/event/world/WorldEvent.h"
-#include "mc/deps/core/math/Vec3.h"
-#include "mc/world/actor/Actor.h"
-#include "mc/world/actor/item/ItemActor.h"
-#include "mc/world/item/ItemStack.h"
 
+
+class Actor;
+class Vec3;
+class ItemStack;
+class ItemActor;
 
 #include "catalyst/Macros.h"
 

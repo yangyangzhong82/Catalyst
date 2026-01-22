@@ -7,7 +7,7 @@
 #include "mc/network/NetworkSystem.h"
 #include "mc/network/ServerNetworkHandler.h"
 #include "mc/server/ServerPlayer.h"
-
+#include "mc/network/NetworkIdentifierWithSubId.h"
 namespace Catalyst {
 
 LL_TYPE_INSTANCE_HOOK(

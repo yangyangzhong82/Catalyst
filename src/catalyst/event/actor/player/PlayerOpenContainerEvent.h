@@ -1,17 +1,17 @@
 #pragma once
 
 #include "ll/api/event/Cancellable.h"
-#include "ll/api/event/player/PlayerEvent.h"
+#include "ll/api/event/player/ServerPlayerEvent.h"
 #include "mc/deps/shared_types/legacy/ContainerType.h"
 #include "mc/legacy/ActorUniqueID.h"
 #include "mc/network/NetworkBlockPosition.h"
 #include "mc/world/ContainerID.h"
 
 #include "catalyst/Macros.h"
-
+class ServerPlayer;
 namespace Catalyst {
 
-class CATALYST_API PlayerOpenContainerBeforeEvent final : public ll::event::Cancellable<ll::event::PlayerEvent> {
+class CATALYST_API PlayerOpenContainerBeforeEvent final : public ll::event::Cancellable<ll::event::ServerPlayerEvent> {
     ContainerID                        mContainerId;
     SharedTypes::Legacy::ContainerType mType;
     NetworkBlockPosition               mPos;
@@ -19,7 +19,7 @@ class CATALYST_API PlayerOpenContainerBeforeEvent final : public ll::event::Canc
 
 public:
     constexpr PlayerOpenContainerBeforeEvent(
-        Player&                            player,
+        ServerPlayer&                            player,
         ContainerID                        containerId,
         SharedTypes::Legacy::ContainerType type,
         NetworkBlockPosition const&        pos,
@@ -45,7 +45,7 @@ class CATALYST_API PlayerOpenContainerAfterEvent final : public ll::event::Playe
 
 public:
     constexpr PlayerOpenContainerAfterEvent(
-        Player&                            player,
+        ServerPlayer&                            player,
         ContainerID                        containerId,
         SharedTypes::Legacy::ContainerType type,
         NetworkBlockPosition const&        pos,

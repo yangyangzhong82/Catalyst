@@ -3,6 +3,9 @@
 #include "ll/api/event/Emitter.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
+#include "mc/world/level/BlockPos.h"
+#include "mc/world/level/BlockSource.h"
+#include "mc/world/level/block/BasePressurePlateBlock.h"
 
 namespace Catalyst {
 

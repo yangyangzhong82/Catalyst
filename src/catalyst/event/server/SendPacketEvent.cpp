@@ -31,7 +31,6 @@ LL_TYPE_INSTANCE_HOOK(
     if (beforeEvent.isCancelled()) {
         return;
     }
-    logger.debug("发送数据包: packetId={}, recipientSubId={}", packet.getId(), static_cast<int>(recipientSubId));
     origin(id, packet, recipientSubId);
 
     SendPacketAfterEvent afterEvent(id, packet, recipientSubId, player);

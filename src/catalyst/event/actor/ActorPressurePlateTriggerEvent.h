@@ -2,12 +2,12 @@
 
 #include "ll/api/event/Cancellable.h"
 #include "ll/api/event/entity/ActorEvent.h"
-#include "mc/world/level/BlockPos.h"
-#include "mc/world/level/BlockSource.h"
-#include "mc/world/level/block/BasePressurePlateBlock.h"
 
 #include "catalyst/Macros.h"
 
+class BasePressurePlateBlock;
+class BlockSource;
+class BlockPos;
 namespace Catalyst {
 
 class CATALYST_API ActorPressurePlateTriggerBeforeEvent final

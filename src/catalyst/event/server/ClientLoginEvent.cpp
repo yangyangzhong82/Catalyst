@@ -4,7 +4,12 @@
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/certificates/identity/LegacyMultiplayerToken.h"
+#include "mc/network/ConnectionRequest.h"
+#include "ll/api/service/Bedrock.h"
+#include "mc/network/NetworkIdentifier.h"
+#include "mc/network/ServerNetworkHandler.h"
 
+#include "mc/network/packet/LoginPacket.h"
 namespace Catalyst {
 
 LL_TYPE_INSTANCE_HOOK(

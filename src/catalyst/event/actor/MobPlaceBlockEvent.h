@@ -2,10 +2,14 @@
 
 #include "ll/api/event/Cancellable.h"
 #include "ll/api/event/entity/MobEvent.h"
-#include "mc/world/level/BlockPos.h"
-#include "mc/world/level/block/Block.h"
+
+
 
 #include "catalyst/Macros.h"
+
+class Block;
+class BlockPos;
+
 
 namespace Catalyst {
 

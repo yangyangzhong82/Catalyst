@@ -2,10 +2,11 @@
 
 #include "ll/api/event/Cancellable.h"
 #include "ll/api/event/entity/ActorEvent.h"
-#include "mc/world/effect/MobEffectInstance.h"
+
 
 #include "catalyst/Macros.h"
 
+class MobEffectInstance;
 namespace Catalyst {
 
 class CATALYST_API ActorEffectAddBeforeEvent final : public ll::event::Cancellable<ll::event::entity::ActorEvent> {
