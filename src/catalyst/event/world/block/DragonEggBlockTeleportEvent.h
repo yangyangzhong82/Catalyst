@@ -2,10 +2,10 @@
 
 #include "ll/api/event/Cancellable.h"
 #include "ll/api/event/world/WorldEvent.h"
-#include "mc/world/level/BlockPos.h"
+
 
 #include "catalyst/Macros.h"
-
+class BlockPos;
 namespace Catalyst {
 
 class CATALYST_API DragonEggBlockTeleportBeforeEvent final

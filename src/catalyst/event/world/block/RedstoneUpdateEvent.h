@@ -3,9 +3,10 @@
 #include "ll/api/event/Cancellable.h"
 #include "ll/api/event/world/WorldEvent.h"
 #include "mc/world/level/BlockPos.h"
-#include "mc/world/redstone/circuit/components/BaseCircuitComponent.h"
+
 
 #include "catalyst/Macros.h"
+class BaseCircuitComponent;
 
 namespace Catalyst {
 

@@ -1,11 +1,14 @@
 #include "catalyst/event/actor/MobPlaceBlockEvent.h"
+#include "catalyst/event/actor/MobTakeBlockEvent.h"
 #include "catalyst/event/actor/player/PlayerArmorStandSwapItemEvent.h"
 #include "catalyst/event/actor/player/PlayerAttackBlockEvent.h"
 #include "catalyst/event/actor/player/PlayerChangeDimensionEvent.h"
 #include "catalyst/event/actor/player/PlayerCompleteUsingItemEvent.h"
 #include "catalyst/event/actor/player/PlayerDropItemEvent.h"
 #include "catalyst/event/actor/player/PlayerEditSignEvent.h"
+#include "catalyst/event/actor/player/PlayerOpenContainerEvent.h"
 #include "catalyst/event/actor/player/PlayerUseFrameBlockEvent.h"
+
 
 #include "catalyst/event/server/ReceivePacketEvent.h"
 #include "catalyst/event/world/block/BlockPistonEvent.h"
@@ -19,7 +22,7 @@
 #include "mc/network/NetworkIdentifier.h"
 #include "mc/network/Packet.h"
 #include "mc/server/ServerPlayer.h"
-
+#include "mc/world/level/Block/Block.h"
 
 namespace Catalyst::Test {
 
@@ -254,6 +257,35 @@ void registerEventTests() {
     bus.emplaceListener<MobPlaceBlockAfterEvent>([](MobPlaceBlockAfterEvent& event) {
         logger.info(
             "MobPlaceBlockAfterEvent: mob={}, pos=({},{},{}), block={}",
+            event.self().getTypeName(),
+            event.pos().x,
+            event.pos().y,
+            event.pos().z,
+            event.block().getTypeName()
+        );
+    });
+
+    bus.emplaceListener<MobTakeBlockBeforeEvent>([](MobTakeBlockBeforeEvent& event) {
+        auto& pos = event.pos();
+        logger.info(
+            "MobTakeBlockBeforeEvent: mob={}, pos=({},{},{}), block={}",
+            event.self().getTypeName(),
+            pos.x,
+            pos.y,
+            pos.z,
+            event.block().getTypeName()
+        );
+
+        // 在 (100,0,100) 到 (150,80,150) 范围内拦截
+        if (pos.x >= 100 && pos.x <= 150 && pos.y >= -64 && pos.y <= 80 && pos.z >= 100 && pos.z <= 150) {
+            logger.warn("拦截生物拾取方块 - 测试保护区域");
+            event.cancel();
+        }
+    });
+
+    bus.emplaceListener<MobTakeBlockAfterEvent>([](MobTakeBlockAfterEvent& event) {
+        logger.info(
+            "MobTakeBlockAfterEvent: mob={}, pos=({},{},{}), block={}",
             event.self().getTypeName(),
             event.pos().x,
             event.pos().y,

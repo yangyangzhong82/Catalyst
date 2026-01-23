@@ -7,7 +7,7 @@
 #include "mc/world/redstone/circuit/ChunkCircuitComponentList.h"
 #include "mc/world/redstone/circuit/CircuitSceneGraph.h"
 #include "mc/world/redstone/circuit/CircuitSystem.h"
-
+#include "mc/world/redstone/circuit/components/BaseCircuitComponent.h"
 namespace Catalyst {
 
 LL_AUTO_TYPE_INSTANCE_HOOK(

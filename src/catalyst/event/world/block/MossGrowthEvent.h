@@ -2,10 +2,11 @@
 
 #include "ll/api/event/Cancellable.h"
 #include "ll/api/event/world/WorldEvent.h"
-#include "mc/world/level/BlockPos.h"
+
 
 #include "catalyst/Macros.h"
 // 很奇怪，这个事件刚开始加载时也会被调用
+class BlockPos;
 
 namespace Catalyst {
 
