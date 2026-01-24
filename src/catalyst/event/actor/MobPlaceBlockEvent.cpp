@@ -18,7 +18,7 @@
 namespace Catalyst {
 
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     MobPlaceBlockEventHook,
     ll::memory::HookPriority::Normal,
     PlaceBlockGoal,
