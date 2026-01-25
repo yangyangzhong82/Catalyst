@@ -11,6 +11,7 @@
 
 
 #include "catalyst/event/server/ReceivePacketEvent.h"
+#include "catalyst/event/world/block/BlockFallEvent.h"
 #include "catalyst/event/world/block/BlockPistonEvent.h"
 #include "catalyst/event/world/block/MossGrowthEvent.h"
 #include "catalyst/event/world/block/NetherPortalCreateEvent.h"
@@ -291,6 +292,41 @@ void registerEventTests() {
             event.pos().y,
             event.pos().z,
             event.block().getTypeName()
+        );
+    });
+
+    bus.emplaceListener<BlockFallBeforeEvent>([](BlockFallBeforeEvent& event) {
+        auto& pos = event.pos();
+        logger.info(
+            "BlockFallBeforeEvent: pos=({},{},{}), block={}, creative={}",
+            pos.x,
+            pos.y,
+            pos.z,
+            event.block().getTypeName(),
+            event.isCreative()
+        );
+
+        // 在 y >= 100 的高度拦截方块坠落（测试悬浮方块）
+        if (pos.y >= 100) {
+            logger.warn("拦截方块坠落 - 测试高度保护（y >= 100）");
+            event.cancel();
+        }
+
+        // 在特定区域拦截（例如：x: -50~-40, z: -50~-40）
+        if (pos.x >= -50 && pos.x <= -40 && pos.z >= -50 && pos.z <= -40) {
+            logger.warn("拦截方块坠落 - 测试区域保护");
+            event.cancel();
+        }
+    });
+
+    bus.emplaceListener<BlockFallAfterEvent>([](BlockFallAfterEvent& event) {
+        logger.info(
+            "BlockFallAfterEvent: pos=({},{},{}), block={}, creative={}",
+            event.pos().x,
+            event.pos().y,
+            event.pos().z,
+            event.block().getTypeName(),
+            event.isCreative()
         );
     });
 }
