@@ -2,10 +2,16 @@ on:
   release:
     types:
       - published
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
+    strategy:
+      matrix:
+        target_type:
+          - server
+          - client
     steps:
       - uses: actions/checkout@v4
 
@@ -23,20 +29,25 @@ jobs:
           xmake repo -u
 
       - run: |
-          xmake f -a x64 -m release -p windows -y
+          xmake f -a x64 -m release -p windows --target_type=${{ matrix.target_type }} -y
 
       - run: |
           xmake -w -y
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.event.repository.name }}-windows-x64-${{ github.sha }}
+          name: ${{ github.event.repository.name }}-${{ github.sha }}-${{ matrix.target_type }}-windows-x64
           path: |
             bin/
 
   update-release-notes:
     permissions:
       contents: write
+    strategy:
+      matrix:
+        target_type:
+          - server
+          - client
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -55,26 +66,31 @@ jobs:
       - update-release-notes
     permissions:
       contents: write
+    strategy:
+      matrix:
+        target_type:
+          - server
+          - client
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/download-artifact@v4
         with:
-          name: ${{ github.event.repository.name }}-windows-x64-${{ github.sha }}
+          name: ${{ github.event.repository.name }}-${{ github.sha }}-${{ matrix.target_type }}-windows-x64
           path: artifact
 
       - run: |
           cp CHANGELOG.md LICENSE README.md artifact/
 
       - run: |
-          zip -r ../${{ github.event.repository.name }}-windows-x64.zip *
+          zip -r ../${{ github.event.repository.name }}-${{ matrix.target_type }}-windows-x64.zip *
         working-directory: artifact
 
       - name: Calculate SHA256
         id: calculate-sha256
         run: |
-          echo release=$(sha256sum ${{ github.event.repository.name }}-windows-x64.zip | awk '{print $1}') >> $GITHUB_OUTPUT
+          echo release=$(sha256sum ${{ github.event.repository.name }}-${{ matrix.target_type }}-windows-x64.zip | awk '{print $1}') >> $GITHUB_OUTPUT
 
       - uses: softprops/action-gh-release@v1
         with:
@@ -82,6 +98,6 @@ jobs:
           body: |
             | File | SHA256 |
             | ---- | ------ |
-            | ${{ github.event.repository.name }}-windows-x64.zip | ${{ steps.calculate-sha256.outputs.release }} |
+            | ${{ github.event.repository.name }}-${{ matrix.target_type }}-windows-x64.zip | ${{ steps.calculate-sha256.outputs.release }} |
           files: |
-            ${{ github.event.repository.name }}-windows-x64.zip
+            ${{ github.event.repository.name }}-${{ matrix.target_type }}-windows-x64.zip
