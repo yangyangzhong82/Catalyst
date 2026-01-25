@@ -2,7 +2,7 @@
 
 #include "ll/api/event/Cancellable.h"
 #include "ll/api/event/player/PlayerEvent.h"
-#include "mc/deps/shared_types/legacy/item/EquipmentSlot.h"
+#include "mc/deps/shared_types/legacy/EquipmentSlot.h"
 
 #include "catalyst/Macros.h"
 

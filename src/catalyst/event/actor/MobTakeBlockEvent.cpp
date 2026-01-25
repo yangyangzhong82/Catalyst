@@ -26,7 +26,7 @@
 #include "mc/world/level/block/BlockChangeContext.h"
 #include "mc/world/level/block/BlockDescriptor.h"
 #include "mc/world/level/dimension/Dimension.h"
-
+BlockChangeContext::BlockChangeContext() : mContextSource(std::monostate{}) {}
 namespace Catalyst {
 
 
@@ -110,8 +110,8 @@ LL_TYPE_INSTANCE_HOOK(TakeBlockGoalTickHook, HookPriority::Normal, TakeBlockGoal
     mMob.add(item);
 
     // 移除方块
-    ActorChangeContext actorContext{&mMob};
-    BlockChangeContext changeContext{actorContext};
+    BlockChangeContext changeContext;
+    changeContext.mContextSource = ActorChangeContext{&mMob};
     blockSource.removeBlock(targetPos, changeContext);
 
     // 发送游戏事件

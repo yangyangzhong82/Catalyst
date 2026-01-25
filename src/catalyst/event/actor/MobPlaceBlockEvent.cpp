@@ -14,7 +14,7 @@
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/block/Block.h"
-
+/*
 namespace Catalyst {
 
 
@@ -143,3 +143,4 @@ static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
 }
 
 } // namespace Catalyst
+*/

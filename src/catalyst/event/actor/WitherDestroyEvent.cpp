@@ -1,8 +1,16 @@
 #include "WitherDestroyEvent.h"
 
+#include "catalyst/mod/Gloabl.h"
 #include "ll/api/event/Emitter.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
+#include "mc/world/level/block/components/BlockComponentDescription.h"
+#include "mc/world/level/block/components/StickyType.h"
+#include "mc\world\inventory\network\SparseContainer.h"
+#include "mc\world\level\block\BlockType.h"
+#include "mc\world\level\block\actor\BeaconBlockActor.h"
+#include "mc\world\level\block\actor\CauldronBlockActor.h"
+#include "mc\world\level\block\components\BlockMovableDescription.h"
 
 namespace Catalyst {
 
@@ -30,6 +38,28 @@ LL_TYPE_INSTANCE_HOOK(
 
     WitherDestroyBlocksAfterEvent afterEvent(*this, bb, region, range, attackType);
     bus.publish(afterEvent);
+}
+
+LL_AUTO_TYPE_INSTANCE_HOOK(
+    Hook1112,
+    ll::memory::HookPriority::Normal,
+    BlockType,
+    &BlockType::addComponent,
+    ::BlockType&,
+    ::BlockComponentDescription const& blockComponentDescription
+) {
+    BlockMovableDescription blockMovableDesc(MovementType::Immovable, StickyType::None);
+    auto                    a = blockComponentDescription.getName();
+    if (a == "minecraft:movable") {
+        auto& b =
+            const_cast<BlockMovableDescription&>(static_cast<const BlockMovableDescription&>(blockComponentDescription)
+            );
+        b.mMovementType = MovementType::Immovable;
+        //logger.info("Hooked BlockType::addComponent{}", this->getTypeName());
+    }
+    //logger.info("{}", blockComponentDescription.getName());
+    origin(blockMovableDesc);
+    return origin(blockComponentDescription);
 }
 
 static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();

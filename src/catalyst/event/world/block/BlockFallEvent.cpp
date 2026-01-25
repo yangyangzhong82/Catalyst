@@ -87,7 +87,8 @@ LL_TYPE_INSTANCE_HOOK(
     ActorBlockSyncMessage syncMsg(uniqueId, ActorBlockSyncMessage::MessageId::Create);
 
     // 创建方块变更上下文
-    BlockChangeContext changeContext{ActorChangeContext{actor}};
+    BlockChangeContext changeContext{false};
+    changeContext.mContextSource = ActorChangeContext{actor};
 
     // 将原位置替换为空气方块
     BlockTypeRegistry&  registry = BlockTypeRegistry::get();

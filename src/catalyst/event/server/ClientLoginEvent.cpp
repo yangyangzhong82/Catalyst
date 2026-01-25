@@ -3,13 +3,16 @@
 #include "ll/api/event/Emitter.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
-#include "mc/certificates/identity/LegacyMultiplayerToken.h"
 #include "mc/network/ConnectionRequest.h"
-#include "ll/api/service/Bedrock.h"
 #include "mc/network/NetworkIdentifier.h"
 #include "mc/network/ServerNetworkHandler.h"
+#include "mc/network/ServerConnectionAuthValidator.h"
+#include "mc/certificates/identity/PlayerAuthenticationInfo.h"
 
 #include "mc/network/packet/LoginPacket.h"
+
+#include <variant>
+/*  
 namespace Catalyst {
 
 LL_TYPE_INSTANCE_HOOK(
@@ -33,17 +36,21 @@ LL_TYPE_INSTANCE_HOOK(
 
     auto* connReq = packet->mConnectionRequest.get();
     if (connReq) {
-        ClientLoginAfterEvent afterEvent(
-            source,
-            packet,
-            connReq->mLegacyMultiplayerToken->getIdentityName(),
-            source.getIPAndPort(),
-            connReq->mLegacyMultiplayerToken->getXuid(false),
-            connReq->mLegacyMultiplayerToken->getXuid(true),
-            connReq->mLegacyMultiplayerToken->getIdentity(),
-            connReq->getDeviceId()
-        );
-        bus.publish(afterEvent);
+        auto result = mConnectionAuthValidator->validate(*connReq);
+
+        if (auto* authInfo = std::get_if<PlayerAuthenticationInfo>(&result)) {
+            ClientLoginAfterEvent afterEvent(
+                source,
+                packet,
+                authInfo->XboxLiveName,
+                source.getIPAndPort(),
+                authInfo->Xuid,
+                authInfo->Xuid,
+                authInfo->AuthenticatedUuid,
+                connReq->getDeviceId()
+            );
+            bus.publish(afterEvent);
+        }
     }
 }
 
