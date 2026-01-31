@@ -10,6 +10,7 @@
 #include "catalyst/event/actor/player/PlayerUseFrameBlockEvent.h"
 
 
+#include "catalyst/event/server/ClientLoginEvent.h"
 #include "catalyst/event/server/ReceivePacketEvent.h"
 #include "catalyst/event/world/block/BlockFallEvent.h"
 #include "catalyst/event/world/block/BlockPistonEvent.h"
@@ -327,6 +328,48 @@ void registerEventTests() {
             event.pos().z,
             event.block().getTypeName(),
             event.isCreative()
+        );
+    });
+
+    bus.emplaceListener<ClientLoginBeforeEvent>([](ClientLoginBeforeEvent& event) {
+        logger.info("ClientLoginBeforeEvent: source={}", event.source().toString());
+    });
+
+    bus.emplaceListener<ClientLoginAfterEvent>([](ClientLoginAfterEvent& event) {
+        logger.info(
+            "ClientLoginAfterEvent: name='{}', ip='{}', uuid='{}', deviceId='{}', xuid='{}'/'{}'",
+            event.name(),
+            event.ip(),
+            event.uuid().asString(),
+            event.deviceId(),
+            event.serverAuthXuid(),
+            event.clientAuthXuid()
+        );
+    });
+
+    bus.emplaceListener<RedstoneUpdateBeforeEvent>([](RedstoneUpdateBeforeEvent& event) {
+        logger.info(
+            "RedstoneUpdateBeforeEvent: pos=({},{},{}), strength={}, isFirstTime={}",
+            event.pos().x,
+            event.pos().y,
+            event.pos().z,
+            event.strength(),
+            event.isFirstTime()
+        );
+        if (event.pos().x == 100 && event.pos().y >= -50 && event.pos().z == 100 ) {
+            logger.warn("拦截特定位置的红石更新事件");
+            event.cancel(); 
+        }
+    });
+
+    bus.emplaceListener<RedstoneUpdateAfterEvent>([](RedstoneUpdateAfterEvent& event) {
+        logger.info(
+            "RedstoneUpdateAfterEvent: pos=({},{},{}), strength={}, isFirstTime={}",
+            event.pos().x,
+            event.pos().y,
+            event.pos().z,
+            event.strength(),
+            event.isFirstTime()
         );
     });
 }

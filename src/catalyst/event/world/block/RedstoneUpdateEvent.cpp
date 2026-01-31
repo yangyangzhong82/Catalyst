@@ -3,7 +3,6 @@
 #include "ll/api/event/Emitter.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
-#include "mc/world/level/block/Block.h"
 #include "mc/world/redstone/circuit/ChunkCircuitComponentList.h"
 #include "mc/world/redstone/circuit/CircuitSceneGraph.h"
 #include "mc/world/redstone/circuit/CircuitSystem.h"
@@ -28,7 +27,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
             ChunkCircuitComponentList&                   chunkComponentList = chunkEntryIterator->second;
             auto&                                        bus                = ll::event::EventBus::getInstance();
 
-            for (const auto& listItem : *chunkComponentList.mComponents) {
+            for (auto& listItem : *chunkComponentList.mComponents) {
                 BaseCircuitComponent* component = listItem.mComponent;
                 if (!component) continue;
 
@@ -41,22 +40,14 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
                         int newStrength = component->getStrength();
                         if (newStrength != -1) {
                             RedstoneUpdateBeforeEvent
-                                beforeEvent(region, component->mPos, newStrength, component->mIsFirstTime, component);
+                                beforeEvent(region, listItem.mPos, newStrength, component->mIsFirstTime, component);
                             bus.publish(beforeEvent);
 
                             if (!beforeEvent.isCancelled()) {
-                                if (!component->mIsFirstTime || !component->mIgnoreFirstUpdate) {
-                                    const Block& blockToUpdate = region.getBlock(component->mPos);
-                                    blockToUpdate.getBlockType().onRedstoneUpdate(
-                                        region,
-                                        component->mPos,
-                                        newStrength,
-                                        component->mIsFirstTime
-                                    );
-                                }
+                                this->updateIndividualBlock(component, chunkPos, listItem.mPos, region);
                                 RedstoneUpdateAfterEvent afterEvent(
                                     region,
-                                    component->mPos,
+                                    listItem.mPos,
                                     newStrength,
                                     component->mIsFirstTime,
                                     component
@@ -69,24 +60,20 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
                 }
             }
 
-            for (const auto& listItem : secondaryUpdateQueue) {
+            for (auto& listItem : secondaryUpdateQueue) {
                 BaseCircuitComponent* component = listItem.mComponent;
                 if (!component) continue;
 
                 int newStrength = component->getStrength();
                 if (newStrength != -1) {
                     RedstoneUpdateBeforeEvent
-                        beforeEvent(region, component->mPos, newStrength, component->mIsFirstTime, component);
+                        beforeEvent(region, listItem.mPos, newStrength, component->mIsFirstTime, component);
                     bus.publish(beforeEvent);
 
                     if (!beforeEvent.isCancelled()) {
-                        if (!component->mIsFirstTime || !component->mIgnoreFirstUpdate) {
-                            const Block& blockToUpdate = region.getBlock(component->mPos);
-                            blockToUpdate.getBlockType()
-                                .onRedstoneUpdate(region, component->mPos, newStrength, component->mIsFirstTime);
-                        }
+                        this->updateIndividualBlock(component, chunkPos, listItem.mPos, region);
                         RedstoneUpdateAfterEvent
-                            afterEvent(region, component->mPos, newStrength, component->mIsFirstTime, component);
+                            afterEvent(region, listItem.mPos, newStrength, component->mIsFirstTime, component);
                         bus.publish(afterEvent);
                     }
                 }

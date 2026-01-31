@@ -27,37 +27,36 @@ public:
 };
 
 class CATALYST_API ClientLoginAfterEvent final : public ll::event::Event {
-    NetworkIdentifier const&     mSource;
     std::shared_ptr<LoginPacket> mPacket;
     std::string                  mName;
     std::string                  mIp;
     std::string                  mServerAuthXuid;
     std::string                  mClientAuthXuid;
-    ::mce::UUID                 mUuid;
+    ::mce::UUID                  mUuid;
     std::string                  mDeviceId;
+    uint64                       mNetworkIdHash;
 
 public:
     ClientLoginAfterEvent(
-        NetworkIdentifier const&     source,
         std::shared_ptr<LoginPacket> packet,
         std::string                  name,
         std::string                  ip,
         std::string                  serverAuthXuid,
         std::string                  clientAuthXuid,
         ::mce::UUID                  uuid,
-        std::string                  deviceId
+        std::string                  deviceId,
+        uint64                       networkIdHash
     )
     : Event(),
-      mSource(source),
       mPacket(std::move(packet)),
       mName(std::move(name)),
       mIp(std::move(ip)),
       mServerAuthXuid(std::move(serverAuthXuid)),
       mClientAuthXuid(std::move(clientAuthXuid)),
       mUuid(std::move(uuid)),
-      mDeviceId(std::move(deviceId)) {}
+      mDeviceId(std::move(deviceId)),
+      mNetworkIdHash(networkIdHash) {}
 
-    NetworkIdentifier const&     source() const { return mSource; }
     std::shared_ptr<LoginPacket> packet() const { return mPacket; }
     std::string const&           name() const { return mName; }
     std::string const&           ip() const { return mIp; }
@@ -66,16 +65,7 @@ public:
     ::mce::UUID const&           uuid() const { return mUuid; }
     std::string const&           deviceId() const { return mDeviceId; }
 
-    void disconnect(std::string const& message) const {
-        ll::service::getServerNetworkHandler()->disconnectClientWithMessage(
-            mSource,
-            mPacket->mSenderSubId,
-            Connection::DisconnectFailReason::Kicked,
-            message,
-            std::nullopt,
-            false
-        );
-    }
+    void disconnect(std::string const& message) const;
 };
 
 } // namespace Catalyst
