@@ -7,7 +7,7 @@
 
 namespace Catalyst {
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     FarmChangeEventHook,
     ll::memory::HookPriority::Normal,
     FarmBlock,
@@ -20,7 +20,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 ) {
     auto& bus = ll::event::EventBus::getInstance();
 
-    FarmChangeBeforeEvent beforeEvent(region, pos, false);
+    FarmChangeBeforeEvent beforeEvent(region, pos, actor, false);
     bus.publish(beforeEvent);
     if (beforeEvent.isCancelled()) {
         return;
@@ -28,7 +28,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 
     origin(region, pos, actor, fallDistance);
 
-    FarmChangeAfterEvent afterEvent(region, pos, false);
+    FarmChangeAfterEvent afterEvent(region, pos, actor, false);
     bus.publish(afterEvent);
 }
 

@@ -48,7 +48,7 @@ static std::string getIPFromRakPeerUnsafe(RakNet::RakNetGUID const& guid) {
 }
 
 // Before event hook - on $handle(LoginPacket)
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     ClientLoginBeforeEventHook,
     ll::memory::HookPriority::Normal,
     ServerNetworkHandler,
@@ -69,21 +69,21 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 }
 
 // Capture player info and fire AfterEvent during async authorization
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     ClientLoginAfterEventHook,
     ll::memory::HookPriority::Normal,
     ServerNetworkHandler,
     &ServerNetworkHandler::$_onClientAsyncAuthorized,
     void,
-    NetworkIdentifier const&                source,
-    ConnectionRequest const&                request,
-    PlayerAuthenticationInfo const&         playerInfo,
-    std::optional<MessToken> const&         hostMessToken
+    NetworkIdentifier const&        source,
+    ConnectionRequest const&        request,
+    PlayerAuthenticationInfo const& playerInfo,
+    std::optional<MessToken> const& hostMessToken
 ) {
     // Store current NetworkIdentifier for disconnect() to use
     sCurrentNetworkId = &source;
 
-    auto& bus = ll::event::EventBus::getInstance();
+    auto&                 bus = ll::event::EventBus::getInstance();
     ClientLoginAfterEvent afterEvent(
         nullptr,
         std::string(playerInfo.XboxLiveName),
@@ -137,7 +137,7 @@ void ClientLoginAfterEvent::disconnect(std::string const& message) const {
 
     // Fallback: search in mClients
     using ClientMap = std::unordered_map<NetworkIdentifier, std::unique_ptr<ServerNetworkHandler::Client>>;
-    auto& clients  = const_cast<ClientMap&>(static_cast<ClientMap const&>(handler->mClients));
+    auto& clients   = const_cast<ClientMap&>(static_cast<ClientMap const&>(handler->mClients));
 
     for (auto& [netId, client] : clients) {
         if (netId.getHash() == mNetworkIdHash) {

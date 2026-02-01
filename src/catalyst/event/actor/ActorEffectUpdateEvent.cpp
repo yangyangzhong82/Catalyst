@@ -29,7 +29,7 @@ LL_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     ActorEffectUpdateEventHook,
     ll::memory::HookPriority::Normal,
     Actor,
@@ -51,7 +51,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     ActorEffectRemoveEventHook,
     ll::memory::HookPriority::Normal,
     Actor,

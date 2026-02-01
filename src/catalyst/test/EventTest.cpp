@@ -7,6 +7,7 @@
 #include "catalyst/event/actor/player/PlayerDropItemEvent.h"
 #include "catalyst/event/actor/player/PlayerEditSignEvent.h"
 #include "catalyst/event/actor/player/PlayerOpenContainerEvent.h"
+#include "catalyst/event/actor/player/PlayerShieldBlockEvent.h"
 #include "catalyst/event/actor/player/PlayerUseFrameBlockEvent.h"
 
 
@@ -24,6 +25,7 @@
 #include "mc/network/NetworkIdentifier.h"
 #include "mc/network/Packet.h"
 #include "mc/server/ServerPlayer.h"
+#include "mc/world/actor/Actor.h"
 #include "mc/world/level/Block/Block.h"
 
 namespace Catalyst::Test {
@@ -144,6 +146,27 @@ void registerEventTests() {
             "PlayerCompleteUsingItemAfterEvent: player={}, item={}",
             event.self().getRealName(),
             event.item().getTypeName()
+        );
+    });
+
+    bus.emplaceListener<PlayerShieldBlockBeforeEvent>([](PlayerShieldBlockBeforeEvent& event) {
+        auto* damager = event.damager();
+        logger.info(
+            "PlayerShieldBlockBeforeEvent: player={}, damage={}, damager={}",
+            event.self().getRealName(),
+            event.damage(),
+            damager ? damager->getNameTag() : "<null>"
+        );
+    });
+
+    bus.emplaceListener<PlayerShieldBlockAfterEvent>([](PlayerShieldBlockAfterEvent& event) {
+        auto* damager = event.damager();
+        logger.info(
+            "PlayerShieldBlockAfterEvent: player={}, damage={}, damager={}, result={}",
+            event.self().getRealName(),
+            event.damage(),
+            damager ? damager->getNameTag() : "<null>",
+            event.result()
         );
     });
 

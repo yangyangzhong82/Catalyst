@@ -7,7 +7,7 @@
 
 namespace Catalyst {
 
-LL_AUTO_STATIC_HOOK(
+LL_STATIC_HOOK(
     SculkBlockGrowthHook,
     ll::memory::HookPriority::Normal,
     &SculkBlockBehavior::_placeGrowthAt,

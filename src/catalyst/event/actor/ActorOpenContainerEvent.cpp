@@ -75,7 +75,7 @@ static bool SafeCheckVftable(void* ptr, void** expectedVftable) noexcept {
     return *reinterpret_cast<void***>(ptr) == expectedVftable;
 }
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     HopperBlockActorStartOpenHook,
     ll::memory::HookPriority::Normal,
     HopperBlockActor,
@@ -110,7 +110,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     }
 }
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     BarrelBlockActorStartOpenHook,
     ll::memory::HookPriority::Normal,
     BarrelBlockActor,
@@ -136,7 +136,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     ChestBlockActorStartOpenHook,
     ll::memory::HookPriority::Normal,
     ChestBlockActor,
@@ -162,7 +162,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     EnderChestContainerStartOpenHook,
     ll::memory::HookPriority::Normal,
     EnderChestContainer,
@@ -188,7 +188,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     FurnaceBlockActorStartOpenHook,
     ll::memory::HookPriority::Normal,
     FurnaceBlockActor,
@@ -214,7 +214,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     ShulkerBoxBlockActorStartOpenHook,
     ll::memory::HookPriority::Normal,
     ShulkerBoxBlockActor,
@@ -240,7 +240,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     BrewingStandBlockActorStartOpenHook,
     ll::memory::HookPriority::Normal,
     BrewingStandBlockActor,

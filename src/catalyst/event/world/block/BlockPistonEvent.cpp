@@ -20,7 +20,7 @@ enum class PistonStateEx : char {
     RetractingCancelled = 5,
 };
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     PistonBlockEventHook,
     ll::memory::HookPriority::Normal,
     PistonBlockActor,

@@ -4,6 +4,7 @@
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/Actor.h"
+#include "mc/world/actor/Mob.h"
 #include "mc/world/level/Level.h"
 
 namespace Catalyst {

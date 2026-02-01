@@ -10,7 +10,7 @@ namespace Catalyst {
 
 using SpreadResult = ::std::optional<::std::pair<::BlockPos const, uchar const>>;
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     SculkSpreadHook,
     ll::memory::HookPriority::Normal,
     MultifaceSpreader,

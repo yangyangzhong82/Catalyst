@@ -9,7 +9,7 @@
 #include "mc/world/redstone/circuit/components/BaseCircuitComponent.h"
 namespace Catalyst {
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     RedstoneUpdateEventHook,
     ll::memory::HookPriority::Normal,
     CircuitSystem,
@@ -45,13 +45,8 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 
                             if (!beforeEvent.isCancelled()) {
                                 this->updateIndividualBlock(component, chunkPos, listItem.mPos, region);
-                                RedstoneUpdateAfterEvent afterEvent(
-                                    region,
-                                    listItem.mPos,
-                                    newStrength,
-                                    component->mIsFirstTime,
-                                    component
-                                );
+                                RedstoneUpdateAfterEvent
+                                    afterEvent(region, listItem.mPos, newStrength, component->mIsFirstTime, component);
                                 bus.publish(afterEvent);
                             }
                         }
