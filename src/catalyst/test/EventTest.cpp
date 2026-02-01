@@ -13,6 +13,7 @@
 
 #include "catalyst/event/server/ClientLoginEvent.h"
 #include "catalyst/event/server/ReceivePacketEvent.h"
+#include "catalyst/event/world/block/BlockExplodedEvent.h"
 #include "catalyst/event/world/block/BlockFallEvent.h"
 #include "catalyst/event/world/block/BlockPistonEvent.h"
 #include "catalyst/event/world/block/MossGrowthEvent.h"
@@ -316,6 +317,25 @@ void registerEventTests() {
             event.pos().y,
             event.pos().z,
             event.block().getTypeName()
+        );
+    });
+
+    bus.emplaceListener<BlockExplodedBeforeEvent>([](BlockExplodedBeforeEvent& event) {
+        logger.info(
+            "BlockExplodedBeforeEvent: pos=({},{},{})",
+            event.pos().x,
+            event.pos().y,
+            event.pos().z
+        );
+        event.cancel();
+    });
+
+    bus.emplaceListener<BlockExplodedAfterEvent>([](BlockExplodedAfterEvent& event) {
+        logger.info(
+            "BlockExplodedAfterEvent: pos=({},{},{})",
+            event.pos().x,
+            event.pos().y,
+            event.pos().z
         );
     });
 
