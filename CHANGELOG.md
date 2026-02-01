@@ -8,3 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - 修复红石更新事件和生物放置方块事件，并恢复客户端连接事件
 
+## [0.2.2] - 2026-02-02
+
+- 增加玩家盾牌格挡事件
+- 为耕地退化事件增加Actor参数
