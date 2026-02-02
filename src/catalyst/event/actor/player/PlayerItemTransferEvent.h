@@ -22,7 +22,8 @@ class CATALYST_API PlayerItemTransferBeforeEvent final : public ll::event::Cance
     FullContainerName          mDstContainer;
     uchar                      mDstSlot;
     uchar                      mAmount;
-    ItemStack const&           mItem;
+    ItemStack                  mSrcItem;
+    ItemStack                  mDstItem;
     ContainerScreenContext     mScreenContext;
 
 public:
@@ -34,7 +35,8 @@ public:
         FullContainerName const&      dstContainer,
         uchar                         dstSlot,
         uchar                         amount,
-        ItemStack const&              item,
+        ItemStack const&              srcItem,
+        ItemStack const&              dstItem,
         ContainerScreenContext const& screenContext
     )
     : Cancellable(player),
@@ -44,7 +46,8 @@ public:
       mDstContainer(dstContainer),
       mDstSlot(dstSlot),
       mAmount(amount),
-      mItem(item),
+      mSrcItem(srcItem),
+      mDstItem(dstItem),
       mScreenContext(screenContext) {}
 
     ItemStackRequestActionType actionType() const { return mActionType; }
@@ -53,7 +56,8 @@ public:
     FullContainerName const&   dstContainer() const { return mDstContainer; }
     uchar                      dstSlot() const { return mDstSlot; }
     uchar                      amount() const { return mAmount; }
-    ItemStack const&           item() const { return mItem; }
+    ItemStack const&           srcItem() const { return mSrcItem; }
+    ItemStack const&           dstItem() const { return mDstItem; }
 
     ContainerScreenContext const& screenContext() const { return mScreenContext; }
 
@@ -81,7 +85,8 @@ class CATALYST_API PlayerItemTransferAfterEvent final : public ll::event::Player
     FullContainerName          mDstContainer;
     uchar                      mDstSlot;
     uchar                      mAmount;
-    ItemStack const&           mItem;
+    ItemStack                  mSrcItem;
+    ItemStack                  mDstItem;
     ContainerScreenContext     mScreenContext;
 
 public:
@@ -93,7 +98,8 @@ public:
         FullContainerName const&      dstContainer,
         uchar                         dstSlot,
         uchar                         amount,
-        ItemStack const&              item,
+        ItemStack const&              srcItem,
+        ItemStack const&              dstItem,
         ContainerScreenContext const& screenContext
     )
     : PlayerEvent(player),
@@ -103,7 +109,8 @@ public:
       mDstContainer(dstContainer),
       mDstSlot(dstSlot),
       mAmount(amount),
-      mItem(item),
+      mSrcItem(srcItem),
+      mDstItem(dstItem),
       mScreenContext(screenContext) {}
 
     ItemStackRequestActionType actionType() const { return mActionType; }
@@ -112,7 +119,8 @@ public:
     FullContainerName const&   dstContainer() const { return mDstContainer; }
     uchar                      dstSlot() const { return mDstSlot; }
     uchar                      amount() const { return mAmount; }
-    ItemStack const&           item() const { return mItem; }
+    ItemStack const&           srcItem() const { return mSrcItem; }
+    ItemStack const&           dstItem() const { return mDstItem; }
 
     ContainerScreenContext const& screenContext() const { return mScreenContext; }
 

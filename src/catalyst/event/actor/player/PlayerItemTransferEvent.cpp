@@ -42,8 +42,9 @@ LL_TYPE_INSTANCE_HOOK(
     auto const& srcSlotInfo = transferAction.mSrc.get();
     auto const& dstSlotInfo = transferAction.mDst.get();
 
-    // 尝试从玩家背包获取物品
-    ItemStack const& item = player.mInventory->mInventory->getItem(srcSlotInfo.mSlot);
+    // 获取源槽位和目标槽位的物品
+    ItemStack const& srcItem = player.mInventory->mInventory->getItem(srcSlotInfo.mSlot);
+    ItemStack const& dstItem = player.mInventory->mInventory->getItem(dstSlotInfo.mSlot);
 
     auto& bus = ll::event::EventBus::getInstance();
 
@@ -55,7 +56,8 @@ LL_TYPE_INSTANCE_HOOK(
         dstSlotInfo.mFullContainerName,
         dstSlotInfo.mSlot,
         transferAction.mAmount,
-        item,
+        srcItem,
+        dstItem,
         screenContext
     );
     bus.publish(beforeEvent);
@@ -67,6 +69,10 @@ LL_TYPE_INSTANCE_HOOK(
     auto result = origin(requestAction);
 
     if (result == ItemStackNetResult::Success) {
+        // AfterEvent 获取转移后的物品状态
+        ItemStack const& newSrcItem = player.mInventory->mInventory->getItem(srcSlotInfo.mSlot);
+        ItemStack const& newDstItem = player.mInventory->mInventory->getItem(dstSlotInfo.mSlot);
+
         PlayerItemTransferAfterEvent afterEvent(
             player,
             actionType,
@@ -75,7 +81,8 @@ LL_TYPE_INSTANCE_HOOK(
             dstSlotInfo.mFullContainerName,
             dstSlotInfo.mSlot,
             transferAction.mAmount,
-            item,
+            newSrcItem,
+            newDstItem,
             screenContext
         );
         bus.publish(afterEvent);
