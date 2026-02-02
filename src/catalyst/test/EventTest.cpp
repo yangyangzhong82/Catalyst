@@ -439,14 +439,15 @@ void registerEventTests() {
         }
 
         logger.info(
-            "PlayerItemTransferBeforeEvent: player={}, action={}, srcSlot={}, dstSlot={}, amount={}, item={}, "
-            "containerPos={}",
+            "PlayerItemTransferBeforeEvent: player={}, action={}, srcSlot={}, dstSlot={}, amount={}, srcItem={}, "
+            "dstItem={}, containerPos={}",
             event.self().getRealName(),
             actionStr(event.actionType()),
             event.srcSlot(),
             event.dstSlot(),
             event.amount(),
-            event.item().getTypeName(),
+            event.srcItem().getTypeName(),
+            event.dstItem().getTypeName(),
             containerPosStr
         );
     });
@@ -471,14 +472,15 @@ void registerEventTests() {
         }
 
         logger.info(
-            "PlayerItemTransferAfterEvent: player={}, action={}, srcSlot={}, dstSlot={}, amount={}, item={}, "
-            "containerPos={}",
+            "PlayerItemTransferAfterEvent: player={}, action={}, srcSlot={}, dstSlot={}, amount={}, srcItem={}, "
+            "dstItem={}, containerPos={}",
             event.self().getRealName(),
             actionStr(event.actionType()),
             event.srcSlot(),
             event.dstSlot(),
             event.amount(),
-            event.item().getTypeName(),
+            event.srcItem().getTypeName(),
+            event.dstItem().getTypeName(),
             containerPosStr
         );
     });
