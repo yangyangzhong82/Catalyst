@@ -6,9 +6,12 @@
 #include "catalyst/event/actor/player/PlayerCompleteUsingItemEvent.h"
 #include "catalyst/event/actor/player/PlayerDropItemEvent.h"
 #include "catalyst/event/actor/player/PlayerEditSignEvent.h"
+#include "catalyst/event/actor/player/PlayerItemTransferEvent.h"
 #include "catalyst/event/actor/player/PlayerOpenContainerEvent.h"
 #include "catalyst/event/actor/player/PlayerShieldBlockEvent.h"
 #include "catalyst/event/actor/player/PlayerUseFrameBlockEvent.h"
+
+#include "fmt/format.h"
 
 
 #include "catalyst/event/server/ClientLoginEvent.h"
@@ -413,6 +416,70 @@ void registerEventTests() {
             event.pos().z,
             event.strength(),
             event.isFirstTime()
+        );
+    });
+
+    bus.emplaceListener<PlayerItemTransferBeforeEvent>([](PlayerItemTransferBeforeEvent& event) {
+        auto actionStr = [](ItemStackRequestActionType type) -> std::string_view {
+            switch (type) {
+            case ItemStackRequestActionType::Take:
+                return "Take";
+            case ItemStackRequestActionType::Place:
+                return "Place";
+            case ItemStackRequestActionType::Swap:
+                return "Swap";
+            default:
+                return "Unknown";
+            }
+        };
+
+        std::string containerPosStr = "N/A";
+        if (auto pos = event.getContainerBlockPos()) {
+            containerPosStr = fmt::format("({},{},{})", pos->x, pos->y, pos->z);
+        }
+
+        logger.info(
+            "PlayerItemTransferBeforeEvent: player={}, action={}, srcSlot={}, dstSlot={}, amount={}, item={}, "
+            "containerPos={}",
+            event.self().getRealName(),
+            actionStr(event.actionType()),
+            event.srcSlot(),
+            event.dstSlot(),
+            event.amount(),
+            event.item().getTypeName(),
+            containerPosStr
+        );
+    });
+
+    bus.emplaceListener<PlayerItemTransferAfterEvent>([](PlayerItemTransferAfterEvent& event) {
+        auto actionStr = [](ItemStackRequestActionType type) -> std::string_view {
+            switch (type) {
+            case ItemStackRequestActionType::Take:
+                return "Take";
+            case ItemStackRequestActionType::Place:
+                return "Place";
+            case ItemStackRequestActionType::Swap:
+                return "Swap";
+            default:
+                return "Unknown";
+            }
+        };
+
+        std::string containerPosStr = "N/A";
+        if (auto pos = event.getContainerBlockPos()) {
+            containerPosStr = fmt::format("({},{},{})", pos->x, pos->y, pos->z);
+        }
+
+        logger.info(
+            "PlayerItemTransferAfterEvent: player={}, action={}, srcSlot={}, dstSlot={}, amount={}, item={}, "
+            "containerPos={}",
+            event.self().getRealName(),
+            actionStr(event.actionType()),
+            event.srcSlot(),
+            event.dstSlot(),
+            event.amount(),
+            event.item().getTypeName(),
+            containerPosStr
         );
     });
 }
