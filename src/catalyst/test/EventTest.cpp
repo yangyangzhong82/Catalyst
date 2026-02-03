@@ -19,6 +19,8 @@
 #include "catalyst/event/world/block/BlockExplodedEvent.h"
 #include "catalyst/event/world/block/BlockFallEvent.h"
 #include "catalyst/event/world/block/BlockPistonEvent.h"
+#include "catalyst/event/world/block/FireBurnBlockEvent.h"
+#include "catalyst/event/world/block/FireSpreadEvent.h"
 #include "catalyst/event/world/block/MossGrowthEvent.h"
 #include "catalyst/event/world/block/NetherPortalCreateEvent.h"
 #include "catalyst/event/world/block/RedstoneUpdateEvent.h"
@@ -324,22 +326,12 @@ void registerEventTests() {
     });
 
     bus.emplaceListener<BlockExplodedBeforeEvent>([](BlockExplodedBeforeEvent& event) {
-        logger.info(
-            "BlockExplodedBeforeEvent: pos=({},{},{})",
-            event.pos().x,
-            event.pos().y,
-            event.pos().z
-        );
+        logger.info("BlockExplodedBeforeEvent: pos=({},{},{})", event.pos().x, event.pos().y, event.pos().z);
         event.cancel();
     });
 
     bus.emplaceListener<BlockExplodedAfterEvent>([](BlockExplodedAfterEvent& event) {
-        logger.info(
-            "BlockExplodedAfterEvent: pos=({},{},{})",
-            event.pos().x,
-            event.pos().y,
-            event.pos().z
-        );
+        logger.info("BlockExplodedAfterEvent: pos=({},{},{})", event.pos().x, event.pos().y, event.pos().z);
     });
 
     bus.emplaceListener<BlockFallBeforeEvent>([](BlockFallBeforeEvent& event) {
@@ -402,9 +394,9 @@ void registerEventTests() {
             event.strength(),
             event.isFirstTime()
         );
-        if (event.pos().x == 100 && event.pos().y >= -50 && event.pos().z == 100 ) {
+        if (event.pos().x == 100 && event.pos().y >= -50 && event.pos().z == 100) {
             logger.warn("拦截特定位置的红石更新事件");
-            event.cancel(); 
+            event.cancel();
         }
     });
 
@@ -482,6 +474,70 @@ void registerEventTests() {
             event.srcItem().getTypeName(),
             event.dstItem().getTypeName(),
             containerPosStr
+        );
+    });
+
+    bus.emplaceListener<FireBurnBlockBeforeEvent>([](FireBurnBlockBeforeEvent& event) {
+        logger.info(
+            "FireBurnBlockBeforeEvent: burnPos=({},{},{}), firePos=({},{},{}), age={}",
+            event.burnPos().x,
+            event.burnPos().y,
+            event.burnPos().z,
+            event.firePos().x,
+            event.firePos().y,
+            event.firePos().z,
+            event.age()
+        );
+        // 如果方块在 y=100 以上，拦截烧毁
+        if (event.burnPos().y > 100) {
+            logger.warn("拦截火焰烧毁 - 高度保护");
+            event.cancel();
+        }
+    });
+
+    bus.emplaceListener<FireBurnBlockAfterEvent>([](FireBurnBlockAfterEvent& event) {
+        logger.info(
+            "FireBurnBlockAfterEvent: burnPos=({},{},{}), firePos=({},{},{}), age={}",
+            event.burnPos().x,
+            event.burnPos().y,
+            event.burnPos().z,
+            event.firePos().x,
+            event.firePos().y,
+            event.firePos().z,
+            event.age()
+        );
+    });
+
+    bus.emplaceListener<FireSpreadBeforeEvent>([](FireSpreadBeforeEvent& event) {
+        logger.info(
+            "FireSpreadBeforeEvent: spreadPos=({},{},{}), firePos=({},{},{}), newAge={}, sourceAge={}",
+            event.spreadPos().x,
+            event.spreadPos().y,
+            event.spreadPos().z,
+            event.firePos().x,
+            event.firePos().y,
+            event.firePos().z,
+            event.newAge(),
+            event.sourceAge()
+        );
+        // 如果方块在 y=100 以上，拦截蔓延
+        if (event.spreadPos().y > 100) {
+            logger.warn("拦截火焰蔓延 - 高度保护");
+            event.cancel();
+        }
+    });
+
+    bus.emplaceListener<FireSpreadAfterEvent>([](FireSpreadAfterEvent& event) {
+        logger.info(
+            "FireSpreadAfterEvent: spreadPos=({},{},{}), firePos=({},{},{}), newAge={}, sourceAge={}",
+            event.spreadPos().x,
+            event.spreadPos().y,
+            event.spreadPos().z,
+            event.firePos().x,
+            event.firePos().y,
+            event.firePos().z,
+            event.newAge(),
+            event.sourceAge()
         );
     });
 }
