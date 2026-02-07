@@ -4,7 +4,7 @@
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/player/Player.h"
-
+#include "catalyst/mod/Gloabl.h"
 namespace Catalyst {
 
 LL_TYPE_INSTANCE_HOOK(
@@ -16,7 +16,13 @@ LL_TYPE_INSTANCE_HOOK(
     ::BlockPos const& bedBlockPos
 ) {
     auto& bus = ll::event::EventBus::getInstance();
-
+logger.info(
+        "PlayerStartSleepEvent: player={}, bedPos=({},{},{})",
+        this->getRealName(),
+        bedBlockPos.x,
+        bedBlockPos.y,
+        bedBlockPos.z
+    );
     PlayerStartSleepBeforeEvent beforeEvent(*this, bedBlockPos);
     bus.publish(beforeEvent);
     if (beforeEvent.isCancelled()) {
@@ -41,7 +47,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerStartSleepAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerStartSleepAfterEvent> {};
+class PlayerStartSleepAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerStartSleepAfterEvent> {
+    ll::memory::HookRegistrar<PlayerStartSleepEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<PlayerStartSleepAfterEventEmitter>();
 }

@@ -49,7 +49,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class MobHealthChangeAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, MobHealthChangeAfterEvent> {};
+class MobHealthChangeAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, MobHealthChangeAfterEvent> {
+    ll::memory::HookRegistrar<MobHealthChangeHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<MobHealthChangeAfterEventEmitter>();
 }

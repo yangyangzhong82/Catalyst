@@ -101,8 +101,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerItemTransferAfterEventEmitter
-: public ll::event::Emitter<afterEmitterFactory, PlayerItemTransferAfterEvent> {};
+class PlayerItemTransferAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerItemTransferAfterEvent> {
+    ll::memory::HookRegistrar<PlayerItemTransferEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<PlayerItemTransferAfterEventEmitter>();
 }

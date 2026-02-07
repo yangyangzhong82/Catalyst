@@ -40,8 +40,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerCompleteUsingItemAfterEventEmitter
-: public ll::event::Emitter<afterEmitterFactory, PlayerCompleteUsingItemAfterEvent> {};
+class PlayerCompleteUsingItemAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerCompleteUsingItemAfterEvent> {
+    ll::memory::HookRegistrar<PlayerCompleteUsingItemEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<PlayerCompleteUsingItemAfterEventEmitter>();
 }

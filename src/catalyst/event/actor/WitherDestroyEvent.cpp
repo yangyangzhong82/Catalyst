@@ -45,8 +45,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class WitherDestroyBlocksAfterEventEmitter
-: public ll::event::Emitter<afterEmitterFactory, WitherDestroyBlocksAfterEvent> {};
+class WitherDestroyBlocksAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, WitherDestroyBlocksAfterEvent> {
+    ll::memory::HookRegistrar<WitherDestroyBlocksEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<WitherDestroyBlocksAfterEventEmitter>();
 }

@@ -77,7 +77,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerEditSignAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerEditSignAfterEvent> {};
+class PlayerEditSignAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerEditSignAfterEvent> {
+    ll::memory::HookRegistrar<PlayerEditSignEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<PlayerEditSignAfterEventEmitter>();
 }

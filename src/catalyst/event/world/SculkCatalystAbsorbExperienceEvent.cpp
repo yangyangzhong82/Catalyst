@@ -41,8 +41,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class SculkCatalystAbsorbExperienceAfterEventEmitter
-: public ll::event::Emitter<afterEmitterFactory, SculkCatalystAbsorbExperienceAfterEvent> {};
+class SculkCatalystAbsorbExperienceAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, SculkCatalystAbsorbExperienceAfterEvent> {
+    ll::memory::HookRegistrar<SculkCatalystAbsorbExperienceEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<SculkCatalystAbsorbExperienceAfterEventEmitter>();
 }

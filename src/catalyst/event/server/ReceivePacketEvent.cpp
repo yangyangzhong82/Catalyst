@@ -177,7 +177,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class ReceivePacketAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, ReceivePacketAfterEvent> {};
+class ReceivePacketAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, ReceivePacketAfterEvent> {
+    ll::memory::HookRegistrar<ReceivePacketEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<ReceivePacketAfterEventEmitter>();
 }

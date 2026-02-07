@@ -82,7 +82,9 @@ static std::unique_ptr<ll::event::EmitterBase> addBeforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> addAfterEmitterFactory();
-class ActorEffectAddAfterEventEmitter : public ll::event::Emitter<addAfterEmitterFactory, ActorEffectAddAfterEvent> {};
+class ActorEffectAddAfterEventEmitter : public ll::event::Emitter<addAfterEmitterFactory, ActorEffectAddAfterEvent> {
+    ll::memory::HookRegistrar<ActorEffectAddEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> addAfterEmitterFactory() {
     return std::make_unique<ActorEffectAddAfterEventEmitter>();
 }
@@ -97,8 +99,9 @@ static std::unique_ptr<ll::event::EmitterBase> updateBeforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> updateAfterEmitterFactory();
-class ActorEffectUpdateAfterEventEmitter
-: public ll::event::Emitter<updateAfterEmitterFactory, ActorEffectUpdateAfterEvent> {};
+class ActorEffectUpdateAfterEventEmitter : public ll::event::Emitter<updateAfterEmitterFactory, ActorEffectUpdateAfterEvent> {
+    ll::memory::HookRegistrar<ActorEffectUpdateEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> updateAfterEmitterFactory() {
     return std::make_unique<ActorEffectUpdateAfterEventEmitter>();
 }
@@ -113,8 +116,9 @@ static std::unique_ptr<ll::event::EmitterBase> removeBeforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> removeAfterEmitterFactory();
-class ActorEffectRemoveAfterEventEmitter
-: public ll::event::Emitter<removeAfterEmitterFactory, ActorEffectRemoveAfterEvent> {};
+class ActorEffectRemoveAfterEventEmitter : public ll::event::Emitter<removeAfterEmitterFactory, ActorEffectRemoveAfterEvent> {
+    ll::memory::HookRegistrar<ActorEffectRemoveEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> removeAfterEmitterFactory() {
     return std::make_unique<ActorEffectRemoveAfterEventEmitter>();
 }

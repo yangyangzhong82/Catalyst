@@ -47,7 +47,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class MossGrowthAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, MossGrowthAfterEvent> {};
+class MossGrowthAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, MossGrowthAfterEvent> {
+    ll::memory::HookRegistrar<MossGrowthEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<MossGrowthAfterEventEmitter>();
 }

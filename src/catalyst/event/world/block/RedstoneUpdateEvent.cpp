@@ -87,7 +87,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class RedstoneUpdateAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, RedstoneUpdateAfterEvent> {};
+class RedstoneUpdateAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, RedstoneUpdateAfterEvent> {
+    ll::memory::HookRegistrar<RedstoneUpdateEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<RedstoneUpdateAfterEventEmitter>();
 }

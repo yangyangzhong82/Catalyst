@@ -46,7 +46,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class SpawnItemActorAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, SpawnItemActorAfterEvent> {};
+class SpawnItemActorAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, SpawnItemActorAfterEvent> {
+    ll::memory::HookRegistrar<SpawnItemActorEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<SpawnItemActorAfterEventEmitter>();
 }

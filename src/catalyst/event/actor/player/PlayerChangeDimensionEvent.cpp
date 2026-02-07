@@ -47,8 +47,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerChangeDimensionAfterEventEmitter
-: public ll::event::Emitter<afterEmitterFactory, PlayerChangeDimensionAfterEvent> {};
+class PlayerChangeDimensionAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerChangeDimensionAfterEvent> {
+    ll::memory::HookRegistrar<PlayerChangeDimensionEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<PlayerChangeDimensionAfterEventEmitter>();
 }

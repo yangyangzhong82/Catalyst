@@ -68,8 +68,10 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerUseFrameBlockAfterEventEmitter
-: public ll::event::Emitter<afterEmitterFactory, PlayerUseFrameBlockAfterEvent> {};
+class PlayerUseFrameBlockAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerUseFrameBlockAfterEvent> {
+    ll::memory::HookRegistrar<PlayerUseFrameBlockEventHook>  hook1;
+    ll::memory::HookRegistrar<PlayerUseFrameBlockEventHook2> hook2;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<PlayerUseFrameBlockAfterEventEmitter>();
 }

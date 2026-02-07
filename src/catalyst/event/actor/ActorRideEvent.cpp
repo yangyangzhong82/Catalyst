@@ -38,7 +38,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class ActorRideAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, ActorRideAfterEvent> {};
+class ActorRideAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, ActorRideAfterEvent> {
+    ll::memory::HookRegistrar<ActorRideEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<ActorRideAfterEventEmitter>();
 }

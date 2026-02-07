@@ -48,8 +48,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerShieldBlockAfterEventEmitter
-: public ll::event::Emitter<afterEmitterFactory, PlayerShieldBlockAfterEvent> {};
+class PlayerShieldBlockAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerShieldBlockAfterEvent> {
+    ll::memory::HookRegistrar<PlayerShieldBlockEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<PlayerShieldBlockAfterEventEmitter>();
 }

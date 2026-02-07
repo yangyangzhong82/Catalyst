@@ -52,8 +52,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class NetherPortalCreateAfterEventEmitter
-: public ll::event::Emitter<afterEmitterFactory, NetherPortalCreateAfterEvent> {};
+class NetherPortalCreateAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, NetherPortalCreateAfterEvent> {
+    ll::memory::HookRegistrar<NetherPortalCreateEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<NetherPortalCreateAfterEventEmitter>();
 }

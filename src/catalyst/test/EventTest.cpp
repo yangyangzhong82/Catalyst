@@ -1,4 +1,4 @@
-#include "catalyst/event/actor/MobPlaceBlockEvent.h"
+﻿#include "catalyst/event/actor/MobPlaceBlockEvent.h"
 #include "catalyst/event/actor/MobTakeBlockEvent.h"
 #include "catalyst/event/actor/player/PlayerArmorStandSwapItemEvent.h"
 #include "catalyst/event/actor/player/PlayerAttackBlockEvent.h"
@@ -207,7 +207,7 @@ void registerEventTests() {
         );
 
         if (event.pos().x == -10 && event.pos().z == 85) {
-            logger.warn("取消活塞动作 - 测试位置");
+            logger.warn("鍙栨秷娲诲鍔ㄤ綔 - 娴嬭瘯浣嶇疆");
             event.cancel();
         }
     });
@@ -278,9 +278,9 @@ void registerEventTests() {
             event.block().getTypeName()
         );
 
-        // 在 (0,0,0) 到 (50,80,50) 范围内拦截
+        // 鍦?(0,0,0) 鍒?(50,80,50) 鑼冨洿鍐呮嫤鎴?
         if (pos.x >= 0 && pos.x <= 50 && pos.y >= -64 && pos.y <= 80 && pos.z >= 0 && pos.z <= 50) {
-            logger.warn("拦截生物放置方块 - 测试保护区域");
+            logger.warn("鎷︽埅鐢熺墿鏀剧疆鏂瑰潡 - 娴嬭瘯淇濇姢鍖哄煙");
             event.cancel();
         }
     });
@@ -307,9 +307,9 @@ void registerEventTests() {
             event.block().getTypeName()
         );
 
-        // 在 (100,0,100) 到 (150,80,150) 范围内拦截
+        // 鍦?(100,0,100) 鍒?(150,80,150) 鑼冨洿鍐呮嫤鎴?
         if (pos.x >= 100 && pos.x <= 150 && pos.y >= -64 && pos.y <= 80 && pos.z >= 100 && pos.z <= 150) {
-            logger.warn("拦截生物拾取方块 - 测试保护区域");
+            logger.warn("鎷︽埅鐢熺墿鎷惧彇鏂瑰潡 - 娴嬭瘯淇濇姢鍖哄煙");
             event.cancel();
         }
     });
@@ -345,15 +345,15 @@ void registerEventTests() {
             event.isCreative()
         );
 
-        // 在 y >= 100 的高度拦截方块坠落（测试悬浮方块）
+        // 鍦?y >= 100 鐨勯珮搴︽嫤鎴柟鍧楀潬钀斤紙娴嬭瘯鎮诞鏂瑰潡锛?
         if (pos.y >= 100) {
-            logger.warn("拦截方块坠落 - 测试高度保护（y >= 100）");
+            logger.warn("鎷︽埅鏂瑰潡鍧犺惤 - 娴嬭瘯楂樺害淇濇姢锛坹 >= 100锛?);
             event.cancel();
         }
 
-        // 在特定区域拦截（例如：x: -50~-40, z: -50~-40）
+        // 鍦ㄧ壒瀹氬尯鍩熸嫤鎴紙渚嬪锛歺: -50~-40, z: -50~-40锛?
         if (pos.x >= -50 && pos.x <= -40 && pos.z >= -50 && pos.z <= -40) {
-            logger.warn("拦截方块坠落 - 测试区域保护");
+            logger.warn("鎷︽埅鏂瑰潡鍧犺惤 - 娴嬭瘯鍖哄煙淇濇姢");
             event.cancel();
         }
     });
@@ -375,11 +375,12 @@ void registerEventTests() {
 
     bus.emplaceListener<ClientLoginAfterEvent>([](ClientLoginAfterEvent& event) {
         logger.info(
-            "ClientLoginAfterEvent: name='{}', ip='{}', uuid='{}', deviceId='{}', xuid='{}'/'{}'",
+            "ClientLoginAfterEvent: name='{}', ip='{}', uuid='{}', deviceId='{}', deviceModel='{}', xuid='{}'/'{}'",
             event.name(),
             event.ip(),
             event.uuid().asString(),
             event.deviceId(),
+            event.deviceModel(),
             event.serverAuthXuid(),
             event.clientAuthXuid()
         );
@@ -395,7 +396,7 @@ void registerEventTests() {
             event.isFirstTime()
         );
         if (event.pos().x == 100 && event.pos().y >= -50 && event.pos().z == 100) {
-            logger.warn("拦截特定位置的红石更新事件");
+            logger.warn("鎷︽埅鐗瑰畾浣嶇疆鐨勭孩鐭虫洿鏂颁簨浠?);
             event.cancel();
         }
     });
@@ -488,9 +489,9 @@ void registerEventTests() {
             event.firePos().z,
             event.age()
         );
-        // 如果方块在 y=100 以上，拦截烧毁
+        // 濡傛灉鏂瑰潡鍦?y=100 浠ヤ笂锛屾嫤鎴儳姣?
         if (event.burnPos().y > 100) {
-            logger.warn("拦截火焰烧毁 - 高度保护");
+            logger.warn("鎷︽埅鐏劙鐑ф瘉 - 楂樺害淇濇姢");
             event.cancel();
         }
     });
@@ -520,9 +521,9 @@ void registerEventTests() {
             event.newAge(),
             event.sourceAge()
         );
-        // 如果方块在 y=100 以上，拦截蔓延
+        // 濡傛灉鏂瑰潡鍦?y=100 浠ヤ笂锛屾嫤鎴敁寤?
         if (event.spreadPos().y > 100) {
-            logger.warn("拦截火焰蔓延 - 高度保护");
+            logger.warn("鎷︽埅鐏劙钄撳欢 - 楂樺害淇濇姢");
             event.cancel();
         }
     });
@@ -543,3 +544,4 @@ void registerEventTests() {
 }
 
 } // namespace Catalyst::Test
+

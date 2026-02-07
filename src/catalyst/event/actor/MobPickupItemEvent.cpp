@@ -48,7 +48,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class MobPickupItemAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, MobPickupItemAfterEvent> {};
+class MobPickupItemAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, MobPickupItemAfterEvent> {
+    ll::memory::HookRegistrar<MobPickupItemHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<MobPickupItemAfterEventEmitter>();
 }

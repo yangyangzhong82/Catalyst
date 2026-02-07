@@ -54,7 +54,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class SculkSpreadAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, SculkSpreadAfterEvent> {};
+class SculkSpreadAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, SculkSpreadAfterEvent> {
+    ll::memory::HookRegistrar<SculkSpreadHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<SculkSpreadAfterEventEmitter>();
 }

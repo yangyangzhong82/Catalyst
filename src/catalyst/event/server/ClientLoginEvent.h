@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "ll/api/event/Cancellable.h"
 #include "ll/api/event/Event.h"
@@ -34,6 +34,7 @@ class CATALYST_API ClientLoginAfterEvent final : public ll::event::Event {
     std::string                  mClientAuthXuid;
     ::mce::UUID                  mUuid;
     std::string                  mDeviceId;
+    std::string                  mDeviceModel;
     uint64                       mNetworkIdHash;
 
 public:
@@ -45,6 +46,7 @@ public:
         std::string                  clientAuthXuid,
         ::mce::UUID                  uuid,
         std::string                  deviceId,
+        std::string                  deviceModel,
         uint64                       networkIdHash
     )
     : Event(),
@@ -55,6 +57,7 @@ public:
       mClientAuthXuid(std::move(clientAuthXuid)),
       mUuid(std::move(uuid)),
       mDeviceId(std::move(deviceId)),
+      mDeviceModel(std::move(deviceModel)),
       mNetworkIdHash(networkIdHash) {}
 
     std::shared_ptr<LoginPacket> packet() const { return mPacket; }
@@ -64,8 +67,9 @@ public:
     std::string const&           clientAuthXuid() const { return mClientAuthXuid; }
     ::mce::UUID const&           uuid() const { return mUuid; }
     std::string const&           deviceId() const { return mDeviceId; }
-
+    std::string const&           deviceModel() const { return mDeviceModel; }
     void disconnect(std::string const& message) const;
 };
 
 } // namespace Catalyst
+

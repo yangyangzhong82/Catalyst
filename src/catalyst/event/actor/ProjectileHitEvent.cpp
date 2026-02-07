@@ -40,7 +40,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class ProjectileHitAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, ProjectileHitAfterEvent> {};
+class ProjectileHitAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, ProjectileHitAfterEvent> {
+    ll::memory::HookRegistrar<ProjectileHitEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<ProjectileHitAfterEventEmitter>();
 }

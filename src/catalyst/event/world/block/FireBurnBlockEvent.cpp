@@ -527,8 +527,10 @@ static std::unique_ptr<ll::event::EmitterBase> burnBeforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> burnAfterEmitterFactory();
-class FireBurnBlockAfterEventEmitter
-: public ll::event::Emitter<burnAfterEmitterFactory, FireBurnBlockAfterEvent> {};
+class FireBurnBlockAfterEventEmitter : public ll::event::Emitter<burnAfterEmitterFactory, FireBurnBlockAfterEvent> {
+    ll::memory::HookRegistrar<FireBurnBlockHook> hook;
+    ll::memory::HookRegistrar<FireTickHook>      tickHook;
+};
 static std::unique_ptr<ll::event::EmitterBase> burnAfterEmitterFactory() {
     return std::make_unique<FireBurnBlockAfterEventEmitter>();
 }
@@ -542,8 +544,10 @@ static std::unique_ptr<ll::event::EmitterBase> spreadBeforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> spreadAfterEmitterFactory();
-class FireSpreadAfterEventEmitter
-: public ll::event::Emitter<spreadAfterEmitterFactory, FireSpreadAfterEvent> {};
+class FireSpreadAfterEventEmitter : public ll::event::Emitter<spreadAfterEmitterFactory, FireSpreadAfterEvent> {
+    ll::memory::HookRegistrar<FireBurnBlockHook> hook;
+    ll::memory::HookRegistrar<FireTickHook>      tickHook;
+};
 static std::unique_ptr<ll::event::EmitterBase> spreadAfterEmitterFactory() {
     return std::make_unique<FireSpreadAfterEventEmitter>();
 }

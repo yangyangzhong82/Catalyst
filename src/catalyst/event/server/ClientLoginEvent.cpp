@@ -1,4 +1,4 @@
-#include "ClientLoginEvent.h"
+﻿#include "ClientLoginEvent.h"
 
 #include "ll/api/event/Emitter.h"
 #include "ll/api/event/EventBus.h"
@@ -92,6 +92,7 @@ LL_TYPE_INSTANCE_HOOK(
         std::string(playerInfo.Xuid),
         playerInfo.AuthenticatedUuid,
         request.getDeviceId(),
+        request.getDeviceModel(),
         source.getHash()
     );
     bus.publish(afterEvent);
@@ -155,3 +156,4 @@ void ClientLoginAfterEvent::disconnect(std::string const& message) const {
 }
 
 } // namespace Catalyst
+

@@ -125,7 +125,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class BlockPistonAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, BlockPistonAfterEvent> {};
+class BlockPistonAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, BlockPistonAfterEvent> {
+    ll::memory::HookRegistrar<PistonBlockEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<BlockPistonAfterEventEmitter>();
 }

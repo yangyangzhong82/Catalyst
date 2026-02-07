@@ -138,7 +138,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class MobTakeBlockAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, MobTakeBlockAfterEvent> {};
+class MobTakeBlockAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, MobTakeBlockAfterEvent> {
+    ll::memory::HookRegistrar<TakeBlockGoalTickHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<MobTakeBlockAfterEventEmitter>();
 }

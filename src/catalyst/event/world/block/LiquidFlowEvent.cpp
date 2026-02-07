@@ -83,7 +83,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class LiquidFlowAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, LiquidFlowAfterEvent> {};
+class LiquidFlowAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, LiquidFlowAfterEvent> {
+    ll::memory::HookRegistrar<LiquidFlowHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<LiquidFlowAfterEventEmitter>();
 }

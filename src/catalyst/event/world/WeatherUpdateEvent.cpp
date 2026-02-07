@@ -41,7 +41,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class WeatherUpdateAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, WeatherUpdateAfterEvent> {};
+class WeatherUpdateAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, WeatherUpdateAfterEvent> {
+    ll::memory::HookRegistrar<WeatherUpdateHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<WeatherUpdateAfterEventEmitter>();
 }

@@ -82,6 +82,7 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
 class ActorDestroyBlockAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, ActorDestroyBlockAfterEvent> {
+    ll::memory::HookRegistrar<ActorDestroyBlockHook> hook;
 };
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<ActorDestroyBlockAfterEventEmitter>();

@@ -41,7 +41,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class FarmChangeAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, FarmChangeAfterEvent> {};
+class FarmChangeAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, FarmChangeAfterEvent> {
+    ll::memory::HookRegistrar<FarmChangeEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<FarmChangeAfterEventEmitter>();
 }

@@ -39,7 +39,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerStopSleepAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerStopSleepAfterEvent> {};
+class PlayerStopSleepAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerStopSleepAfterEvent> {
+    ll::memory::HookRegistrar<PlayerStopSleepEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<PlayerStopSleepAfterEventEmitter>();
 }

@@ -6,6 +6,9 @@
 #include "mc/world/actor/Actor.h"
 #include "mc/world/actor/Mob.h"
 #include "mc/world/level/Level.h"
+#include "mc\world\level\ActorDimensionTransferer.h"
+#include "mc/world/level/block/BlockType.h"
+#include "mc\world\level\BlockPalette.h"
 
 namespace Catalyst {
 
@@ -46,8 +49,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class ActorChangeDimensionAfterEventEmitter
-: public ll::event::Emitter<afterEmitterFactory, ActorChangeDimensionAfterEvent> {};
+class ActorChangeDimensionAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, ActorChangeDimensionAfterEvent> {
+    ll::memory::HookRegistrar<ActorChangeDimensionEventHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<ActorChangeDimensionAfterEventEmitter>();
 }

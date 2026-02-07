@@ -44,8 +44,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerInteractEntityAfterEventEmitter
-: public ll::event::Emitter<afterEmitterFactory, PlayerInteractEntityAfterEvent> {};
+class PlayerInteractEntityAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerInteractEntityAfterEvent> {
+    ll::memory::HookRegistrar<InteractEntityHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<PlayerInteractEntityAfterEventEmitter>();
 }

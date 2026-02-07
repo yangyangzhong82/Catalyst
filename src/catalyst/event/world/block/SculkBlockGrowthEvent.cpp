@@ -43,7 +43,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class SculkBlockGrowthAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, SculkBlockGrowthAfterEvent> {};
+class SculkBlockGrowthAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, SculkBlockGrowthAfterEvent> {
+    ll::memory::HookRegistrar<SculkBlockGrowthHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<SculkBlockGrowthAfterEventEmitter>();
 }

@@ -44,8 +44,9 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerArmorStandSwapItemAfterEventEmitter
-: public ll::event::Emitter<afterEmitterFactory, PlayerArmorStandSwapItemAfterEvent> {};
+class PlayerArmorStandSwapItemAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerArmorStandSwapItemAfterEvent> {
+    ll::memory::HookRegistrar<ArmorStandSwapItemHook> hook;
+};
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
     return std::make_unique<PlayerArmorStandSwapItemAfterEventEmitter>();
 }
