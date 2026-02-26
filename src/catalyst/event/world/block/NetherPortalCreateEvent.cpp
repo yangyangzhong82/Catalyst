@@ -194,7 +194,7 @@ static bool validatePortalVolumeSecondPass(
 
 static PortalCandidate findPortalCandidate(::BlockSource& source, ::BlockPos const& center, ::Vec3 const& entityPos, int seed) {
     PortalCandidate best;
-    int minY = source.getMinHeight() + 1;
+    int minY = source.getMinHeight();
     int maxY = source.getMaxHeight() - 1;
     if (minY > maxY) {
         return best;
@@ -285,14 +285,25 @@ static ::PortalAxis axisFromStep(int stepX, int stepZ) {
 }
 
 static void placeFallbackSupport(::BlockSource& source, ::BlockPos const& innerBottomLeft, int stepX, int stepZ) {
-    auto const& netherrack = ::BlockTypeRegistry::get().getDefaultBlockState(::VanillaBlockTypeIds::Netherrack(), true);
-    for (int w = -1; w <= 3; ++w) {
-        BlockPos p = innerBottomLeft;
-        p.x += stepX * w;
-        p.z += stepZ * w;
-        p.y -= 1;
-        if (source.getBlock(p).isAir()) {
-            source.setBlock(p, netherrack, 3, nullptr, ::BlockChangeContext{});
+    auto const& netherrack =
+        ::BlockTypeRegistry::get().getDefaultBlockState(::VanillaBlockTypeIds::Netherrack(), true);
+    int depthX = stepZ;
+    int depthZ = -stepX;
+
+    // Cross-shaped pattern: depth ±2 for inner columns (width 0,1),
+    // depth ±1 for frame columns (width -1,2). Matches vanilla exactly.
+    for (int depth = -2; depth <= 2; ++depth) {
+        for (int width = -1; width <= 2; ++width) {
+            if (std::abs(depth) == 2 && (width == -1 || width == 2)) {
+                continue;
+            }
+            BlockPos p = innerBottomLeft;
+            p.x += stepX * width + depthX * depth;
+            p.z += stepZ * width + depthZ * depth;
+            p.y -= 1;
+            if (source.getBlock(p).isAir()) {
+                source.setBlock(p, netherrack, 3, nullptr, ::BlockChangeContext{});
+            }
         }
     }
 }
@@ -360,17 +371,11 @@ static void placePortalBlocks(::BlockSource& source, ::BlockPos const& innerBott
 }
 
 static int chooseFallbackY(::BlockSource const& source, int centerY) {
-    int minY = source.getMinHeight() + 1;
-    int topSafeY = source.getMaxHeight() - 10;
-    if (topSafeY < minY) {
-        return minY;
-    }
-
-    int y = topSafeY;
-    if (centerY <= topSafeY) {
+    int y = source.getMaxHeight() - 10;
+    if (centerY <= y) {
         y = centerY > 70 ? centerY : 70;
     }
-    return y < minY ? minY : y;
+    return y;
 }
 
 static ::PortalRecord buildRecordFromShapeAndPlacement(
@@ -392,7 +397,7 @@ static ::PortalRecord buildRecordFromShapeAndPlacement(
     auto base            = innerBottomLeft;
     base.x -= xInc;
     base.z -= zInc;
-    if (shape.mBottomLeftValid && axis == ::PortalAxis::X && shape.mWidth > 2) {
+    if (shape.mBottomLeftValid && axis == ::PortalAxis::X) {
         base.x -= (shape.mWidth - 2);
     }
     base.y -= 1;

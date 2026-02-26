@@ -113,7 +113,8 @@ static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
 }
 
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class DragonEggBlockTeleportAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, DragonEggBlockTeleportAfterEvent> {
+class DragonEggBlockTeleportAfterEventEmitter
+: public ll::event::Emitter<afterEmitterFactory, DragonEggBlockTeleportAfterEvent> {
     ll::memory::HookRegistrar<DragonEggBlockTeleportEventHook> hook;
 };
 static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
