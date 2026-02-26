@@ -20,6 +20,8 @@
 
 #include <unordered_map>
 
+#ifdef LL_PLAT_S
+
 namespace Catalyst {
 
 // Thread-local pointer to current NetworkIdentifier during event dispatch
@@ -156,4 +158,14 @@ void ClientLoginAfterEvent::disconnect(std::string const& message) const {
 }
 
 } // namespace Catalyst
+
+#else
+
+namespace Catalyst {
+
+void ClientLoginAfterEvent::disconnect(std::string const&) const {}
+
+} // namespace Catalyst
+
+#endif
 
