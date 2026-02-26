@@ -1,0 +1,99 @@
+#include "IceBlockMeltEvent.h"
+
+#include "ll/api/event/Emitter.h"
+#include "ll/api/event/EventBus.h"
+#include "ll/api/memory/Hook.h"
+#include "mc/deps/core/math/Vec3.h"
+#include "mc/deps/shared_types/legacy/LevelEvent.h"
+#include "mc/deps/shared_types/legacy/LevelSoundEvent.h"
+#include "mc/world/actor/ActorSoundIdentifier.h"
+#include "mc/world/level/BlockPos.h"
+#include "mc/world/level/BlockSource.h"
+#include "mc/world/level/Level.h"
+#include "mc/world/level/block/BedrockBlockNames.h"
+#include "mc/world/level/block/Block.h"
+#include "mc/world/level/block/IceBlock.h"
+#include "mc/world/level/block/VanillaBlockTypeIds.h"
+#include "mc/world/level/block/registry/BlockTypeRegistry.h"
+#include "mc/world/level/dimension/VanillaDimensions.h"
+
+namespace Catalyst {
+
+LL_STATIC_HOOK(
+    IceBlockMeltHook,
+    ll::memory::HookPriority::Normal,
+    &IceBlock::_getMeltedBlockAndSendEvents,
+    ::Block const&,
+    ::BlockSource&    region,
+    ::BlockPos const& pos
+) {
+    auto& bus = ll::event::EventBus::getInstance();
+
+    auto const& sourceBlock = region.getBlock(pos);
+    bool const  inNether    = region.getDimensionId() == VanillaDimensions::Nether();
+
+    auto&       registry     = BlockTypeRegistry::get();
+    auto const& meltedBlock  = inNether ? registry.getDefaultBlockState(BedrockBlockNames::Air())
+                                        : registry.getDefaultBlockState(VanillaBlockTypeIds::FlowingWater());
+
+    IceBlockMeltBeforeEvent beforeEvent(region, pos, sourceBlock, meltedBlock, inNether);
+    bus.publish(beforeEvent);
+    if (beforeEvent.isCancelled()) {
+        // Force a block update to keep client and server in sync when melting is intercepted.
+        if (auto cancelledBlock = Block::tryGetFromRegistry(sourceBlock.getTypeName(), sourceBlock.getData())) {
+            region._blockChanged(pos, 0, *cancelledBlock, *cancelledBlock, 3, true, nullptr, nullptr);
+            return *cancelledBlock;
+        }
+
+        region._blockChanged(pos, 0, sourceBlock, sourceBlock, 3, true, nullptr, nullptr);
+        return sourceBlock;
+    }
+
+    if (inNether) {
+        auto& level = region.getLevel();
+
+        level.broadcastSoundEvent(
+            region,
+            SharedTypes::Legacy::LevelSoundEvent::Fizz,
+            pos.center(),
+            -1,
+            ActorSoundIdentifier{},
+            false
+        );
+
+        Vec3 particlePos{
+            static_cast<float>(pos.x),
+            static_cast<float>(pos.y),
+            static_cast<float>(pos.z)
+        };
+        level.broadcastLocalEvent(
+            region,
+            SharedTypes::Legacy::LevelEvent::ParticlesEvaporateWater,
+            particlePos,
+            sourceBlock
+        );
+    }
+
+    IceBlockMeltAfterEvent afterEvent(region, pos, sourceBlock, meltedBlock, inNether);
+    bus.publish(afterEvent);
+
+    return meltedBlock;
+}
+
+static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
+class IceBlockMeltBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, IceBlockMeltBeforeEvent> {
+    ll::memory::HookRegistrar<IceBlockMeltHook> hook;
+};
+static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
+    return std::make_unique<IceBlockMeltBeforeEventEmitter>();
+}
+
+static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
+class IceBlockMeltAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, IceBlockMeltAfterEvent> {
+    ll::memory::HookRegistrar<IceBlockMeltHook> hook;
+};
+static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
+    return std::make_unique<IceBlockMeltAfterEventEmitter>();
+}
+
+} // namespace Catalyst
