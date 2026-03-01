@@ -1,12 +1,13 @@
 #include "PlayerOpenContainerEvent.h"
 
+#include "catalyst/event/server/SendPacketEvent.h"
+#include "catalyst/mod/Gloabl.h"
 #include "ll/api/event/Emitter.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/Listener.h"
 #include "mc/network/packet/ContainerOpenPacket.h"
 #include "mc/world/actor/player/Player.h"
-#include "catalyst/mod/Gloabl.h"
-#include "catalyst/event/server/SendPacketEvent.h"
+
 
 namespace Catalyst {
 
@@ -23,7 +24,7 @@ public:
                 if (ev.packet().getId() != MinecraftPacketIds::ContainerOpen) {
                     return;
                 }
-logger.debug("捕获到ContainerOpenPacket发送事件");
+                logger.debug("捕获到ContainerOpenPacket发送事件");
                 // 获取玩家
                 auto player = ev.player();
                 if (!player) {
@@ -47,6 +48,7 @@ logger.debug("捕获到ContainerOpenPacket发送事件");
                 // 如果事件被取消，则取消发包
                 if (beforeEvent.isCancelled()) {
                     ev.cancel();
+                    ev.player()->doDeleteContainerManager(false);
                 }
             },
             ll::event::EventPriority::Normal

@@ -1,10 +1,11 @@
 #include "PlayerStartSleepEvent.h"
 
+#include "catalyst/mod/Gloabl.h"
 #include "ll/api/event/Emitter.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/player/Player.h"
-#include "catalyst/mod/Gloabl.h"
+
 namespace Catalyst {
 
 LL_TYPE_INSTANCE_HOOK(
@@ -15,8 +16,12 @@ LL_TYPE_INSTANCE_HOOK(
     ::BedSleepingResult,
     ::BlockPos const& bedBlockPos
 ) {
-    auto& bus = ll::event::EventBus::getInstance();
-logger.info(
+    auto& bus           = ll::event::EventBus::getInstance();
+    bool  canStartSleep = this->canStartSleepInBed();
+    if (!canStartSleep) {
+        return origin(bedBlockPos);
+    }
+    logger.info(
         "PlayerStartSleepEvent: player={}, bedPos=({},{},{})",
         this->getRealName(),
         bedBlockPos.x,

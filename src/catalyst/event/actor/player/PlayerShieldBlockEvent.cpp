@@ -10,7 +10,7 @@
 
 namespace Catalyst {
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     PlayerShieldBlockEventHook,
     HookPriority::Normal,
     Player,
@@ -21,7 +21,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 ) {
     auto& bus = ll::event::EventBus::getInstance();
 
-    auto  damagerId = source.getDamagingEntityUniqueID();
+    auto   damagerId = source.getDamagingEntityUniqueID();
     Actor* damager   = getLevel().fetchEntity(damagerId, false);
 
     PlayerShieldBlockBeforeEvent beforeEvent(*this, source, damage, damager);
@@ -56,4 +56,3 @@ static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
 }
 
 } // namespace Catalyst
-
