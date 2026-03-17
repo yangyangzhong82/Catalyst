@@ -1,0 +1,302 @@
+#include "PlayerMendingRepairEvent.h"
+
+#include <algorithm>
+#include <memory>
+#include <optional>
+
+#include "catalyst/mod/Gloabl.h"
+#include "ll/api/event/Emitter.h"
+#include "ll/api/event/EventBus.h"
+#include "ll/api/memory/Hook.h"
+#include "mc/entity/components/ActorEquipmentComponent.h"
+#include "mc/entity/components/SynchedActorDataComponent.h"
+#include "mc/world/SimpleContainer.h"
+#include "mc/world/actor/ActorDataIDs.h"
+#include "mc/world/actor/DataItem.h"
+#include "mc/world/actor/item/ExperienceOrb.h"
+#include "mc/world/actor/player/Inventory.h"
+#include "mc/world/actor/player/Player.h"
+#include "mc/world/actor/player/PlayerInventory.h"
+#include "mc/world/item/enchanting/EnchantUtils.h"
+namespace Catalyst {
+
+namespace {
+
+struct MendingTarget {
+    ContainerID                                   containerId;
+    int                                           slot;
+    std::optional<SharedTypes::Legacy::ArmorSlot> armorSlot;
+};
+
+bool isSameStack(ItemStack const& lhs, ItemStack const& rhs) {
+    return std::addressof(lhs) == std::addressof(rhs) || lhs.matchesItem(rhs);
+}
+
+bool isRepairableMendingItem(ItemStack const& item) {
+    return item.mValid_DeprecatedSeeComment && !item.isNull()
+        && item.mCount > 0 && EnchantUtils::hasEnchant(Enchant::Type::Mending, item)
+        && item.isDamageableItem() && item.getDamageValue() > 0;
+}
+
+std::optional<MendingTarget> resolveMendingTarget(Player& player, ItemStack const& targetItem) {
+    if (!player.mInventory) {
+        return std::nullopt;
+    }
+
+    PlayerInventory& playerInventory = *player.mInventory;
+
+    if (playerInventory.mSelectedContainerId == ContainerID::Inventory) {
+        ItemStack const& selectedItem = playerInventory.mInventory->getItem(playerInventory.mSelected);
+        if (isSameStack(targetItem, selectedItem)) {
+            return MendingTarget{ContainerID::Inventory, playerInventory.mSelected, std::nullopt};
+        }
+    }
+
+    auto equipment = player.getEntityContext().tryGetComponent<ActorEquipmentComponent>();
+    if (!equipment) {
+        return std::nullopt;
+    }
+
+    if (equipment->mHand) {
+        ItemStack const& offhandItem = equipment->mHand->getItem(1);
+        if (isSameStack(targetItem, offhandItem)) {
+            return MendingTarget{ContainerID::Offhand, 1, std::nullopt};
+        }
+    }
+
+    if (equipment->mArmor) {
+        for (int slot = 0; slot < static_cast<int>(SharedTypes::Legacy::ArmorSlot::HumanoidCount); ++slot) {
+            auto const       armorSlot = static_cast<SharedTypes::Legacy::ArmorSlot>(slot);
+            ItemStack const& armorItem = equipment->mArmor->getItem(slot);
+            if (isSameStack(targetItem, armorItem)) {
+                return MendingTarget{ContainerID::Armor, slot, armorSlot};
+            }
+        }
+    }
+
+    return std::nullopt;
+}
+
+ItemStack const* getMendingTargetItem(Player& player, MendingTarget const& target) {
+    if (!player.mInventory) {
+        return nullptr;
+    }
+
+    switch (target.containerId) {
+    case ContainerID::Inventory:
+        return std::addressof(player.mInventory->mInventory->getItem(target.slot));
+    case ContainerID::Offhand: {
+        auto equipment = player.getEntityContext().tryGetComponent<ActorEquipmentComponent>();
+        if (!equipment || !equipment->mHand) {
+            return nullptr;
+        }
+        return std::addressof(equipment->mHand->getItem(target.slot));
+    }
+    case ContainerID::Armor: {
+        auto equipment = player.getEntityContext().tryGetComponent<ActorEquipmentComponent>();
+        if (!equipment || !equipment->mArmor) {
+            return nullptr;
+        }
+        return std::addressof(equipment->mArmor->getItem(target.slot));
+    }
+    default:
+        return nullptr;
+    }
+}
+
+DataItem* getOrbValueDataItem(ExperienceOrb& orb) {
+    auto* synchedActorData = orb.mEntityData->mData.get();
+    if (!synchedActorData) {
+        return nullptr;
+    }
+
+    auto& items = synchedActorData->mData->mItemsArray;
+    auto  index = static_cast<size_t>(ActorDataIDs::Value);
+    if (index >= items->size() || !(*items)[index]) {
+        return nullptr;
+    }
+
+    DataItem* dataItem = (*items)[index].get();
+    if (!dataItem || !dataItem->getData<short>()) {
+        return nullptr;
+    }
+
+    return dataItem;
+}
+
+bool setOrbValue(ExperienceOrb& orb, DataItem& dataItem, int value) {
+    auto* synchedActorData = orb.mEntityData->mData.get();
+    if (!synchedActorData) {
+        return false;
+    }
+
+    auto dataRef = dataItem.getData<short>();
+    if (!dataRef) {
+        return false;
+    }
+
+    auto newValue = static_cast<short>(std::max(0, value));
+    if (*dataRef != newValue) {
+        *dataRef = newValue;
+        synchedActorData->mData->markDirty(dataItem);
+    }
+    return true;
+}
+
+} // namespace
+
+LL_TYPE_INSTANCE_HOOK(
+    PlayerMendingRepairEventHook,
+    ll::memory::HookPriority::Normal,
+    ExperienceOrb,
+    &ExperienceOrb::_handleMending,
+    void,
+    Player& player
+) {
+    ItemStack const& originalTarget = EnchantUtils::getRandomDamagedItemWithMending(player);
+    if (!isRepairableMendingItem(originalTarget)) {
+        return origin(player);
+    }
+
+    auto target = resolveMendingTarget(player, originalTarget);
+    if (!target) {
+        logger.debug("PlayerMendingRepairEvent fallback to origin: targetMapped=false, orbValueData=unknown");
+        return origin(player);
+    }
+
+    int oldDamage    = originalTarget.getDamageValue();
+    int oldOrbValue  = this->getValue();
+    int repairAmount = std::min(oldDamage, oldOrbValue * 2);
+    if (repairAmount <= 0) {
+        return origin(player);
+    }
+
+    ItemStack originalItem(originalTarget);
+    ItemStack repairedItem(originalTarget);
+    repairedItem.setDamageValue(static_cast<short>(std::max(0, oldDamage - repairAmount)));
+
+    int   newOrbValue = std::max(0, oldOrbValue - repairAmount / 2);
+    auto& bus = ll::event::EventBus::getInstance();
+
+    PlayerMendingRepairBeforeEvent beforeEvent(
+        player,
+        *this,
+        target->containerId,
+        target->slot,
+        target->armorSlot,
+        ItemStack(originalItem),
+        ItemStack(repairedItem),
+        repairAmount,
+        oldOrbValue,
+        newOrbValue
+    );
+    bus.publish(beforeEvent);
+    if (beforeEvent.isCancelled()) {
+        return;
+    }
+
+    auto* orbValueDataItem = getOrbValueDataItem(*this);
+    if (!orbValueDataItem) {
+        logger.debug("PlayerMendingRepairEvent fallback to origin after BeforeEvent: orbValueData=false");
+        origin(player);
+
+        auto* currentItem = getMendingTargetItem(player, *target);
+        if (!currentItem) {
+            return;
+        }
+
+        ItemStack finalItem(*currentItem);
+        int finalRepairAmount = std::max(
+            0,
+            static_cast<int>(originalItem.getDamageValue()) - static_cast<int>(finalItem.getDamageValue())
+        );
+        if (finalRepairAmount <= 0) {
+            return;
+        }
+
+        PlayerMendingRepairAfterEvent afterEvent(
+            player,
+            *this,
+            target->containerId,
+            target->slot,
+            target->armorSlot,
+            std::move(originalItem),
+            std::move(finalItem),
+            finalRepairAmount,
+            oldOrbValue,
+            this->getValue()
+        );
+        bus.publish(afterEvent);
+        return;
+    }
+
+    if (!setOrbValue(*this, *orbValueDataItem, newOrbValue)) {
+        logger.debug("PlayerMendingRepairEvent fallback to origin after BeforeEvent: orbValueWrite=false");
+        origin(player);
+        return;
+    }
+
+    switch (target->containerId) {
+    case ContainerID::Inventory:
+        player.mTransactionManager->_createServerSideAction(originalTarget, repairedItem);
+        player.mInventory->mInventory->setItem(target->slot, repairedItem);
+        break;
+    case ContainerID::Offhand:
+        player.setOffhandSlot(repairedItem);
+        break;
+    case ContainerID::Armor:
+        if (!target->armorSlot) {
+            return;
+        }
+        player.setDamagedArmor(*target->armorSlot, repairedItem);
+        break;
+    default:
+        return;
+    }
+
+    auto* currentItem = getMendingTargetItem(player, *target);
+    if (!currentItem) {
+        return;
+    }
+
+    ItemStack finalItem(*currentItem);
+    int finalRepairAmount =
+        std::max(0, static_cast<int>(originalItem.getDamageValue()) - static_cast<int>(finalItem.getDamageValue()));
+    if (finalRepairAmount <= 0) {
+        return;
+    }
+
+    PlayerMendingRepairAfterEvent afterEvent(
+        player,
+        *this,
+        target->containerId,
+        target->slot,
+        target->armorSlot,
+        std::move(originalItem),
+        std::move(finalItem),
+        finalRepairAmount,
+        oldOrbValue,
+        this->getValue()
+    );
+    bus.publish(afterEvent);
+}
+
+static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
+class PlayerMendingRepairBeforeEventEmitter
+: public ll::event::Emitter<beforeEmitterFactory, PlayerMendingRepairBeforeEvent> {
+    ll::memory::HookRegistrar<PlayerMendingRepairEventHook> hook;
+};
+static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
+    return std::make_unique<PlayerMendingRepairBeforeEventEmitter>();
+}
+
+static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
+class PlayerMendingRepairAfterEventEmitter
+: public ll::event::Emitter<afterEmitterFactory, PlayerMendingRepairAfterEvent> {
+    ll::memory::HookRegistrar<PlayerMendingRepairEventHook> hook;
+};
+static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
+    return std::make_unique<PlayerMendingRepairAfterEventEmitter>();
+}
+
+} // namespace Catalyst
