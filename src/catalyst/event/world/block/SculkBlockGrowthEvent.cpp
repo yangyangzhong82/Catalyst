@@ -19,6 +19,16 @@ LL_STATIC_HOOK(
     ::SculkSpreader&     spreader
 ) {
     auto& bus = ll::event::EventBus::getInstance();
+    WeakRef<BlockSource> regionWeak;
+
+    if (region == nullptr) {
+        // Some worldgen paths provide a null BlockSource pointer.
+        // Preserve game behavior, but skip publishing events that require BlockSource&.
+        origin(target, region, pos, random, spreader);
+        return;
+    }
+
+    regionWeak = region->getWeakRef();
 
     SculkBlockGrowthBeforeEvent beforeEvent(*region, pos);
     bus.publish(beforeEvent);
@@ -29,7 +39,14 @@ LL_STATIC_HOOK(
 
     origin(target, region, pos, random, spreader);
 
-    SculkBlockGrowthAfterEvent afterEvent(*region, pos);
+    auto lockedRegion = regionWeak.lock();
+    if (!lockedRegion) {
+        // _placeGrowthAt may invalidate the original BlockSource on some worldgen paths.
+        // Do not publish an AfterEvent with a dangling WorldEvent::blockSource().
+        return;
+    }
+
+    SculkBlockGrowthAfterEvent afterEvent(*lockedRegion, pos);
     bus.publish(afterEvent);
 }
 
