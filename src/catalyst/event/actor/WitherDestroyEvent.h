@@ -29,6 +29,8 @@ public:
       mRange(range),
       mAttackType(attackType) {}
 
+    void serialize(CompoundTag&) const override;
+
     AABB const&                  aabb() const { return mAABB; }
     BlockSource&                 region() const { return mRegion; }
     int                          range() const { return mRange; }
@@ -54,6 +56,8 @@ public:
       mRegion(region),
       mRange(range),
       mAttackType(attackType) {}
+
+    void serialize(CompoundTag&) const override;
 
     AABB const&                  aabb() const { return mAABB; }
     BlockSource&                 region() const { return mRegion; }

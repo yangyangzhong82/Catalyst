@@ -7,7 +7,27 @@
 #include "mc/world/redstone/circuit/CircuitSceneGraph.h"
 #include "mc/world/redstone/circuit/CircuitSystem.h"
 #include "mc/world/redstone/circuit/components/BaseCircuitComponent.h"
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void RedstoneUpdateBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["pos"]       = ListTag{pos().x, pos().y, pos().z};
+    nbt["strength"]  = strength();
+    nbt["firstTime"] = isFirstTime();
+    nbt["component"] = ll::event::serializePtrObj(component());
+}
+
+void RedstoneUpdateAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::world::WorldEvent::serialize(nbt);
+    nbt["pos"]       = ListTag{pos().x, pos().y, pos().z};
+    nbt["strength"]  = strength();
+    nbt["firstTime"] = isFirstTime();
+    nbt["component"] = ll::event::serializePtrObj(component());
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     RedstoneUpdateEventHook,

@@ -10,7 +10,29 @@
 #include "mc/world/level/material/Material.h"
 #include "mc/world/level/material/MaterialType.h"
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void LiquidFlowBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["liquidBlock"]       = ll::event::serializeRefObj(liquidBlock());
+    nbt["toPos"]             = ListTag{toPos().x, toPos().y, toPos().z};
+    nbt["neighbor"]          = neighbor();
+    nbt["fromPos"]           = ListTag{fromPos().x, fromPos().y, fromPos().z};
+    nbt["flowFromDirection"] = (int)flowFromDirection();
+}
+
+void LiquidFlowAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::world::WorldEvent::serialize(nbt);
+    nbt["liquidBlock"]       = ll::event::serializeRefObj(liquidBlock());
+    nbt["toPos"]             = ListTag{toPos().x, toPos().y, toPos().z};
+    nbt["neighbor"]          = neighbor();
+    nbt["fromPos"]           = ListTag{fromPos().x, fromPos().y, fromPos().z};
+    nbt["flowFromDirection"] = (int)flowFromDirection();
+}
+
 
 namespace {
 

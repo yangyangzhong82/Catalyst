@@ -15,6 +15,8 @@ class CATALYST_API MobPickupItemBeforeEvent final : public ll::event::Cancellabl
 public:
     constexpr MobPickupItemBeforeEvent(Actor& mob, ItemActor& itemActor) : Cancellable(mob), mItemActor(itemActor) {}
 
+    void serialize(CompoundTag&) const override;
+
     ItemActor& itemActor() const { return mItemActor; }
 };
 
@@ -23,6 +25,8 @@ class CATALYST_API MobPickupItemAfterEvent final : public ll::event::entity::Act
 
 public:
     constexpr MobPickupItemAfterEvent(Actor& mob, ItemActor& itemActor) : ActorEvent(mob), mItemActor(itemActor) {}
+
+    void serialize(CompoundTag&) const override;
 
     ItemActor& itemActor() const { return mItemActor; }
 };

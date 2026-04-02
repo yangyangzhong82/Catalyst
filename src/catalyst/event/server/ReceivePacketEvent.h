@@ -31,6 +31,8 @@ public:
       mSubClientId(subClientId),
       mPlayer(player) {}
 
+    void serialize(CompoundTag&) const override;
+
     NetworkIdentifier const& networkId() const { return mNetworkId; }
     Packet const&            packet() const { return mPacket; }
     SubClientId              subClientId() const { return mSubClientId; }
@@ -54,6 +56,8 @@ public:
       mPacket(packet),
       mSubClientId(subClientId),
       mPlayer(player) {}
+
+    void serialize(CompoundTag&) const override;
 
     NetworkIdentifier const& networkId() const { return mNetworkId; }
     Packet const&            packet() const { return mPacket; }

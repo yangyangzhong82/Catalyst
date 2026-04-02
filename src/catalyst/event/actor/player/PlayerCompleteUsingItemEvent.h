@@ -18,6 +18,8 @@ public:
     : Cancellable(player),
       mItem(item) {}
 
+    void serialize(CompoundTag&) const override;
+
     ItemStack const& item() const { return mItem; }
 };
 
@@ -28,6 +30,8 @@ public:
     constexpr PlayerCompleteUsingItemAfterEvent(Player& player, ItemStack const& item)
     : PlayerEvent(player),
       mItem(item) {}
+
+    void serialize(CompoundTag&) const override;
 
     ItemStack const& item() const { return mItem; }
 };

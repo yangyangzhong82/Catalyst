@@ -7,7 +7,26 @@
 #include "mc/world/level/ChangeDimensionRequest.h"
 #include "mc/world/level/Level.h"
 
+#include "mc/nbt/CompoundTag.h"
+
 namespace Catalyst {
+
+void PlayerChangeDimensionBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["fromDimensionId"] = fromDimensionId();
+    nbt["toDimensionId"]   = toDimensionId();
+    nbt["respawn"]         = isRespawn();
+    nbt["usePortal"]       = isUsePortal();
+}
+
+void PlayerChangeDimensionAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::PlayerEvent::serialize(nbt);
+    nbt["fromDimensionId"] = fromDimensionId();
+    nbt["toDimensionId"]   = toDimensionId();
+    nbt["respawn"]         = isRespawn();
+    nbt["usePortal"]       = isUsePortal();
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     PlayerChangeDimensionEventHook,

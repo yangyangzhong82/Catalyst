@@ -6,6 +6,8 @@
 
 #include "catalyst/event/actor/ActorOpenContainerEvent.h"
 #include "ll/api/event/EventBus.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+#include "mc/nbt/CompoundTag.h"
 #include "mc/world/inventory/EnderChestContainer.h"
 #include "mc/world/level/block/actor/BarrelBlockActor.h"
 #include "mc/world/level/block/actor/BrewingStandBlockActor.h"
@@ -73,6 +75,18 @@ static bool SafeCheckVftable(void* ptr, void** expectedVftable) noexcept {
 
     // 直接比较 vftable（内存已验证可读）
     return *reinterpret_cast<void***>(ptr) == expectedVftable;
+}
+
+void Catalyst::ActorOpenContainerBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["containerType"] = magic_enum::enum_name(containerType());
+    nbt["blockActor"]    = ll::event::serializePtrObj(blockActor());
+}
+
+void Catalyst::ActorOpenContainerAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::ActorEvent::serialize(nbt);
+    nbt["containerType"] = magic_enum::enum_name(containerType());
+    nbt["blockActor"]    = ll::event::serializePtrObj(blockActor());
 }
 
 LL_TYPE_INSTANCE_HOOK(

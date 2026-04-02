@@ -25,7 +25,46 @@
 #include "mc/world/item/ItemStack.h"
 #include "mc/world/level/Level.h"
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void MobTotemResurrectBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["killingDamage"] = ll::event::serializeRefObj(killingDamage());
+    nbt["totem"]         = ll::event::serializeRefObj(totem());
+    nbt["hasTotem"]      = hasTotem();
+    ListTag effectsList;
+    for (auto const& eff : effects()) {
+        CompoundTag effTag;
+        effTag["effect"]        = ll::event::serializePtrObj(eff.effect);
+        effTag["durationTicks"] = eff.durationTicks;
+        effTag["amplifier"]     = eff.amplifier;
+        effTag["visible"]       = eff.visible;
+        effectsList.emplace_back(std::move(effTag));
+    }
+    nbt["effects"] = std::move(effectsList);
+}
+
+void MobTotemResurrectAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::entity::MobEvent::serialize(nbt);
+    nbt["killingDamage"] = ll::event::serializeRefObj(killingDamage());
+    nbt["totem"]         = ll::event::serializeRefObj(totem());
+    nbt["hasTotem"]      = hasTotem();
+    nbt["result"]        = result();
+    ListTag effectsList;
+    for (auto const& eff : effects()) {
+        CompoundTag effTag;
+        effTag["effect"]        = ll::event::serializePtrObj(eff.effect);
+        effTag["durationTicks"] = eff.durationTicks;
+        effTag["amplifier"]     = eff.amplifier;
+        effTag["visible"]       = eff.visible;
+        effectsList.emplace_back(std::move(effTag));
+    }
+    nbt["effects"] = std::move(effectsList);
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     MobTotemResurrectHook,

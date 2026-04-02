@@ -5,8 +5,26 @@
 #include "ll/api/memory/Hook.h"
 #include "mc/world/level/Explosion.h"
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
 
+void ExplosionBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["explosion"] = ll::event::serializeRefObj(explosion());
+    nbt["pos"]       = ListTag{pos().x, pos().y, pos().z};
+    nbt["radius"]    = radius();
+    nbt["fire"]      = fire();
+    nbt["breaking"]  = breaking();
+}
+
+void ExplosionAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::world::WorldEvent::serialize(nbt);
+    nbt["explosion"] = ll::event::serializeRefObj(explosion());
+    nbt["pos"]       = ListTag{pos().x, pos().y, pos().z};
+    nbt["radius"]    = radius();
+}
 LL_TYPE_INSTANCE_HOOK(
     ExplosionEventHook,
     ll::memory::HookPriority::Normal,

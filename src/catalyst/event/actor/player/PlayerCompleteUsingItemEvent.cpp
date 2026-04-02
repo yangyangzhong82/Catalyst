@@ -6,7 +6,21 @@
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/item/ItemStack.h"
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void PlayerCompleteUsingItemBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["item"] = ll::event::serializeRefObj(item());
+}
+
+void PlayerCompleteUsingItemAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::PlayerEvent::serialize(nbt);
+    nbt["item"] = ll::event::serializeRefObj(item());
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     PlayerCompleteUsingItemEventHook,

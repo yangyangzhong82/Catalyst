@@ -22,6 +22,8 @@ public:
       mContainerType(containerType),
       mBlockActor(blockActor) {}
 
+    void serialize(CompoundTag&) const override;
+
     ContainerType containerType() const { return mContainerType; }
     BlockActor*   blockActor() const { return mBlockActor; }
 };
@@ -35,6 +37,8 @@ public:
     : ActorEvent(actor),
       mContainerType(containerType),
       mBlockActor(blockActor) {}
+
+    void serialize(CompoundTag&) const override;
 
     ContainerType containerType() const { return mContainerType; }
     BlockActor*   blockActor() const { return mBlockActor; }

@@ -14,6 +14,8 @@ class CATALYST_API PlayerUseFrameBlockBeforeEvent final : public ll::event::Canc
 public:
     constexpr PlayerUseFrameBlockBeforeEvent(Player& player, BlockPos pos) : Cancellable(player), mPos(pos) {}
 
+    void serialize(CompoundTag&) const override;
+
     BlockPos const& pos() const { return mPos; }
 };
 
@@ -22,6 +24,8 @@ class CATALYST_API PlayerUseFrameBlockAfterEvent final : public ll::event::Playe
 
 public:
     constexpr PlayerUseFrameBlockAfterEvent(Player& player, BlockPos pos) : PlayerEvent(player), mPos(pos) {}
+
+    void serialize(CompoundTag&) const override;
 
     BlockPos const& pos() const { return mPos; }
 };

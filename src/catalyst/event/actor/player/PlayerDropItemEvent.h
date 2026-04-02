@@ -21,6 +21,8 @@ public:
       mItem(item),
       mSlot(slot) {}
 
+    void serialize(CompoundTag&) const override;
+
     ItemStack const& item() const { return mItem; }
     int              slot() const { return mSlot; }
 };
@@ -34,6 +36,8 @@ public:
     : PlayerEvent(player),
       mItem(item),
       mSlot(slot) {}
+
+    void serialize(CompoundTag&) const override;
 
     ItemStack const& item() const { return mItem; }
     int              slot() const { return mSlot; }

@@ -5,7 +5,41 @@
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/Actor.h"
 #include "mc/world/effect/MobEffectInstance.h"
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void ActorEffectAddBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["effect"] = ll::event::serializeRefObj(effect());
+}
+
+void ActorEffectAddAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::entity::ActorEvent::serialize(nbt);
+    nbt["effect"] = ll::event::serializeRefObj(effect());
+}
+
+void ActorEffectUpdateBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["effect"] = ll::event::serializeRefObj(effect());
+}
+
+void ActorEffectUpdateAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::entity::ActorEvent::serialize(nbt);
+    nbt["effect"] = ll::event::serializeRefObj(effect());
+}
+
+void ActorEffectRemoveBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["effect"] = ll::event::serializeRefObj(effect());
+}
+
+void ActorEffectRemoveAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::entity::ActorEvent::serialize(nbt);
+    nbt["effect"] = ll::event::serializeRefObj(effect());
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     ActorEffectAddEventHook,

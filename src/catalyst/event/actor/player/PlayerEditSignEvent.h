@@ -31,6 +31,8 @@ public:
       mNewFrontText(std::move(newFrontText)),
       mNewBackText(std::move(newBackText)) {}
 
+    void serialize(CompoundTag&) const override;
+
     BlockPos const&    pos() const { return mPos; }
     std::string const& oldFrontText() const { return mOldFrontText; }
     std::string const& oldBackText() const { return mOldBackText; }
@@ -60,6 +62,8 @@ public:
       mOldBackText(std::move(oldBackText)),
       mNewFrontText(std::move(newFrontText)),
       mNewBackText(std::move(newBackText)) {}
+
+    void serialize(CompoundTag&) const override;
 
     BlockPos const&    pos() const { return mPos; }
     std::string const& oldFrontText() const { return mOldFrontText; }

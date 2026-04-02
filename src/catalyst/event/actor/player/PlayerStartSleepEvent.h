@@ -18,6 +18,8 @@ public:
     : Cancellable(player),
       mBedBlockPos(bedBlockPos) {}
 
+    void serialize(CompoundTag&) const override;
+
     BlockPos const& getBedBlockPos() const { return mBedBlockPos; }
 };
 
@@ -30,6 +32,8 @@ public:
     : PlayerEvent(player),
       mBedBlockPos(bedBlockPos),
       mResult(result) {}
+
+    void serialize(CompoundTag&) const override;
 
     BlockPos const&   getBedBlockPos() const { return mBedBlockPos; }
     BedSleepingResult getResult() const { return mResult; }

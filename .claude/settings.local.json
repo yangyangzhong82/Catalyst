@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xmake build:*)",
+      "Bash(where /r D:kaifamaCatalyst *LevelContainerModel*)",
+      "Bash(dir /s /b D:kaifamaCatalyst*LevelContainerModel*)",
+      "Bash(ls:*)",
+      "Bash(python add_serialize.py)"
+    ]
+  }
+}

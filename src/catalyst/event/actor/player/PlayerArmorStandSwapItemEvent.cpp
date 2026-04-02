@@ -6,7 +6,23 @@
 #include "mc/world/actor/ArmorStand.h"
 #include "mc/world/actor/player/Player.h"
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void PlayerArmorStandSwapItemBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["armorStand"] = ll::event::serializeRefObj(armorStand());
+    nbt["slot"]       = magic_enum::enum_name(slot());
+}
+
+void PlayerArmorStandSwapItemAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::PlayerEvent::serialize(nbt);
+    nbt["armorStand"] = ll::event::serializeRefObj(armorStand());
+    nbt["slot"]       = magic_enum::enum_name(slot());
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     ArmorStandSwapItemHook,

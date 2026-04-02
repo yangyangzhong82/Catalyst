@@ -17,6 +17,8 @@ public:
     : Cancellable(blockSource),
       mPos(pos) {}
 
+    void serialize(CompoundTag&) const override;
+
     BlockPos const& pos() const { return mPos; }
 };
 
@@ -25,6 +27,8 @@ class CATALYST_API SculkBlockGrowthAfterEvent final : public ll::event::world::W
 
 public:
     constexpr SculkBlockGrowthAfterEvent(BlockSource& blockSource, BlockPos pos) : WorldEvent(blockSource), mPos(pos) {}
+
+    void serialize(CompoundTag&) const override;
 
     BlockPos const& pos() const { return mPos; }
 };

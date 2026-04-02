@@ -30,6 +30,8 @@ public:
       mMeltedBlock(meltedBlock),
       mInNether(inNether) {}
 
+    void serialize(CompoundTag&) const override;
+
     BlockPos const& pos() const { return mPos; }
     ::Block const&  sourceBlock() const { return mSourceBlock; }
     ::Block const&  meltedBlock() const { return mMeltedBlock; }
@@ -55,6 +57,8 @@ public:
       mSourceBlock(sourceBlock),
       mMeltedBlock(meltedBlock),
       mInNether(inNether) {}
+
+    void serialize(CompoundTag&) const override;
 
     BlockPos const& pos() const { return mPos; }
     ::Block const&  sourceBlock() const { return mSourceBlock; }

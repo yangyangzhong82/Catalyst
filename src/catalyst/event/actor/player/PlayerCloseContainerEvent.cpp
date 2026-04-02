@@ -9,7 +9,24 @@
 #include "mc/world/actor/player/Player.h"
 
 
+#include "mc/nbt/CompoundTag.h"
+
 namespace Catalyst {
+
+void PlayerCloseContainerBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["containerId"]          = (int)containerId();
+    nbt["containerType"]        = magic_enum::enum_name(containerType());
+    nbt["serverInitiatedClose"] = serverInitiatedClose();
+}
+
+void PlayerCloseContainerAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::PlayerEvent::serialize(nbt);
+    nbt["containerId"]          = (int)containerId();
+    nbt["containerType"]        = magic_enum::enum_name(containerType());
+    nbt["serverInitiatedClose"] = serverInitiatedClose();
+}
+
 
 static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
 class PlayerCloseContainerBeforeEventEmitter

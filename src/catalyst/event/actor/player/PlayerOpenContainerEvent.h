@@ -31,6 +31,8 @@ public:
       mPos(pos),
       mEntityUniqueID(entityUniqueID) {}
 
+    void serialize(CompoundTag&) const override;
+
     ContainerID                        containerId() const { return mContainerId; }
     SharedTypes::Legacy::ContainerType type() const { return mType; }
     NetworkBlockPosition const&        pos() const { return mPos; }
@@ -56,6 +58,8 @@ public:
       mType(type),
       mPos(pos),
       mEntityUniqueID(entityUniqueID) {}
+
+    void serialize(CompoundTag&) const override;
 
     ContainerID                        containerId() const { return mContainerId; }
     SharedTypes::Legacy::ContainerType type() const { return mType; }

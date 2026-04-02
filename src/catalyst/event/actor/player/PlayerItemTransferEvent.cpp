@@ -14,7 +14,37 @@
 #include "mc/world/inventory/network/ItemStackRequestActionTransferBase.h"
 #include "mc/world/inventory/network/ItemStackRequestActionType.h"
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void PlayerItemTransferBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["actionType"]    = magic_enum::enum_name(actionType());
+    nbt["srcContainer"]  = ll::event::serializeRefObj(srcContainer());
+    nbt["srcSlot"]       = (int)srcSlot();
+    nbt["dstContainer"]  = ll::event::serializeRefObj(dstContainer());
+    nbt["dstSlot"]       = (int)dstSlot();
+    nbt["amount"]        = (int)amount();
+    nbt["srcItem"]       = ll::event::serializeRefObj(srcItem());
+    nbt["dstItem"]       = ll::event::serializeRefObj(dstItem());
+    nbt["screenContext"] = ll::event::serializeRefObj(screenContext());
+}
+
+void PlayerItemTransferAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::PlayerEvent::serialize(nbt);
+    nbt["actionType"]    = magic_enum::enum_name(actionType());
+    nbt["srcContainer"]  = ll::event::serializeRefObj(srcContainer());
+    nbt["srcSlot"]       = (int)srcSlot();
+    nbt["dstContainer"]  = ll::event::serializeRefObj(dstContainer());
+    nbt["dstSlot"]       = (int)dstSlot();
+    nbt["amount"]        = (int)amount();
+    nbt["srcItem"]       = ll::event::serializeRefObj(srcItem());
+    nbt["dstItem"]       = ll::event::serializeRefObj(dstItem());
+    nbt["screenContext"] = ll::event::serializeRefObj(screenContext());
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     PlayerItemTransferEventHook,

@@ -21,6 +21,8 @@ public:
       mNewValue(newValue),
       mBuff(buff) {}
 
+    void serialize(CompoundTag&) const override;
+
     float                oldValue() const { return mOldValue; }
     float                newValue() const { return mNewValue; }
     AttributeBuff const& buff() const { return mBuff; }
@@ -37,6 +39,8 @@ public:
       mOldValue(oldValue),
       mNewValue(newValue),
       mBuff(buff) {}
+
+    void serialize(CompoundTag&) const override;
 
     float                oldValue() const { return mOldValue; }
     float                newValue() const { return mNewValue; }

@@ -23,6 +23,8 @@ public:
       mAction(action),
       mDirection(direction) {}
 
+    void serialize(CompoundTag&) const override;
+
     BlockPos const& pos() const { return mPos; }
     PistonAction    action() const { return mAction; }
     int             direction() const { return mDirection; }
@@ -39,6 +41,8 @@ public:
       mPos(pos),
       mAction(action),
       mDirection(direction) {}
+
+    void serialize(CompoundTag&) const override;
 
     BlockPos const& pos() const { return mPos; }
     PistonAction    action() const { return mAction; }

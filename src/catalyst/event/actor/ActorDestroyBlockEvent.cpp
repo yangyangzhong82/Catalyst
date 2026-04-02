@@ -11,7 +11,23 @@
 #include "mc/world/events/ActorGameplayEvent.h"
 #include "mc/world/events/ActorGriefingBlockEvent.h"
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void ActorDestroyBlockBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["pos"]   = ListTag{pos().x, pos().y, pos().z};
+    nbt["block"] = ll::event::serializeRefObj(block());
+}
+
+void ActorDestroyBlockAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::entity::ActorEvent::serialize(nbt);
+    nbt["pos"]   = ListTag{pos().x, pos().y, pos().z};
+    nbt["block"] = ll::event::serializeRefObj(block());
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     ActorDestroyBlockHook,

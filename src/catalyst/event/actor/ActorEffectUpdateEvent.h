@@ -17,6 +17,8 @@ public:
     : Cancellable(actor),
       mEffect(effect) {}
 
+    void serialize(CompoundTag&) const override;
+
     MobEffectInstance const& effect() const { return mEffect; }
 };
 
@@ -27,6 +29,8 @@ public:
     constexpr ActorEffectAddAfterEvent(Actor& actor, MobEffectInstance const& effect)
     : ActorEvent(actor),
       mEffect(effect) {}
+
+    void serialize(CompoundTag&) const override;
 
     MobEffectInstance const& effect() const { return mEffect; }
 };
@@ -39,6 +43,8 @@ public:
     : Cancellable(actor),
       mEffect(effect) {}
 
+    void serialize(CompoundTag&) const override;
+
     MobEffectInstance& effect() const { return mEffect; }
 };
 
@@ -49,6 +55,8 @@ public:
     constexpr ActorEffectUpdateAfterEvent(Actor& actor, MobEffectInstance& effect)
     : ActorEvent(actor),
       mEffect(effect) {}
+
+    void serialize(CompoundTag&) const override;
 
     MobEffectInstance& effect() const { return mEffect; }
 };
@@ -61,6 +69,8 @@ public:
     : Cancellable(actor),
       mEffect(effect) {}
 
+    void serialize(CompoundTag&) const override;
+
     MobEffectInstance& effect() const { return mEffect; }
 };
 
@@ -71,6 +81,8 @@ public:
     constexpr ActorEffectRemoveAfterEvent(Actor& actor, MobEffectInstance& effect)
     : ActorEvent(actor),
       mEffect(effect) {}
+
+    void serialize(CompoundTag&) const override;
 
     MobEffectInstance& effect() const { return mEffect; }
 };

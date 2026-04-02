@@ -8,7 +8,26 @@
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/level/Level.h"
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void PlayerShieldBlockBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["source"]  = ll::event::serializeRefObj(source());
+    nbt["damage"]  = damage();
+    nbt["damager"] = ll::event::serializePtrObj(damager());
+}
+
+void PlayerShieldBlockAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::PlayerEvent::serialize(nbt);
+    nbt["source"]  = ll::event::serializeRefObj(source());
+    nbt["damage"]  = damage();
+    nbt["damager"] = ll::event::serializePtrObj(damager());
+    nbt["result"]  = result();
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     PlayerShieldBlockEventHook,

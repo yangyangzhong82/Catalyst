@@ -26,6 +26,8 @@ public:
       mFirePos(firePos),
       mAge(age) {}
 
+    void serialize(CompoundTag&) const override;
+
     BlockPos const& burnPos() const { return mBurnPos; }
     BlockPos const& firePos() const { return mFirePos; }
     int             age() const { return mAge; }
@@ -47,6 +49,8 @@ public:
       mBurnPos(burnPos),
       mFirePos(firePos),
       mAge(age) {}
+
+    void serialize(CompoundTag&) const override;
 
     BlockPos const& burnPos() const { return mBurnPos; }
     BlockPos const& firePos() const { return mFirePos; }

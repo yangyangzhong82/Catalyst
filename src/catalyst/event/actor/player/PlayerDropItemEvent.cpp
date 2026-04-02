@@ -11,7 +11,23 @@
 #include "mc/world/inventory/transaction/InventorySourceType.h"
 #include "mc/world/inventory/transaction/InventoryTransaction.h"
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void PlayerDropItemBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["item"] = ll::event::serializeRefObj(item());
+    nbt["slot"] = slot();
+}
+
+void PlayerDropItemAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::PlayerEvent::serialize(nbt);
+    nbt["item"] = ll::event::serializeRefObj(item());
+    nbt["slot"] = slot();
+}
+
 
 /*
 LL_AUTO_TYPE_INSTANCE_HOOK(

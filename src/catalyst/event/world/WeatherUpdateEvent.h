@@ -30,6 +30,8 @@ public:
       mLightningLevel(lightningLevel),
       mLightningTime(lightningTime) {}
 
+    void serialize(CompoundTag&) const override;
+
     float  rainLevel() const { return mRainLevel; }
     float& rainLevel() { return mRainLevel; }
     int    rainTime() const { return mRainTime; }
@@ -59,6 +61,8 @@ public:
       mRainTime(rainTime),
       mLightningLevel(lightningLevel),
       mLightningTime(lightningTime) {}
+
+    void serialize(CompoundTag&) const override;
 
     float rainLevel() const { return mRainLevel; }
     int   rainTime() const { return mRainTime; }

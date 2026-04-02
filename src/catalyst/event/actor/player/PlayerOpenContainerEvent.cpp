@@ -9,7 +9,27 @@
 #include "mc/world/actor/player/Player.h"
 
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void PlayerOpenContainerBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["containerId"]    = (int)containerId();
+    nbt["type"]           = magic_enum::enum_name(type());
+    nbt["pos"]            = ListTag{pos().x, pos().y, pos().z};
+    nbt["entityUniqueID"] = ll::event::serializeRefObj(mEntityUniqueID);
+}
+
+void PlayerOpenContainerAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::PlayerEvent::serialize(nbt);
+    nbt["containerId"]    = (int)containerId();
+    nbt["type"]           = magic_enum::enum_name(type());
+    nbt["pos"]            = ListTag{pos().x, pos().y, pos().z};
+    nbt["entityUniqueID"] = ll::event::serializeRefObj(mEntityUniqueID);
+}
+
 
 static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
 class PlayerOpenContainerBeforeEventEmitter

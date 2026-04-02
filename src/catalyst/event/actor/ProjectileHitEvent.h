@@ -21,6 +21,8 @@ public:
       mComponent(component),
       mHitResult(hitResult) {}
 
+    void serialize(CompoundTag&) const override;
+
     ProjectileComponent& component() const { return mComponent; }
     HitResult const&     hitResult() const { return mHitResult; }
 };
@@ -34,6 +36,8 @@ public:
     : ActorEvent(owner),
       mComponent(component),
       mHitResult(hitResult) {}
+
+    void serialize(CompoundTag&) const override;
 
     ProjectileComponent& component() const { return mComponent; }
     HitResult const&     hitResult() const { return mHitResult; }

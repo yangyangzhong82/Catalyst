@@ -30,6 +30,8 @@ public:
       mIsFirstTime(isFirstTime),
       mComponent(component) {}
 
+    void serialize(CompoundTag&) const override;
+
     BlockPos const&       pos() const { return mPos; }
     int                   strength() const { return mStrength; }
     bool                  isFirstTime() const { return mIsFirstTime; }
@@ -55,6 +57,8 @@ public:
       mStrength(strength),
       mIsFirstTime(isFirstTime),
       mComponent(component) {}
+
+    void serialize(CompoundTag&) const override;
 
     BlockPos const&       pos() const { return mPos; }
     int                   strength() const { return mStrength; }

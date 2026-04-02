@@ -33,6 +33,8 @@ public:
       mPos(pos),
       mThrowTime(throwTime) {}
 
+    void serialize(CompoundTag&) const override;
+
     ItemStack const& item() const { return mItem; }
     Actor*           spawner() const { return mSpawner; }
     Vec3 const&      pos() const { return mPos; }
@@ -61,6 +63,8 @@ public:
       mPos(pos),
       mThrowTime(throwTime),
       mItemActor(itemActor) {}
+
+    void serialize(CompoundTag&) const override;
 
     ItemStack const& item() const { return mItem; }
     Actor*           spawner() const { return mSpawner; }

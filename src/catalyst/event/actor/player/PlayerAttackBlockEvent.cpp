@@ -6,7 +6,22 @@
 #include "mc/network/ServerPlayerBlockUseHandler.h"
 #include "mc/server/ServerPlayer.h"
 
+#include "mc/nbt/CompoundTag.h"
+
 namespace Catalyst {
+
+void PlayerAttackBlockBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["pos"]  = ListTag{pos().x, pos().y, pos().z};
+    nbt["face"] = face();
+}
+
+void PlayerAttackBlockAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::ServerPlayerEvent::serialize(nbt);
+    nbt["pos"]  = ListTag{pos().x, pos().y, pos().z};
+    nbt["face"] = face();
+}
+
 
 LL_STATIC_HOOK(
     PlayerAttackBlockEventHook,

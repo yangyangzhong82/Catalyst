@@ -22,6 +22,8 @@ public:
       mSource(source),
       mPacket(std::move(packet)) {}
 
+    void serialize(CompoundTag&) const override;
+
     NetworkIdentifier const&     source() const { return mSource; }
     std::shared_ptr<LoginPacket> packet() const { return mPacket; }
 };
@@ -59,6 +61,8 @@ public:
       mDeviceId(std::move(deviceId)),
       mDeviceModel(std::move(deviceModel)),
       mNetworkIdHash(networkIdHash) {}
+
+    void serialize(CompoundTag&) const override;
 
     std::shared_ptr<LoginPacket> packet() const { return mPacket; }
     std::string const&           name() const { return mName; }

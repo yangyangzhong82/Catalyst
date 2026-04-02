@@ -20,7 +20,25 @@
 #include "mc/world/level/block/FallingBlock.h"
 #include "mc/world/level/block/registry/BlockTypeRegistry.h"
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void BlockFallBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["pos"]      = ListTag{pos().x, pos().y, pos().z};
+    nbt["block"]    = ll::event::serializeRefObj(block());
+    nbt["creative"] = isCreative();
+}
+
+void BlockFallAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::world::WorldEvent::serialize(nbt);
+    nbt["pos"]      = ListTag{pos().x, pos().y, pos().z};
+    nbt["block"]    = ll::event::serializeRefObj(block());
+    nbt["creative"] = isCreative();
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     BlockFallEventHook5,

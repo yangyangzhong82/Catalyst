@@ -22,6 +22,8 @@ public:
       mActor(actor),
       mToFarmland(toFarmland) {}
 
+    void serialize(CompoundTag&) const override;
+
     BlockPos const& pos() const { return mPos; }
     Actor*          actor() const { return mActor; }
     bool            toFarmland() const { return mToFarmland; }
@@ -38,6 +40,8 @@ public:
       mPos(pos),
       mActor(actor),
       mToFarmland(toFarmland) {}
+
+    void serialize(CompoundTag&) const override;
 
     BlockPos const& pos() const { return mPos; }
     Actor*          actor() const { return mActor; }

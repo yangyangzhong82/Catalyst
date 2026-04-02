@@ -6,7 +6,24 @@
 #include "mc/world/level/WorldBlockTarget.h"
 #include "mc/world/level/levelgen/feature/VegetationPatchFeature.h"
 
+#include "mc/nbt/CompoundTag.h"
+
 namespace Catalyst {
+
+void MossGrowthBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["origin"]  = ListTag{origin().x, origin().y, origin().z};
+    nbt["xRadius"] = xRadius();
+    nbt["zRadius"] = zRadius();
+}
+
+void MossGrowthAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::world::WorldEvent::serialize(nbt);
+    nbt["origin"]  = ListTag{origin().x, origin().y, origin().z};
+    nbt["xRadius"] = xRadius();
+    nbt["zRadius"] = zRadius();
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     MossGrowthEventHook,

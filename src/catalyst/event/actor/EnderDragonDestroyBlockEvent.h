@@ -22,6 +22,8 @@ public:
       mPos(pos),
       mBlock(block) {}
 
+    void serialize(CompoundTag&) const override;
+
     BlockPos const& pos() const { return mPos; }
     Block const&    block() const { return mBlock; }
 };
@@ -37,6 +39,8 @@ public:
       mPos(pos),
       mBlock(block),
       mDestroyed(destroyed) {}
+
+    void serialize(CompoundTag&) const override;
 
     BlockPos const& pos() const { return mPos; }
     Block const&    block() const { return mBlock; }

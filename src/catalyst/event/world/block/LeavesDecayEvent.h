@@ -20,6 +20,8 @@ public:
       mPos(pos),
       mLeavesBlock(leavesBlock) {}
 
+    void serialize(CompoundTag&) const override;
+
     BlockPos const& pos() const { return mPos; }
     ::Block const&  leavesBlock() const { return mLeavesBlock; }
 };
@@ -33,6 +35,8 @@ public:
     : WorldEvent(blockSource),
       mPos(pos),
       mLeavesBlock(leavesBlock) {}
+
+    void serialize(CompoundTag&) const override;
 
     BlockPos const& pos() const { return mPos; }
     ::Block const&  leavesBlock() const { return mLeavesBlock; }

@@ -18,6 +18,8 @@ public:
       mPos(pos),
       mFace(face) {}
 
+    void serialize(CompoundTag&) const override;
+
     BlockPos const& pos() const { return mPos; }
     int             face() const { return mFace; }
 };
@@ -31,6 +33,8 @@ public:
     : ServerPlayerEvent(player),
       mPos(pos),
       mFace(face) {}
+
+    void serialize(CompoundTag&) const override;
 
     BlockPos const& pos() const { return mPos; }
     int             face() const { return mFace; }

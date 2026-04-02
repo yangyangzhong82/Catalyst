@@ -6,7 +6,28 @@
 #include "mc/world/actor/Actor.h"
 #include "mc/world/level/BedrockSpawner.h"
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void ProjectileSpawnBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["id"]        = ll::event::serializeRefObj(id());
+    nbt["spawner"]   = ll::event::serializePtrObj(spawner());
+    nbt["position"]  = ListTag{position().x, position().y, position().z};
+    nbt["direction"] = ListTag{direction().x, direction().y, direction().z};
+}
+
+void ProjectileSpawnAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::world::WorldEvent::serialize(nbt);
+    nbt["id"]         = ll::event::serializeRefObj(id());
+    nbt["spawner"]    = ll::event::serializePtrObj(spawner());
+    nbt["position"]   = ListTag{position().x, position().y, position().z};
+    nbt["direction"]  = ListTag{direction().x, direction().y, direction().z};
+    nbt["projectile"] = ll::event::serializePtrObj(projectile());
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     ProjectileSpawnEventHook,

@@ -5,7 +5,22 @@
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/player/Player.h"
 
+#include "mc/nbt/CompoundTag.h"
+
 namespace Catalyst {
+
+void PlayerStopSleepBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["forcefulWakeUp"]  = isForcefulWakeUp();
+    nbt["updateLevelList"] = isUpdateLevelList();
+}
+
+void PlayerStopSleepAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::PlayerEvent::serialize(nbt);
+    nbt["forcefulWakeUp"]  = isForcefulWakeUp();
+    nbt["updateLevelList"] = isUpdateLevelList();
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     PlayerStopSleepEventHook,

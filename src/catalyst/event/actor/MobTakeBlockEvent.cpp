@@ -27,7 +27,23 @@
 #include "mc/world/level/block/BlockDescriptor.h"
 #include "mc/world/level/dimension/Dimension.h"
 BlockChangeContext::BlockChangeContext() : mContextSource(std::monostate{}) {}
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void MobTakeBlockBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["pos"]   = ListTag{pos().x, pos().y, pos().z};
+    nbt["block"] = ll::event::serializeRefObj(block());
+}
+
+void MobTakeBlockAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::entity::MobEvent::serialize(nbt);
+    nbt["pos"]   = ListTag{pos().x, pos().y, pos().z};
+    nbt["block"] = ll::event::serializeRefObj(block());
+}
+
 
 
 LL_TYPE_INSTANCE_HOOK(TakeBlockGoalTickHook, HookPriority::Normal, TakeBlockGoal, &TakeBlockGoal::$tick, void) {

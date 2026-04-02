@@ -34,6 +34,8 @@ public:
       mFromPos(fromPos),
       mFlowFromDirection(flowFromDirection) {}
 
+    void serialize(CompoundTag&) const override;
+
     LiquidBlock const& liquidBlock() const { return mLiquidBlock; }
     BlockPos const&    toPos() const { return mToPos; }
     int                neighbor() const { return mNeighbor; }
@@ -64,6 +66,8 @@ public:
       mNeighbor(neighbor),
       mFromPos(fromPos),
       mFlowFromDirection(flowFromDirection) {}
+
+    void serialize(CompoundTag&) const override;
 
     LiquidBlock const& liquidBlock() const { return mLiquidBlock; }
     BlockPos const&    toPos() const { return mToPos; }

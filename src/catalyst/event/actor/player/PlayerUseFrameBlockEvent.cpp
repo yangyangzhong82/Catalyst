@@ -8,7 +8,20 @@
 #include "mc/world/level/block/block_events/BlockPlayerInteractEvent.h"
 
 
+#include "mc/nbt/CompoundTag.h"
+
 namespace Catalyst {
+
+void PlayerUseFrameBlockBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["pos"] = ListTag{pos().x, pos().y, pos().z};
+}
+
+void PlayerUseFrameBlockAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::PlayerEvent::serialize(nbt);
+    nbt["pos"] = ListTag{pos().x, pos().y, pos().z};
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     PlayerUseFrameBlockEventHook,

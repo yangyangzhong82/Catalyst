@@ -20,6 +20,8 @@ public:
       mBlock(block),
       mCreative(creative) {}
 
+    void serialize(CompoundTag&) const override;
+
     BlockPos const& pos() const { return mPos; }
     ::Block const&  block() const { return mBlock; }
     bool            isCreative() const { return mCreative; }
@@ -36,6 +38,8 @@ public:
       mPos(pos),
       mBlock(block),
       mCreative(creative) {}
+
+    void serialize(CompoundTag&) const override;
 
     BlockPos const& pos() const { return mPos; }
     ::Block const&  block() const { return mBlock; }

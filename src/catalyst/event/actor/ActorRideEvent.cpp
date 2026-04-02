@@ -5,7 +5,21 @@
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/Actor.h"
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void ActorRideBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["passenger"] = ll::event::serializeRefObj(passenger());
+}
+
+void ActorRideAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::entity::ActorEvent::serialize(nbt);
+    nbt["passenger"] = ll::event::serializeRefObj(passenger());
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     ActorRideEventHook,

@@ -35,7 +35,40 @@
 #include <algorithm>
 #include <string_view>
 
+#include "mc/nbt/CompoundTag.h"
+
 namespace Catalyst {
+
+void FireBurnBlockBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["burnPos"] = ListTag{burnPos().x, burnPos().y, burnPos().z};
+    nbt["firePos"] = ListTag{firePos().x, firePos().y, firePos().z};
+    nbt["age"]     = age();
+}
+
+void FireBurnBlockAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::world::WorldEvent::serialize(nbt);
+    nbt["burnPos"] = ListTag{burnPos().x, burnPos().y, burnPos().z};
+    nbt["firePos"] = ListTag{firePos().x, firePos().y, firePos().z};
+    nbt["age"]     = age();
+}
+
+void FireSpreadBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["spreadPos"] = ListTag{spreadPos().x, spreadPos().y, spreadPos().z};
+    nbt["firePos"]   = ListTag{firePos().x, firePos().y, firePos().z};
+    nbt["newAge"]    = newAge();
+    nbt["sourceAge"] = sourceAge();
+}
+
+void FireSpreadAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::world::WorldEvent::serialize(nbt);
+    nbt["spreadPos"] = ListTag{spreadPos().x, spreadPos().y, spreadPos().z};
+    nbt["firePos"]   = ListTag{firePos().x, firePos().y, firePos().z};
+    nbt["newAge"]    = newAge();
+    nbt["sourceAge"] = sourceAge();
+}
+
 
 // 辅助函数：检查方块是否为TNT
 static bool isTntBlock(Block const& block) {

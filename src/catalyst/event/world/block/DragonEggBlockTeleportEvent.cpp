@@ -16,7 +16,22 @@
 #include "mc/world/level/block/VanillaBlockTypeIds.h"
 #include "mc/world/level/block/registry/BlockTypeRegistry.h"
 
+#include "mc/nbt/CompoundTag.h"
+
 namespace Catalyst {
+
+void DragonEggBlockTeleportBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["oldPos"] = ListTag{getOldPos().x, getOldPos().y, getOldPos().z};
+    nbt["newPos"] = ListTag{getNewPos().x, getNewPos().y, getNewPos().z};
+}
+
+void DragonEggBlockTeleportAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::world::WorldEvent::serialize(nbt);
+    nbt["oldPos"] = ListTag{getOldPos().x, getOldPos().y, getOldPos().z};
+    nbt["newPos"] = ListTag{getNewPos().x, getNewPos().y, getNewPos().z};
+}
+
 
 LL_STATIC_HOOK(
     DragonEggBlockTeleportEventHook,

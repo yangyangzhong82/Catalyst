@@ -7,7 +7,25 @@
 #include "mc/world/attribute/AttributeBuff.h"
 #include "mc/world/attribute/HealthAttributeDelegate.h"
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void MobHealthChangeBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["oldValue"] = oldValue();
+    nbt["newValue"] = newValue();
+    nbt["buff"]     = ll::event::serializeRefObj(buff());
+}
+
+void MobHealthChangeAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::entity::MobEvent::serialize(nbt);
+    nbt["oldValue"] = oldValue();
+    nbt["newValue"] = newValue();
+    nbt["buff"]     = ll::event::serializeRefObj(buff());
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     MobHealthChangeHook,

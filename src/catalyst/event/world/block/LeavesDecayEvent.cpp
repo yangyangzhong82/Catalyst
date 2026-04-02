@@ -8,7 +8,23 @@
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/block/LeavesBlock.h"
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void LeavesDecayBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["pos"]        = ListTag{pos().x, pos().y, pos().z};
+    nbt["leavesBlock"] = ll::event::serializeRefObj(leavesBlock());
+}
+
+void LeavesDecayAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::world::WorldEvent::serialize(nbt);
+    nbt["pos"]        = ListTag{pos().x, pos().y, pos().z};
+    nbt["leavesBlock"] = ll::event::serializeRefObj(leavesBlock());
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     LeavesDecayHook,

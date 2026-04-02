@@ -29,6 +29,8 @@ public:
       mPosition(position),
       mDirection(direction) {}
 
+    void serialize(CompoundTag&) const override;
+
     ActorDefinitionIdentifier const& id() const { return mId; }
     Actor*                           spawner() const { return mSpawner; }
     Vec3 const&                      position() const { return mPosition; }
@@ -57,6 +59,8 @@ public:
       mPosition(position),
       mDirection(direction),
       mProjectile(projectile) {}
+
+    void serialize(CompoundTag&) const override;
 
     ActorDefinitionIdentifier const& id() const { return mId; }
     Actor*                           spawner() const { return mSpawner; }

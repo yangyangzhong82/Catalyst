@@ -20,6 +20,8 @@ public:
       mActor(actor),
       mLocation(location) {}
 
+    void serialize(CompoundTag&) const override;
+
     Actor&      actor() const { return mActor; }
     Vec3 const& location() const { return mLocation; }
 };
@@ -35,6 +37,8 @@ public:
       mActor(actor),
       mLocation(location),
       mResult(result) {}
+
+    void serialize(CompoundTag&) const override;
 
     Actor&      actor() const { return mActor; }
     Vec3 const& location() const { return mLocation; }

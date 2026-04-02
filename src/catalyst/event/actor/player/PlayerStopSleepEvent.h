@@ -17,6 +17,8 @@ public:
       mForcefulWakeUp(forcefulWakeUp),
       mUpdateLevelList(updateLevelList) {}
 
+    void serialize(CompoundTag&) const override;
+
     bool isForcefulWakeUp() const { return mForcefulWakeUp; }
     bool isUpdateLevelList() const { return mUpdateLevelList; }
 };
@@ -30,6 +32,8 @@ public:
     : PlayerEvent(player),
       mForcefulWakeUp(forcefulWakeUp),
       mUpdateLevelList(updateLevelList) {}
+
+    void serialize(CompoundTag&) const override;
 
     bool isForcefulWakeUp() const { return mForcefulWakeUp; }
     bool isUpdateLevelList() const { return mUpdateLevelList; }

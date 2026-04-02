@@ -18,6 +18,8 @@ public:
       mFromDimensionId(fromDimensionId),
       mToDimensionId(toDimensionId) {}
 
+    void serialize(CompoundTag&) const override;
+
     int fromDimensionId() const { return mFromDimensionId; }
     int toDimensionId() const { return mToDimensionId; }
 };
@@ -31,6 +33,8 @@ public:
     : ActorEvent(actor),
       mFromDimensionId(fromDimensionId),
       mToDimensionId(toDimensionId) {}
+
+    void serialize(CompoundTag&) const override;
 
     int fromDimensionId() const { return mFromDimensionId; }
     int toDimensionId() const { return mToDimensionId; }

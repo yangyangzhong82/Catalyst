@@ -7,7 +7,18 @@
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/block/BasePressurePlateBlock.h"
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void ActorPressurePlateTriggerBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["block"]  = ll::event::serializeRefObj(block());
+    nbt["region"] = ll::event::serializeRefObj(region());
+    nbt["pos"]    = ListTag{pos().x, pos().y, pos().z};
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     ActorPressurePlateTriggerEventHook,

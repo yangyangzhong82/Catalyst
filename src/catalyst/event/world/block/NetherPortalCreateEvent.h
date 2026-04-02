@@ -38,6 +38,8 @@ public:
       mForcedPlacement(forcedPlacement),
       mRadius(radius) {}
 
+    void serialize(CompoundTag&) const override;
+
     BlockPos const& centerPos() const { return mCenterPos; }
     BlockPos const& plannedPos() const { return mPlannedPos; }
     int             stepX() const { return mStepX; }
@@ -80,6 +82,8 @@ public:
       mShapeValid(shapeValid),
       mPortalBlocks(std::move(portalBlocks)),
       mRadius(radius) {}
+
+    void serialize(CompoundTag&) const override;
 
     BlockPos const& centerPos() const { return mCenterPos; }
     BlockPos const& portalPos() const { return mPortalPos; }

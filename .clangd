@@ -6,9 +6,32 @@ Diagnostics:
     - "-Wc++11-narrowing"
     - "-Wc++2b-extensions"
     - "-Wmicrosoft-cast"
+    - "unknown_type_name"
+    - "no_member_namespace"
 CompileFlags:
+  Compiler: clang-cl
   Add:
     - "-ferror-limit=0"
     - '-D__FUNCTION__="dummy"'
     - '-D__clangd__'
     - '-D_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH'
+    - '-DMCAPI=""'
+    - '-DMCAPI_C=""'
+    - '-DMCVAPI=""'
+    - '/std:c++latest'
+    - '/EHsc'
+    - '-isystem'
+    - 'D:/vs/VC/Tools/MSVC/14.44.35207/include'
+    - '-isystem'
+    - 'C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/ucrt'
+    - '-isystem'
+    - 'C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared'
+    - '-isystem'
+    - 'C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/um'
+    - '-isystem'
+    - 'C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/winrt'
+  Remove:
+    - '/Fo*'
+    - '/Fd*'
+    - '-o'
+  CompilationDatabase: .

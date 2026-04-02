@@ -56,7 +56,36 @@ struct equal_to<::PortalRecord> {
 
 } // namespace std
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void NetherPortalCreateBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["centerPos"]       = ListTag{centerPos().x, centerPos().y, centerPos().z};
+    nbt["plannedPos"]      = ListTag{plannedPos().x, plannedPos().y, plannedPos().z};
+    nbt["stepX"]           = stepX();
+    nbt["stepZ"]           = stepZ();
+    nbt["forcedPlacement"] = forcedPlacement();
+    nbt["radius"]          = radius();
+}
+
+void NetherPortalCreateAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::entity::ActorEvent::serialize(nbt);
+    nbt["centerPos"]       = ListTag{centerPos().x, centerPos().y, centerPos().z};
+    nbt["portalPos"]       = ListTag{portalPos().x, portalPos().y, portalPos().z};
+    nbt["portalRecord"]    = ll::event::serializeRefObj(portalRecord());
+    nbt["shapeBottomLeft"] = ListTag{shapeBottomLeft().x, shapeBottomLeft().y, shapeBottomLeft().z};
+    nbt["shapeWidth"]      = shapeWidth();
+    nbt["shapeHeight"]     = shapeHeight();
+    nbt["shapeValid"]      = isShapeValid();
+    nbt["radius"]          = radius();
+    nbt["span"]            = span();
+    nbt["xInc"]            = xInc();
+    nbt["zInc"]            = zInc();
+}
+
 
 static BlockPos getPortalInnerPosFromRecord(::PortalRecord const& record) {
     auto pos = record.mBaseBlockPos.get();

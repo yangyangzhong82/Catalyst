@@ -13,6 +13,8 @@ class CATALYST_API ActorRideBeforeEvent final : public ll::event::Cancellable<ll
 public:
     constexpr ActorRideBeforeEvent(Actor& vehicle, Actor& passenger) : Cancellable(vehicle), mPassenger(passenger) {}
 
+    void serialize(CompoundTag&) const override;
+
     Actor& passenger() const { return mPassenger; }
 };
 
@@ -21,6 +23,8 @@ class CATALYST_API ActorRideAfterEvent final : public ll::event::entity::ActorEv
 
 public:
     constexpr ActorRideAfterEvent(Actor& vehicle, Actor& passenger) : ActorEvent(vehicle), mPassenger(passenger) {}
+
+    void serialize(CompoundTag&) const override;
 
     Actor& passenger() const { return mPassenger; }
 };

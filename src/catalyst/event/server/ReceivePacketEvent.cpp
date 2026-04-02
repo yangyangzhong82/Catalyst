@@ -42,7 +42,27 @@ struct GameplayHandlerResult<CoordinatorResult> {
     GameplayHandlerResult(CoordinatorResult v) : value(v) {}
 };
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void ReceivePacketBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["networkId"]   = ll::event::serializeRefObj(networkId());
+    nbt["packet"]      = ll::event::serializeRefObj(packet());
+    nbt["subClientId"] = (int)subClientId();
+    nbt["player"]      = ll::event::serializePtrObj(player());
+}
+
+void ReceivePacketAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::Event::serialize(nbt);
+    nbt["networkId"]   = ll::event::serializeRefObj(networkId());
+    nbt["packet"]      = ll::event::serializeRefObj(packet());
+    nbt["subClientId"] = (int)subClientId();
+    nbt["player"]      = ll::event::serializePtrObj(player());
+}
+
 
 
 LL_TYPE_INSTANCE_HOOK(
@@ -106,7 +126,26 @@ LL_TYPE_INSTANCE_HOOK(
     return result;
 }
 */
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void ReceivePacketBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["networkId"]   = ll::event::serializeRefObj(networkId());
+    nbt["packet"]      = ll::event::serializeRefObj(packet());
+    nbt["subClientId"] = (int)subClientId();
+    nbt["player"]      = ll::event::serializePtrObj(player());
+}
+
+void ReceivePacketAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::Event::serialize(nbt);
+    nbt["networkId"]   = ll::event::serializeRefObj(networkId());
+    nbt["packet"]      = ll::event::serializeRefObj(packet());
+    nbt["subClientId"] = (int)subClientId();
+    nbt["player"]      = ll::event::serializePtrObj(player());
+}
 
 LL_TYPE_INSTANCE_HOOK(
     ReceivePacketEventHook,

@@ -27,6 +27,8 @@ public:
       mRespawn(respawn),
       mUsePortal(usePortal) {}
 
+    void serialize(CompoundTag&) const override;
+
     int  fromDimensionId() const { return mFromDimensionId; }
     int  toDimensionId() const { return mToDimensionId; }
     bool isRespawn() const { return mRespawn; }
@@ -52,6 +54,8 @@ public:
       mToDimensionId(toDimensionId),
       mRespawn(respawn),
       mUsePortal(usePortal) {}
+
+    void serialize(CompoundTag&) const override;
 
     int  fromDimensionId() const { return mFromDimensionId; }
     int  toDimensionId() const { return mToDimensionId; }

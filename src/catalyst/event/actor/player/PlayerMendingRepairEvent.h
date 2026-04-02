@@ -50,6 +50,8 @@ public:
       mOldOrbValue(oldOrbValue),
       mNewOrbValue(newOrbValue) {}
 
+    void serialize(CompoundTag&) const override;
+
     ExperienceOrb& orb() const { return mOrb; }
     ContainerID    containerId() const { return mContainerId; }
     int            slot() const { return mSlot; }
@@ -96,6 +98,8 @@ public:
       mRepairAmount(repairAmount),
       mOldOrbValue(oldOrbValue),
       mNewOrbValue(newOrbValue) {}
+
+    void serialize(CompoundTag&) const override;
 
     ExperienceOrb& orb() const { return mOrb; }
     ContainerID    containerId() const { return mContainerId; }

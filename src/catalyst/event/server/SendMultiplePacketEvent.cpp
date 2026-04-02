@@ -8,7 +8,22 @@
 #include "mc/network/ServerNetworkHandler.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/network/NetworkIdentifierWithSubId.h"
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void SendMultiplePacketBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["ids"]    = ll::event::serializeRefObj(ids());
+    nbt["packet"] = ll::event::serializeRefObj(packet());
+    ListTag playersList;
+    for (auto* p : players()) {
+        playersList.emplace_back(ll::event::serializePtrObj(p));
+    }
+    nbt["players"] = std::move(playersList);
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     SendMultiplePacketEventHook,

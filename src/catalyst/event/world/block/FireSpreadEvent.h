@@ -29,6 +29,8 @@ public:
       mNewAge(newAge),
       mSourceAge(sourceAge) {}
 
+    void serialize(CompoundTag&) const override;
+
     BlockPos const& spreadPos() const { return mSpreadPos; }
     BlockPos const& firePos() const { return mFirePos; }
     int             newAge() const { return mNewAge; }
@@ -54,6 +56,8 @@ public:
       mFirePos(firePos),
       mNewAge(newAge),
       mSourceAge(sourceAge) {}
+
+    void serialize(CompoundTag&) const override;
 
     BlockPos const& spreadPos() const { return mSpreadPos; }
     BlockPos const& firePos() const { return mFirePos; }

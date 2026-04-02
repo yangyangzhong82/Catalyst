@@ -25,6 +25,8 @@ public:
       mValue(value),
       mMergedPickupCount(mergedPickupCount) {}
 
+    void serialize(CompoundTag&) const override;
+
     ExperienceOrb& targetOrb() const { return static_cast<ExperienceOrb&>(self()); }
     ExperienceOrb& sourceOrb() const { return mSourceOrb; }
     int            value() const { return mValue; }
@@ -51,6 +53,8 @@ public:
       mValue(value),
       mOldPickupCount(oldPickupCount),
       mNewPickupCount(newPickupCount) {}
+
+    void serialize(CompoundTag&) const override;
 
     ExperienceOrb& targetOrb() const { return static_cast<ExperienceOrb&>(self()); }
     ExperienceOrb& sourceOrb() const { return mSourceOrb; }

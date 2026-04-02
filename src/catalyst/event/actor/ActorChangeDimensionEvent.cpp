@@ -3,6 +3,7 @@
 #include "ll/api/event/Emitter.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
+#include "mc/nbt/CompoundTag.h"
 #include "mc/world/actor/Actor.h"
 #include "mc/world/actor/Mob.h"
 #include "mc/world/level/Level.h"
@@ -11,6 +12,18 @@
 #include "mc\world\level\BlockPalette.h"
 
 namespace Catalyst {
+
+void ActorChangeDimensionBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["fromDimensionId"] = fromDimensionId();
+    nbt["toDimensionId"]   = toDimensionId();
+}
+
+void ActorChangeDimensionAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::entity::ActorEvent::serialize(nbt);
+    nbt["fromDimensionId"] = fromDimensionId();
+    nbt["toDimensionId"]   = toDimensionId();
+}
 
 LL_TYPE_INSTANCE_HOOK(
     ActorChangeDimensionEventHook,

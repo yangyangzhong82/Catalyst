@@ -10,7 +10,27 @@
 #include "mc/server/ServerPlayer.h"
 
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void SendPacketBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["networkId"]   = ll::event::serializeRefObj(networkId());
+    nbt["packet"]      = ll::event::serializeRefObj(packet());
+    nbt["subClientId"] = (int)subClientId();
+    nbt["player"]      = ll::event::serializePtrObj(player());
+}
+
+void SendPacketAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::Event::serialize(nbt);
+    nbt["networkId"]   = ll::event::serializeRefObj(networkId());
+    nbt["packet"]      = ll::event::serializeRefObj(packet());
+    nbt["subClientId"] = (int)subClientId();
+    nbt["player"]      = ll::event::serializePtrObj(player());
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     SendPacketEventHook,

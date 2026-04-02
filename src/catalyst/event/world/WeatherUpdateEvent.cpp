@@ -5,8 +5,25 @@
 #include "ll/api/memory/Hook.h"
 #include "mc/world/level/Level.h"
 
+#include "mc/nbt/CompoundTag.h"
+
 namespace Catalyst {
 
+void WeatherUpdateBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["rainLevel"]      = rainLevel();
+    nbt["rainTime"]       = rainTime();
+    nbt["lightningLevel"] = lightningLevel();
+    nbt["lightningTime"]  = lightningTime();
+}
+
+void WeatherUpdateAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::world::LevelEvent::serialize(nbt);
+    nbt["rainLevel"]      = rainLevel();
+    nbt["rainTime"]       = rainTime();
+    nbt["lightningLevel"] = lightningLevel();
+    nbt["lightningTime"]  = lightningTime();
+}
 LL_TYPE_INSTANCE_HOOK(
     WeatherUpdateHook,
     ll::memory::HookPriority::Normal,

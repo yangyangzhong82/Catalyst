@@ -5,7 +5,23 @@
 #include "ll/api/memory/Hook.h"
 #include "mc/world/level/block/actor/SculkCatalystBlockActor.h"
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void SculkCatalystAbsorbExperienceBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["blockActor"] = ll::event::serializeRefObj(blockActor());
+    nbt["actor"]      = ll::event::serializeRefObj(actor());
+}
+
+void SculkCatalystAbsorbExperienceAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::world::LevelEvent::serialize(nbt);
+    nbt["blockActor"] = ll::event::serializeRefObj(blockActor());
+    nbt["actor"]      = ll::event::serializeRefObj(actor());
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     SculkCatalystAbsorbExperienceEventHook,

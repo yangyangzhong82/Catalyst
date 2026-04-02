@@ -5,7 +5,20 @@
 #include "ll/api/memory/Hook.h"
 #include "mc/world/level/block/SculkBlockBehavior.h"
 
+#include "mc/nbt/CompoundTag.h"
+
 namespace Catalyst {
+
+void SculkBlockGrowthBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["pos"] = ListTag{pos().x, pos().y, pos().z};
+}
+
+void SculkBlockGrowthAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::world::WorldEvent::serialize(nbt);
+    nbt["pos"] = ListTag{pos().x, pos().y, pos().z};
+}
+
 
 LL_STATIC_HOOK(
     SculkBlockGrowthHook,

@@ -22,6 +22,8 @@ public:
       mDamage(damage),
       mDamager(damager) {}
 
+    void serialize(CompoundTag&) const override;
+
     ActorDamageSource const& source() const { return mSource; }
     float                    damage() const { return mDamage; }
     Actor*                   damager() const { return mDamager; }
@@ -46,6 +48,8 @@ public:
       mDamage(damage),
       mDamager(damager),
       mResult(result) {}
+
+    void serialize(CompoundTag&) const override;
 
     ActorDamageSource const& source() const { return mSource; }
     float                    damage() const { return mDamage; }

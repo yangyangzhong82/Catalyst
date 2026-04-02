@@ -19,6 +19,8 @@ public:
       mOldPos(oldPos),
       mNewPos(newPos) {}
 
+    void serialize(CompoundTag&) const override;
+
     BlockPos const& getOldPos() const { return mOldPos; }
     BlockPos const& getNewPos() const { return mNewPos; }
     void            setNewPos(BlockPos const& pos) { mNewPos = pos; }
@@ -33,6 +35,8 @@ public:
     : WorldEvent(region),
       mOldPos(oldPos),
       mNewPos(newPos) {}
+
+    void serialize(CompoundTag&) const override;
 
     BlockPos const& getOldPos() const { return mOldPos; }
     BlockPos const& getNewPos() const { return mNewPos; }

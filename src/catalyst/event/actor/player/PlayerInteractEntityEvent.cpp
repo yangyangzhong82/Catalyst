@@ -7,7 +7,24 @@
 #include "mc/world/actor/player/Player.h"
 
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void PlayerInteractEntityBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["actor"]    = ll::event::serializeRefObj(actor());
+    nbt["location"] = ListTag{location().x, location().y, location().z};
+}
+
+void PlayerInteractEntityAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::PlayerEvent::serialize(nbt);
+    nbt["actor"]    = ll::event::serializeRefObj(actor());
+    nbt["location"] = ListTag{location().x, location().y, location().z};
+    nbt["result"]   = result();
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     InteractEntityHook,

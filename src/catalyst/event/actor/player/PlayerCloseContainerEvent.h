@@ -26,6 +26,8 @@ public:
       mContainerType(containerType),
       mServerInitiatedClose(serverInitiatedClose) {}
 
+    void serialize(CompoundTag&) const override;
+
     ContainerID                        containerId() const { return mContainerId; }
     SharedTypes::Legacy::ContainerType containerType() const { return mContainerType; }
     bool                               serverInitiatedClose() const { return mServerInitiatedClose; }
@@ -47,6 +49,8 @@ public:
       mContainerId(containerId),
       mContainerType(containerType),
       mServerInitiatedClose(serverInitiatedClose) {}
+
+    void serialize(CompoundTag&) const override;
 
     ContainerID                        containerId() const { return mContainerId; }
     SharedTypes::Legacy::ContainerType containerType() const { return mContainerType; }

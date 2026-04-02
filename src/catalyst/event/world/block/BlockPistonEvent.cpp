@@ -13,7 +13,24 @@
 #include "mc/world/redstone/circuit/CircuitSystem.h"
 
 
+#include "mc/nbt/CompoundTag.h"
+
 namespace Catalyst {
+
+void BlockPistonBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["pos"]       = ListTag{pos().x, pos().y, pos().z};
+    nbt["action"]    = magic_enum::enum_name(action());
+    nbt["direction"] = direction();
+}
+
+void BlockPistonAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::world::WorldEvent::serialize(nbt);
+    nbt["pos"]       = ListTag{pos().x, pos().y, pos().z};
+    nbt["action"]    = magic_enum::enum_name(action());
+    nbt["direction"] = direction();
+}
+
 
 enum class PistonStateEx : char {
     ExpandingCancelled  = 4,

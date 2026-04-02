@@ -8,7 +8,20 @@
 #include "mc/world/level/Explosion.h"
 #include "mc/world/level/block/Block.h"
 
+#include "mc/nbt/CompoundTag.h"
+
 namespace Catalyst {
+
+void BlockExplodedBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["pos"] = ListTag{pos().x, pos().y, pos().z};
+}
+
+void BlockExplodedAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::world::WorldEvent::serialize(nbt);
+    nbt["pos"] = ListTag{pos().x, pos().y, pos().z};
+}
+
 
 std::unordered_set<::BlockPos>* affectedBlocks = nullptr;
 BlockSource*                    region         = nullptr;

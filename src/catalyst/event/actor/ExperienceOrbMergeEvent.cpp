@@ -11,7 +11,26 @@
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/phys/AABB.h"
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void ExperienceOrbMergeBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["sourceOrb"]        = ll::event::serializeRefObj(sourceOrb());
+    nbt["value"]            = value();
+    nbt["mergedPickupCount"] = mergedPickupCount();
+}
+
+void ExperienceOrbMergeAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::entity::ActorEvent::serialize(nbt);
+    nbt["sourceOrb"]      = ll::event::serializeRefObj(sourceOrb());
+    nbt["value"]          = value();
+    nbt["oldPickupCount"] = oldPickupCount();
+    nbt["newPickupCount"] = newPickupCount();
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     ExperienceOrbMergeEventHook,

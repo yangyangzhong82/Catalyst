@@ -16,6 +16,8 @@ public:
     : Cancellable(blockSource),
       mPos(pos) {}
 
+    void serialize(CompoundTag&) const override;
+
     BlockPos const& pos() const { return mPos; }
 };
 
@@ -26,6 +28,8 @@ public:
     constexpr BlockExplodedAfterEvent(BlockSource& blockSource, BlockPos const& pos)
     : WorldEvent(blockSource),
       mPos(pos) {}
+
+    void serialize(CompoundTag&) const override;
 
     BlockPos const& pos() const { return mPos; }
 };

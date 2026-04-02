@@ -21,6 +21,8 @@ public:
       mBlockActor(blockActor),
       mActor(actor) {}
 
+    void serialize(CompoundTag&) const override;
+
     SculkCatalystBlockActor& blockActor() const { return mBlockActor; }
     Actor&                   actor() const { return mActor; }
 };
@@ -34,6 +36,8 @@ public:
     : LevelEvent(level),
       mBlockActor(blockActor),
       mActor(actor) {}
+
+    void serialize(CompoundTag&) const override;
 
     SculkCatalystBlockActor& blockActor() const { return mBlockActor; }
     Actor&                   actor() const { return mActor; }

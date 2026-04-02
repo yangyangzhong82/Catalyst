@@ -24,6 +24,8 @@ public:
       mArmorStand(armorStand),
       mSlot(slot) {}
 
+    void serialize(CompoundTag&) const override;
+
     ArmorStand&                        armorStand() const { return mArmorStand; }
     SharedTypes::Legacy::EquipmentSlot slot() const { return mSlot; }
 };
@@ -41,6 +43,8 @@ public:
     : PlayerEvent(player),
       mArmorStand(armorStand),
       mSlot(slot) {}
+
+    void serialize(CompoundTag&) const override;
 
     ArmorStand&                        armorStand() const { return mArmorStand; }
     SharedTypes::Legacy::EquipmentSlot slot() const { return mSlot; }

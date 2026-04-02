@@ -28,6 +28,8 @@ public:
       mRegion(region),
       mPos(pos) {}
 
+    void serialize(CompoundTag&) const override;
+
     BasePressurePlateBlock const& block() const { return mBlock; }
     BlockSource&                  region() const { return mRegion; }
     BlockPos const&               pos() const { return mPos; }

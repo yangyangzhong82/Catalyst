@@ -6,7 +6,23 @@
 #include "mc/entity/components_json_legacy/ProjectileComponent.h"
 #include "mc/world/actor/Actor.h"
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void ProjectileHitBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["component"] = ll::event::serializeRefObj(component());
+    nbt["hitResult"]  = ll::event::serializeRefObj(hitResult());
+}
+
+void ProjectileHitAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::entity::ActorEvent::serialize(nbt);
+    nbt["component"] = ll::event::serializeRefObj(component());
+    nbt["hitResult"]  = ll::event::serializeRefObj(hitResult());
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     ProjectileHitEventHook,

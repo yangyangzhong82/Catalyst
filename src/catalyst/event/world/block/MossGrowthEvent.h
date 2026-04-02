@@ -22,6 +22,8 @@ public:
       mXRadius(xRadius),
       mZRadius(zRadius) {}
 
+    void serialize(CompoundTag&) const override;
+
     BlockPos const& origin() const { return mOrigin; }
     int             xRadius() const { return mXRadius; }
     int             zRadius() const { return mZRadius; }
@@ -38,6 +40,8 @@ public:
       mOrigin(origin),
       mXRadius(xRadius),
       mZRadius(zRadius) {}
+
+    void serialize(CompoundTag&) const override;
 
     BlockPos const& origin() const { return mOrigin; }
     int             xRadius() const { return mXRadius; }

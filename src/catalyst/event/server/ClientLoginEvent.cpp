@@ -22,7 +22,30 @@
 
 #ifdef LL_PLAT_S
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void ClientLoginBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["source"] = ll::event::serializeRefObj(source());
+    nbt["packet"] = ll::event::serializePtrObj(packet().get());
+}
+
+void ClientLoginAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::Event::serialize(nbt);
+    nbt["packet"]         = ll::event::serializePtrObj(packet().get());
+    nbt["name"]           = name();
+    nbt["ip"]             = ip();
+    nbt["serverAuthXuid"] = serverAuthXuid();
+    nbt["clientAuthXuid"] = clientAuthXuid();
+    nbt["uuid"]           = ll::event::serializeRefObj(mUuid);
+    nbt["deviceId"]       = deviceId();
+    nbt["deviceModel"]    = deviceModel();
+    nbt["networkIdHash"]  = (int64_t)mNetworkIdHash;
+}
+
 
 // Thread-local pointer to current NetworkIdentifier during event dispatch
 static thread_local NetworkIdentifier const* sCurrentNetworkId = nullptr;
@@ -168,4 +191,3 @@ void ClientLoginAfterEvent::disconnect(std::string const&) const {}
 } // namespace Catalyst
 
 #endif
-

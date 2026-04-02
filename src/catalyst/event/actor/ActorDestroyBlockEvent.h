@@ -20,6 +20,8 @@ public:
       mPos(pos),
       mBlock(block) {}
 
+    void serialize(CompoundTag&) const override;
+
     Vec3 const&  pos() const { return mPos; }
     Block const& block() const { return mBlock; }
 };
@@ -33,6 +35,8 @@ public:
     : ActorEvent(actor),
       mPos(pos),
       mBlock(block) {}
+
+    void serialize(CompoundTag&) const override;
 
     Vec3 const&  pos() const { return mPos; }
     Block const& block() const { return mBlock; }

@@ -50,6 +50,8 @@ public:
       mDstItem(dstItem),
       mScreenContext(screenContext) {}
 
+    void serialize(CompoundTag&) const override;
+
     ItemStackRequestActionType actionType() const { return mActionType; }
     FullContainerName const&   srcContainer() const { return mSrcContainer; }
     uchar                      srcSlot() const { return mSrcSlot; }
@@ -112,6 +114,8 @@ public:
       mSrcItem(srcItem),
       mDstItem(dstItem),
       mScreenContext(screenContext) {}
+
+    void serialize(CompoundTag&) const override;
 
     ItemStackRequestActionType actionType() const { return mActionType; }
     FullContainerName const&   srcContainer() const { return mSrcContainer; }

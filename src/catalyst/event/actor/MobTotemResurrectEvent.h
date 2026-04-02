@@ -41,6 +41,8 @@ public:
       mHasTotem(hasTotem),
       mEffects(std::move(effects)) {}
 
+    void serialize(CompoundTag&) const override;
+
     ActorDamageSource const& killingDamage() const { return mKillingDamage; }
     ItemStack const&         totem() const { return mTotem; }
     bool                     hasTotem() const { return mHasTotem; }
@@ -71,6 +73,8 @@ public:
       mHasTotem(hasTotem),
       mResult(result),
       mEffects(std::move(effects)) {}
+
+    void serialize(CompoundTag&) const override;
 
     ActorDamageSource const& killingDamage() const { return mKillingDamage; }
     ItemStack const&         totem() const { return mTotem; }

@@ -6,7 +6,26 @@
 #include "mc/world/level/WorldBlockTarget.h"
 #include "mc/world/level/block/MultifaceSpreader.h"
 
+#include "mc/nbt/CompoundTag.h"
+
 namespace Catalyst {
+
+void SculkSpreadBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["pos"]             = ListTag{pos().x, pos().y, pos().z};
+    nbt["targetPos"]       = ListTag{targetPos().x, targetPos().y, targetPos().z};
+    nbt["startingFace"]    = (int)startingFace();
+    nbt["spreadDirection"] = (int)spreadDirection();
+}
+
+void SculkSpreadAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::world::WorldEvent::serialize(nbt);
+    nbt["pos"]             = ListTag{pos().x, pos().y, pos().z};
+    nbt["targetPos"]       = ListTag{targetPos().x, targetPos().y, targetPos().z};
+    nbt["startingFace"]    = (int)startingFace();
+    nbt["spreadDirection"] = (int)spreadDirection();
+}
+
 
 using SpreadResult = ::std::optional<::std::pair<::BlockPos const, uchar const>>;
 

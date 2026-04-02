@@ -26,6 +26,8 @@ public:
       mPacket(packet),
       mPlayers(std::move(players)) {}
 
+    void serialize(CompoundTag&) const override;
+
     std::vector<NetworkIdentifierWithSubId> const& ids() const { return mIds; }
     Packet const&                                  packet() const { return mPacket; }
     std::vector<ServerPlayer*> const&              players() const { return mPlayers; }

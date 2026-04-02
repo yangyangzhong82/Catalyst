@@ -17,6 +17,8 @@ public:
     : Cancellable(blockSource),
       mExplosion(explosion) {}
 
+    void serialize(CompoundTag&) const override;
+
     Explosion&  explosion() const { return mExplosion; }
     Vec3 const& pos() const { return mExplosion.mPos; }
     float       radius() const { return mExplosion.mRadius; }
@@ -34,6 +36,8 @@ public:
     constexpr ExplosionAfterEvent(BlockSource& blockSource, Explosion& explosion)
     : WorldEvent(blockSource),
       mExplosion(explosion) {}
+
+    void serialize(CompoundTag&) const override;
 
     Explosion&  explosion() const { return mExplosion; }
     Vec3 const& pos() const { return mExplosion.mPos; }

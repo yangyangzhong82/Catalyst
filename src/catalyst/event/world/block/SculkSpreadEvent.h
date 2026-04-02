@@ -28,6 +28,8 @@ public:
       mStartingFace(startingFace),
       mSpreadDirection(spreadDirection) {}
 
+    void serialize(CompoundTag&) const override;
+
     BlockPos const& pos() const { return mPos; }
     BlockPos const& targetPos() const { return mTargetPos; }
     uchar           startingFace() const { return mStartingFace; }
@@ -53,6 +55,8 @@ public:
       mTargetPos(targetPos),
       mStartingFace(startingFace),
       mSpreadDirection(spreadDirection) {}
+
+    void serialize(CompoundTag&) const override;
 
     BlockPos const& pos() const { return mPos; }
     BlockPos const& targetPos() const { return mTargetPos; }

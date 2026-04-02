@@ -12,7 +12,28 @@
 
 #include "catalyst/mod/Gloabl.h"
 
+#include "mc/nbt/CompoundTag.h"
+
 namespace Catalyst {
+
+void PlayerEditSignBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["pos"]          = ListTag{pos().x, pos().y, pos().z};
+    nbt["oldFrontText"] = oldFrontText();
+    nbt["oldBackText"]  = oldBackText();
+    nbt["newFrontText"] = newFrontText();
+    nbt["newBackText"]  = newBackText();
+}
+
+void PlayerEditSignAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::ServerPlayerEvent::serialize(nbt);
+    nbt["pos"]          = ListTag{pos().x, pos().y, pos().z};
+    nbt["oldFrontText"] = oldFrontText();
+    nbt["oldBackText"]  = oldBackText();
+    nbt["newFrontText"] = newFrontText();
+    nbt["newBackText"]  = newBackText();
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     PlayerEditSignEventHook,

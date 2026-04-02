@@ -8,7 +8,21 @@
 #include "mc/world/actor/ai/goal/PickupItemsGoal.h"
 #include "mc/world/actor/item/ItemActor.h"
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void MobPickupItemBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["itemActor"] = ll::event::serializeRefObj(itemActor());
+}
+
+void MobPickupItemAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::entity::ActorEvent::serialize(nbt);
+    nbt["itemActor"] = ll::event::serializeRefObj(itemActor());
+}
+
 
 LL_TYPE_INSTANCE_HOOK(
     MobPickupItemHook,

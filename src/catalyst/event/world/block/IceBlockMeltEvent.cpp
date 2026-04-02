@@ -17,7 +17,27 @@
 #include "mc/world/level/block/registry/BlockTypeRegistry.h"
 #include "mc/world/level/dimension/VanillaDimensions.h"
 
+#include "mc/nbt/CompoundTag.h"
+#include "ll/api/event/EventRefObjSerializer.h"
+
 namespace Catalyst {
+
+void IceBlockMeltBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["pos"]         = ListTag{pos().x, pos().y, pos().z};
+    nbt["sourceBlock"] = ll::event::serializeRefObj(sourceBlock());
+    nbt["meltedBlock"] = ll::event::serializeRefObj(meltedBlock());
+    nbt["inNether"]    = isInNether();
+}
+
+void IceBlockMeltAfterEvent::serialize(CompoundTag& nbt) const {
+    ll::event::world::WorldEvent::serialize(nbt);
+    nbt["pos"]         = ListTag{pos().x, pos().y, pos().z};
+    nbt["sourceBlock"] = ll::event::serializeRefObj(sourceBlock());
+    nbt["meltedBlock"] = ll::event::serializeRefObj(meltedBlock());
+    nbt["inNether"]    = isInNether();
+}
+
 
 LL_STATIC_HOOK(
     IceBlockMeltHook,
