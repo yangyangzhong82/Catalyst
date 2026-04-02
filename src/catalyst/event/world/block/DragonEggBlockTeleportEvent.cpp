@@ -39,15 +39,17 @@ LL_STATIC_HOOK(
 
     for (int i = 0; i < 1000; ++i) {
         int offsetX = (coreRandom._genRandInt32() & 0xF) - (coreRandom._genRandInt32() & 0xF); // [-15, 15]
+        int maxH    = region.getMaxHeight();
+        int offsetY = (coreRandom._genRandInt32() & 7) - (coreRandom._genRandInt32() & 7); // [-7, 7]
+        offsetY     = std::clamp(offsetY, 0, maxH);
         int offsetZ = (coreRandom._genRandInt32() & 0xF) - (coreRandom._genRandInt32() & 0xF); // [-15, 15]
-        int offsetY = (coreRandom._genRandInt32() & 7) - (coreRandom._genRandInt32() & 7);     // [-7, 7]
 
         BlockPos currentAttemptPos  = pos;
         currentAttemptPos.x        += offsetX;
         currentAttemptPos.y        += offsetY;
         currentAttemptPos.z        += offsetZ;
 
-        if (region.getBlock(currentAttemptPos).isAir() && region.mMaxHeight >= currentAttemptPos.y) {
+        if (region.getBlock(currentAttemptPos).isAir()) {
             newPos        = currentAttemptPos;
             foundValidPos = true;
             break;
