@@ -8,7 +8,7 @@
 #include "mc/world/level/Explosion.h"
 #include "mc/world/level/block/Block.h"
 
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 
 namespace Catalyst {
 

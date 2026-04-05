@@ -10,7 +10,7 @@
 #include "mc/world/level/material/Material.h"
 #include "mc/world/level/material/MaterialType.h"
 
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
 
 namespace Catalyst {

@@ -8,7 +8,7 @@
 #include "mc/world/actor/ai/goal/PickupItemsGoal.h"
 #include "mc/world/actor/item/ItemActor.h"
 
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
 
 namespace Catalyst {
@@ -30,18 +30,13 @@ LL_TYPE_INSTANCE_HOOK(
     PickupItemsGoal,
     &PickupItemsGoal::_pickItemUp,
     void,
-    ::ItemActor* itemActor
+    ::ItemActor& itemActor
 ) {
     auto& mob = this->mMob;
 
-    if (!itemActor) {
-        origin(itemActor);
-        return;
-    }
-
     auto& bus = ll::event::EventBus::getInstance();
 
-    MobPickupItemBeforeEvent beforeEvent(mob, *itemActor);
+    MobPickupItemBeforeEvent beforeEvent(mob, itemActor);
     bus.publish(beforeEvent);
     if (beforeEvent.isCancelled()) {
         return;
@@ -49,7 +44,7 @@ LL_TYPE_INSTANCE_HOOK(
 
     origin(itemActor);
 
-    MobPickupItemAfterEvent afterEvent(mob, *itemActor);
+    MobPickupItemAfterEvent afterEvent(mob, itemActor);
     bus.publish(afterEvent);
 }
 

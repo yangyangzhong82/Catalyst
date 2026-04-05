@@ -5,7 +5,6 @@
 #include "ll/api/memory/Hook.h"
 #include "mc/gameplayhandlers/CoordinatorResult.h"
 #include "mc/util/Random.h"
-#include "mc/util/Randomize.h"
 #include "mc/util/VariantParameterList.h"
 #include "mc/world/actor/ActorDefinitionDescriptor.h"
 #include "mc/world/actor/Mob.h"
@@ -26,8 +25,7 @@
 #include "mc/world/level/block/BlockChangeContext.h"
 #include "mc/world/level/block/BlockDescriptor.h"
 #include "mc/world/level/dimension/Dimension.h"
-BlockChangeContext::BlockChangeContext() : mContextSource(std::monostate{}) {}
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
 
 namespace Catalyst {
@@ -49,7 +47,6 @@ void MobTakeBlockAfterEvent::serialize(CompoundTag& nbt) const {
 LL_TYPE_INSTANCE_HOOK(TakeBlockGoalTickHook, HookPriority::Normal, TakeBlockGoal, &TakeBlockGoal::$tick, void) {
     auto&     level  = mMob.getLevel();
     auto&     random = level.getRandom();
-    Randomize randomize(random);
     auto&     mobPos = mMob.getPosition();
     BlockPos  targetPos(mobPos);
 
@@ -126,7 +123,7 @@ LL_TYPE_INSTANCE_HOOK(TakeBlockGoalTickHook, HookPriority::Normal, TakeBlockGoal
     mMob.add(item);
 
     // 移除方块
-    BlockChangeContext changeContext;
+    BlockChangeContext changeContext{};
     changeContext.mContextSource = ActorChangeContext{&mMob};
     blockSource.removeBlock(targetPos, changeContext);
 

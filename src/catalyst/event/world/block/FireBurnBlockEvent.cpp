@@ -9,7 +9,6 @@
 #include "mc/deps/core/string/HashedString.h"
 #include "mc/deps/shared_types/legacy/Difficulty.h"
 #include "mc/util/Random.h"
-#include "mc/util/Randomize.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
@@ -35,7 +34,7 @@
 #include <algorithm>
 #include <string_view>
 
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 
 namespace Catalyst {
 
@@ -106,7 +105,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::BlockSource&    region,
     ::BlockPos const& pos,
     int               chance,
-    ::Randomize&      randomize,
+    ::IRandom&        random,
     int               age,
     ::BlockPos const& firePos
 ) {
@@ -127,10 +126,9 @@ LL_TYPE_INSTANCE_HOOK(
     }
 
     // 原版随机检查: nextInt(chance) < flameOdds
-    // 如果 randomize 有效且 chance > 0
-    int     randVal   = 0;
-    IRandom* randomPtr = randomize.mRandom.get().get();
-    if (randomPtr && chance > 0) {
+    int      randVal   = 0;
+    IRandom* randomPtr = &random;
+    if (chance > 0) {
         randVal = randomPtr->nextInt(chance);
     }
     if (randVal >= flameOdds) {
@@ -185,7 +183,7 @@ LL_TYPE_INSTANCE_HOOK(
             }
             // 检查 doTileDrops 规则
             if (gameRules.getBool(doTileDropsId, true)) {
-                BlockChangeContext ctx(false);
+                BlockChangeContext ctx{};
                 region.removeBlock(pos, ctx);
             }
         }
@@ -214,13 +212,13 @@ LL_TYPE_INSTANCE_HOOK(
                 newBlock->mBlockType->destroy(region, pos, *newBlock, nullptr);
             }
             if (gameRules.getBool(doTileDropsId, true)) {
-                BlockChangeContext ctx(false);
+                BlockChangeContext ctx{};
                 region.removeBlock(pos, ctx);
             }
         }
     } else if (!isTnt) {
         // 普通可燃方块处理
-        BlockChangeContext ctx(false);
+        BlockChangeContext ctx{};
         region.removeBlock(pos, ctx);
 
         // 只有在有效火焰位置才放置火焰
@@ -245,7 +243,7 @@ LL_TYPE_INSTANCE_HOOK(
 
         // 检查 doTileDrops 规则
         if (gameRules.getBool(doTileDropsId, true)) {
-            BlockChangeContext ctx(false);
+            BlockChangeContext ctx{};
             region.removeBlock(pos, ctx);
         }
 
@@ -285,7 +283,7 @@ LL_TYPE_INSTANCE_HOOK(
 
     // 检查火焰位置是否有效
     if (!mayPlace(region, firePos)) {
-        BlockChangeContext ctx(false);
+        BlockChangeContext ctx{};
         region.removeBlock(firePos, ctx);
         return;
     }
@@ -331,7 +329,7 @@ LL_TYPE_INSTANCE_HOOK(
         }
 
         if (extinguishByRain) {
-            BlockChangeContext ctx(false);
+            BlockChangeContext ctx{};
             region.removeBlock(firePos, ctx);
             return;
         }
@@ -357,7 +355,7 @@ LL_TYPE_INSTANCE_HOOK(
 
         auto newBlock = fireBlock.setState<int>(VanillaStates::Age(), newAge);
         if (newBlock) {
-            BlockChangeContext ctx(false);
+            BlockChangeContext ctx{};
             region.setBlock(firePos, *newBlock, 1, nullptr, ctx);
         }
 
@@ -426,7 +424,7 @@ CHECK_AGE_REMOVE:
 
 REMOVE_FIRE:
     {
-        BlockChangeContext ctx(false);
+        BlockChangeContext ctx{};
         region.removeBlock(firePos, ctx);
         return;
     }
@@ -437,8 +435,6 @@ LABEL_55:
     auto const& biome  = region.getBiome(firePos);
     bool        isHumid = biome.isHumid();
 
-    Randomize randomize(static_cast<IRandom&>(random));
-
     // 烧毁相邻方块的概率
     int horizontalChance = isHumid ? 250 : 300;
     int verticalChance   = isHumid ? 200 : 250;
@@ -446,12 +442,12 @@ LABEL_55:
     auto& bus = ll::event::EventBus::getInstance();
 
     // 检查6个相邻方块的烧毁 (checkBurn 会触发 FireBurnBlockEvent)
-    checkBurn(region, BlockPos(firePos.x + 1, firePos.y, firePos.z), horizontalChance, randomize, age, firePos);
-    checkBurn(region, BlockPos(firePos.x - 1, firePos.y, firePos.z), horizontalChance, randomize, age, firePos);
-    checkBurn(region, BlockPos(firePos.x, firePos.y - 1, firePos.z), verticalChance, randomize, age, firePos);
-    checkBurn(region, BlockPos(firePos.x, firePos.y + 1, firePos.z), verticalChance, randomize, age, firePos);
-    checkBurn(region, BlockPos(firePos.x, firePos.y, firePos.z - 1), horizontalChance, randomize, age, firePos);
-    checkBurn(region, BlockPos(firePos.x, firePos.y, firePos.z + 1), horizontalChance, randomize, age, firePos);
+    checkBurn(region, BlockPos(firePos.x + 1, firePos.y, firePos.z), horizontalChance, random, age, firePos);
+    checkBurn(region, BlockPos(firePos.x - 1, firePos.y, firePos.z), horizontalChance, random, age, firePos);
+    checkBurn(region, BlockPos(firePos.x, firePos.y - 1, firePos.z), verticalChance, random, age, firePos);
+    checkBurn(region, BlockPos(firePos.x, firePos.y + 1, firePos.z), verticalChance, random, age, firePos);
+    checkBurn(region, BlockPos(firePos.x, firePos.y, firePos.z - 1), horizontalChance, random, age, firePos);
+    checkBurn(region, BlockPos(firePos.x, firePos.y, firePos.z + 1), horizontalChance, random, age, firePos);
 
     // 火焰蔓延到周围方块
     for (int dx = -1; dx <= 1; dx++) {
@@ -534,7 +530,7 @@ LABEL_55:
                 if (fireRef) {
                     auto newFireBlock = fireRef->setState<int>(VanillaStates::Age(), newFireAge);
                     if (newFireBlock) {
-                        BlockChangeContext ctx(false);
+                        BlockChangeContext ctx{};
                         region.setBlock(testPos, *newFireBlock, 1, nullptr, ctx);
                         _tryAddToTickingQueue(region, testPos, random);
 

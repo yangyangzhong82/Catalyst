@@ -42,7 +42,7 @@ struct GameplayHandlerResult<CoordinatorResult> {
     GameplayHandlerResult(CoordinatorResult v) : value(v) {}
 };
 
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
 
 namespace Catalyst {
@@ -126,7 +126,7 @@ LL_TYPE_INSTANCE_HOOK(
     return result;
 }
 */
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
 
 namespace Catalyst {

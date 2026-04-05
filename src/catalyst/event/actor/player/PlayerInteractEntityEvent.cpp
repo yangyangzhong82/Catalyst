@@ -7,7 +7,7 @@
 #include "mc/world/actor/player/Player.h"
 
 
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
 
 namespace Catalyst {
@@ -20,9 +20,10 @@ void PlayerInteractEntityBeforeEvent::serialize(CompoundTag& nbt) const {
 
 void PlayerInteractEntityAfterEvent::serialize(CompoundTag& nbt) const {
     ll::event::PlayerEvent::serialize(nbt);
-    nbt["actor"]    = ll::event::serializeRefObj(actor());
-    nbt["location"] = ListTag{location().x, location().y, location().z};
-    nbt["result"]   = result();
+    nbt["actor"]         = ll::event::serializeRefObj(actor());
+    nbt["location"]      = ListTag{location().x, location().y, location().z};
+    nbt["resultSuccess"] = result().mSuccess;
+    nbt["resultSwing"]   = result().mSwing;
 }
 
 
@@ -31,19 +32,19 @@ LL_TYPE_INSTANCE_HOOK(
     ll::memory::HookPriority::Normal,
     Player,
     &Player::interact,
-    bool,
-    Actor&      actor,
-    Vec3 const& location
+    InteractionResult,
+    Actor&            actor,
+    Vec3 const&       location
 ) {
     auto& bus = ll::event::EventBus::getInstance();
 
     PlayerInteractEntityBeforeEvent beforeEvent(*this, actor, location);
     bus.publish(beforeEvent);
     if (beforeEvent.isCancelled()) {
-        return false;
+        return InteractionResult{};
     }
 
-    bool result = origin(actor, location);
+    InteractionResult result = origin(actor, location);
 
     PlayerInteractEntityAfterEvent afterEvent(*this, actor, location, result);
     bus.publish(afterEvent);

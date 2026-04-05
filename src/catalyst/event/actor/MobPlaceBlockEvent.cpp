@@ -22,7 +22,7 @@
 #include "mc/world/level/dimension/Dimension.h"
 #include "mc/network/packet/MobEquipmentPacket.h"
 
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
 
 namespace Catalyst {

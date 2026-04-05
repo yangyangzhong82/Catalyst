@@ -13,7 +13,7 @@
 #include "mc/world/redstone/circuit/CircuitSystem.h"
 
 
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 
 namespace Catalyst {
 

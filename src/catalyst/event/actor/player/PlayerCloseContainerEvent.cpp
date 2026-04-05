@@ -9,7 +9,7 @@
 #include "mc/world/actor/player/Player.h"
 
 
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 
 namespace Catalyst {
 

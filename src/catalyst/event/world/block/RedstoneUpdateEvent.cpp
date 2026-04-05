@@ -7,7 +7,7 @@
 #include "mc/world/redstone/circuit/CircuitSceneGraph.h"
 #include "mc/world/redstone/circuit/CircuitSystem.h"
 #include "mc/world/redstone/circuit/components/BaseCircuitComponent.h"
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
 
 namespace Catalyst {

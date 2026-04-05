@@ -11,7 +11,7 @@
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/phys/AABB.h"
 
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
 
 namespace Catalyst {

@@ -7,7 +7,7 @@
 #include "catalyst/Macros.h"
 
 class Block;
-
+/*
 namespace Catalyst {
 
 class CATALYST_API LeavesDecayBeforeEvent final : public ll::event::Cancellable<ll::event::world::WorldEvent> {
@@ -43,3 +43,4 @@ public:
 };
 
 } // namespace Catalyst
+*/

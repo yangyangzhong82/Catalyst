@@ -17,7 +17,7 @@
 #include "mc/world/level/block/registry/BlockTypeRegistry.h"
 #include "mc/world/level/dimension/VanillaDimensions.h"
 
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
 
 namespace Catalyst {

@@ -6,7 +6,7 @@
 #include "mc/network/ServerPlayerBlockUseHandler.h"
 #include "mc/server/ServerPlayer.h"
 
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 
 namespace Catalyst {
 

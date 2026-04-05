@@ -11,7 +11,7 @@
 #include "mc/world/events/ActorGameplayEvent.h"
 #include "mc/world/events/ActorGriefingBlockEvent.h"
 
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
 
 namespace Catalyst {

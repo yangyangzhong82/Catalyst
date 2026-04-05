@@ -8,7 +8,7 @@
 #include "mc/world/level/block/block_events/BlockPlayerInteractEvent.h"
 
 
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 
 namespace Catalyst {
 

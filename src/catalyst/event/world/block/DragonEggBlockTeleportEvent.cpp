@@ -16,7 +16,7 @@
 #include "mc/world/level/block/VanillaBlockTypeIds.h"
 #include "mc/world/level/block/registry/BlockTypeRegistry.h"
 
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 
 namespace Catalyst {
 

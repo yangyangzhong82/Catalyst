@@ -7,7 +7,7 @@
 #include "catalyst/event/actor/ActorOpenContainerEvent.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/EventRefObjSerializer.h"
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 #include "mc/world/inventory/EnderChestContainer.h"
 #include "mc/world/level/block/actor/BarrelBlockActor.h"
 #include "mc/world/level/block/actor/BrewingStandBlockActor.h"

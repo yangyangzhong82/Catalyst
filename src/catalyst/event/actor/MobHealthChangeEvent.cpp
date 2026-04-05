@@ -7,7 +7,7 @@
 #include "mc/world/attribute/AttributeBuff.h"
 #include "mc/world/attribute/HealthAttributeDelegate.h"
 
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
 
 namespace Catalyst {
@@ -32,7 +32,7 @@ LL_TYPE_INSTANCE_HOOK(
     ll::memory::HookPriority::Normal,
     HealthAttributeDelegate,
     &HealthAttributeDelegate::$change,
-    float,
+    std::optional<float>,
     float                  oldValue,
     float                  newValue,
     ::AttributeBuff const& buff
@@ -50,7 +50,7 @@ LL_TYPE_INSTANCE_HOOK(
         return oldValue;
     }
 
-    auto result = origin(oldValue, newValue, buff);
+    std::optional<float> result = origin(oldValue, newValue, buff);
 
     MobHealthChangeAfterEvent afterEvent(*mob, oldValue, newValue, buff);
     bus.publish(afterEvent);

@@ -33,7 +33,7 @@
 #include "mc/world/level/storage/GameRuleId.h"
 #include "mc/world/level/storage/GameRules.h"
 
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
 
 namespace Catalyst {
@@ -207,7 +207,7 @@ LL_TYPE_INSTANCE_HOOK(
                         }
                     }
 
-                    BlockChangeContext changeContext(false);
+                    BlockChangeContext changeContext{};
                     changeContext.mContextSource = ActorChangeContext{this};
 
                     bool const destroyed = blockSource.removeBlock(pos, changeContext);

@@ -6,7 +6,7 @@
 #include "mc/world/actor/item/ItemActor.h"
 #include "mc/world/level/BedrockSpawner.h"
 
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
 
 namespace Catalyst {

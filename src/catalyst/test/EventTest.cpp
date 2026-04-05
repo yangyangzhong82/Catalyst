@@ -27,7 +27,6 @@
 #include "catalyst/event/world/block/FireBurnBlockEvent.h"
 #include "catalyst/event/world/block/FireSpreadEvent.h"
 #include "catalyst/event/world/block/IceBlockMeltEvent.h"
-#include "catalyst/event/world/block/LeavesDecayEvent.h"
 #include "catalyst/event/world/block/MossGrowthEvent.h"
 #include "catalyst/event/world/block/RedstoneUpdateEvent.h"
 #include "catalyst/mod/Gloabl.h"
@@ -748,32 +747,6 @@ void registerEventTests() {
             event.sourceBlock().getTypeName(),
             event.meltedBlock().getTypeName(),
             event.isInNether()
-        );
-    });
-
-    bus.emplaceListener<LeavesDecayBeforeEvent>([](LeavesDecayBeforeEvent& event) {
-        logger.info(
-            "LeavesDecayBeforeEvent: pos=({},{},{}), block={}",
-            event.pos().x,
-            event.pos().y,
-            event.pos().z,
-            event.leavesBlock().getTypeName()
-        );
-
-        // 测试拦截：保护出生点附近树叶不腐烂
-        if (event.pos().z <= 16) {
-            logger.warn("拦截树叶腐烂 - 测试保护区域");
-            event.cancel();
-        }
-    });
-
-    bus.emplaceListener<LeavesDecayAfterEvent>([](LeavesDecayAfterEvent& event) {
-        logger.info(
-            "LeavesDecayAfterEvent: pos=({},{},{}), block={}",
-            event.pos().x,
-            event.pos().y,
-            event.pos().z,
-            event.leavesBlock().getTypeName()
         );
     });
 }

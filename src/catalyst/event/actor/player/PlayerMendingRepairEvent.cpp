@@ -18,7 +18,7 @@
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/actor/player/PlayerInventory.h"
 #include "mc/world/item/enchanting/EnchantUtils.h"
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
 
 namespace Catalyst {
@@ -172,7 +172,7 @@ bool setOrbValue(ExperienceOrb& orb, DataItem& dataItem, int value) {
     auto newValue = static_cast<short>(std::max(0, value));
     if (*dataRef != newValue) {
         *dataRef = newValue;
-        synchedActorData->mData->markDirty(dataItem);
+        synchedActorData->mData->mDirtyFlags->set(static_cast<size_t>(ActorDataIDs::Value));
     }
     return true;
 }

@@ -2,6 +2,7 @@
 
 #include "ll/api/event/Cancellable.h"
 #include "ll/api/event/player/PlayerEvent.h"
+#include "mc/world/gamemode/InteractionResult.h"
 
 #include "catalyst/Macros.h"
 
@@ -29,10 +30,15 @@ public:
 class CATALYST_API PlayerInteractEntityAfterEvent final : public ll::event::PlayerEvent {
     Actor&      mActor;
     Vec3 const& mLocation;
-    bool        mResult;
+    InteractionResult mResult;
 
 public:
-    constexpr PlayerInteractEntityAfterEvent(Player& player, Actor& actor, Vec3 const& location, bool result)
+    constexpr PlayerInteractEntityAfterEvent(
+        Player&            player,
+        Actor&             actor,
+        Vec3 const&        location,
+        InteractionResult  result
+    )
     : PlayerEvent(player),
       mActor(actor),
       mLocation(location),
@@ -42,7 +48,7 @@ public:
 
     Actor&      actor() const { return mActor; }
     Vec3 const& location() const { return mLocation; }
-    bool        result() const { return mResult; }
+    InteractionResult result() const { return mResult; }
 };
 
 } // namespace Catalyst

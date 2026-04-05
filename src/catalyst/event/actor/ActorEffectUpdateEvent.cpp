@@ -5,7 +5,7 @@
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/Actor.h"
 #include "mc/world/effect/MobEffectInstance.h"
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
 
 namespace Catalyst {

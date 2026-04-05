@@ -8,7 +8,7 @@
 #include "mc/network/ServerNetworkHandler.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/network/NetworkIdentifierWithSubId.h"
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
 
 namespace Catalyst {

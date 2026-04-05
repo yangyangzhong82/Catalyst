@@ -20,7 +20,7 @@
 #include "mc/world/level/block/FallingBlock.h"
 #include "mc/world/level/block/registry/BlockTypeRegistry.h"
 
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
 
 namespace Catalyst {
@@ -105,7 +105,7 @@ LL_TYPE_INSTANCE_HOOK(
     ActorBlockSyncMessage syncMsg(uniqueId, ActorBlockSyncMessage::MessageId::Create);
 
     // 创建方块变更上下文
-    BlockChangeContext changeContext{false};
+    BlockChangeContext changeContext{};
     changeContext.mContextSource = ActorChangeContext{actor};
 
     // 将原位置替换为空气方块

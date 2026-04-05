@@ -6,7 +6,7 @@
 #include "mc/world/level/WorldBlockTarget.h"
 #include "mc/world/level/levelgen/feature/VegetationPatchFeature.h"
 
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 
 namespace Catalyst {
 

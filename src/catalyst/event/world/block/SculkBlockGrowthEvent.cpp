@@ -5,7 +5,7 @@
 #include "ll/api/memory/Hook.h"
 #include "mc/world/level/block/SculkBlockBehavior.h"
 
-#include "mc/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
 
 namespace Catalyst {
 
