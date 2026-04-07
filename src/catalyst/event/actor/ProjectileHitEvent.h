@@ -3,44 +3,47 @@
 #include "ll/api/event/Cancellable.h"
 #include "ll/api/event/entity/ActorEvent.h"
 
-
 #include "catalyst/Macros.h"
-
-class HitResult;
-class ProjectileComponent;
+#include "mc/world/phys/HitResult.h"
 
 namespace Catalyst {
 
 class CATALYST_API ProjectileHitBeforeEvent final : public ll::event::Cancellable<ll::event::entity::ActorEvent> {
-    ProjectileComponent& mComponent;
-    HitResult const&     mHitResult;
+    HitResult const& mHitResult;
 
 public:
-    constexpr ProjectileHitBeforeEvent(Actor& owner, ProjectileComponent& component, HitResult const& hitResult)
-    : Cancellable(owner),
-      mComponent(component),
+    constexpr ProjectileHitBeforeEvent(Actor& projectile, HitResult const& hitResult)
+    : Cancellable(projectile),
       mHitResult(hitResult) {}
 
     void serialize(CompoundTag&) const override;
 
-    ProjectileComponent& component() const { return mComponent; }
-    HitResult const&     hitResult() const { return mHitResult; }
+    HitResult const& hitResult() const { return mHitResult; }
+    HitResultType    type() const { return hitResult().mType; }
+    uchar            face() const { return hitResult().mFacing; }
+    BlockPos const&  blockPos() const { return hitResult().mBlock; }
+    Vec3 const&      pos() const { return hitResult().mPos; }
+    bool             isHitLiquid() const { return hitResult().mIsHitLiquid; }
+    Actor*           hitActor() const { return hitResult().getEntity(); }
 };
 
 class CATALYST_API ProjectileHitAfterEvent final : public ll::event::entity::ActorEvent {
-    ProjectileComponent& mComponent;
-    HitResult const&     mHitResult;
+    HitResult const& mHitResult;
 
 public:
-    constexpr ProjectileHitAfterEvent(Actor& owner, ProjectileComponent& component, HitResult const& hitResult)
-    : ActorEvent(owner),
-      mComponent(component),
+    constexpr ProjectileHitAfterEvent(Actor& projectile, HitResult const& hitResult)
+    : ActorEvent(projectile),
       mHitResult(hitResult) {}
 
     void serialize(CompoundTag&) const override;
 
-    ProjectileComponent& component() const { return mComponent; }
-    HitResult const&     hitResult() const { return mHitResult; }
+    HitResult const& hitResult() const { return mHitResult; }
+    HitResultType    type() const { return hitResult().mType; }
+    uchar            face() const { return hitResult().mFacing; }
+    BlockPos const&  blockPos() const { return hitResult().mBlock; }
+    Vec3 const&      pos() const { return hitResult().mPos; }
+    bool             isHitLiquid() const { return hitResult().mIsHitLiquid; }
+    Actor*           hitActor() const { return hitResult().getEntity(); }
 };
 
 } // namespace Catalyst
