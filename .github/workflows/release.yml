@@ -11,7 +11,6 @@ jobs:
       matrix:
         target_type:
           - server
-          - client
     steps:
       - uses: actions/checkout@v6
 
@@ -43,11 +42,6 @@ jobs:
   update-release-notes:
     permissions:
       contents: write
-    strategy:
-      matrix:
-        target_type:
-          - server
-          - client
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -70,7 +64,6 @@ jobs:
       matrix:
         target_type:
           - server
-          - client
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
