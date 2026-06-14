@@ -36,15 +36,16 @@ bool Entry::load() {
     // 根据配置更新语言
     I18n::getInstance().setLanguage(ConfigManager::getInstance().get().language);
 
+    if (config.enableTest) {
+        Test::registerEventTests();
+    }
+
     logger.info(tr("plugin.loaded"));
     return true;
 }
 
 bool Entry::enable() {
     getSelf().getLogger().debug("Enabling...");
-    if (config.enableTest) {
-        Test::registerEventTests();
-    }
     return true;
 }
 

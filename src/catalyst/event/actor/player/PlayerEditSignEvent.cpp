@@ -35,7 +35,7 @@ void PlayerEditSignAfterEvent::serialize(CompoundTag& nbt) const {
 }
 
 
-LL_TYPE_INSTANCE_HOOK(
+LL_AUTO_TYPE_INSTANCE_HOOK(
     PlayerEditSignEventHook,
     HookPriority::Normal,
     ServerNetworkHandler,
@@ -70,6 +70,8 @@ LL_TYPE_INSTANCE_HOOK(
     const auto& newBackTextData  = nbtData["BackText"].get<CompoundTag>();
     std::string newFrontText     = newFrontTextData["Text"].get<StringTag>();
     std::string newBackText      = newBackTextData["Text"].get<StringTag>();
+
+
 
     if (oldFrontText == newFrontText && oldBackText == newBackText) {
         return origin(source, packet);

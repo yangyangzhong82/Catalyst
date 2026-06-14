@@ -4,6 +4,7 @@
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/deps/core/math/Vec3.h"
+#include "mc/deps/core/string/HashedString.h"
 #include "mc/deps/shared_types/legacy/LevelEvent.h"
 #include "mc/deps/shared_types/legacy/LevelSoundEvent.h"
 #include "mc/world/actor/ActorSoundIdentifier.h"
@@ -60,7 +61,8 @@ LL_STATIC_HOOK(
     bus.publish(beforeEvent);
     if (beforeEvent.isCancelled()) {
         // Force a block update to keep client and server in sync when melting is intercepted.
-        if (auto cancelledBlock = Block::tryGetFromRegistry(sourceBlock.getTypeName(), sourceBlock.getData())) {
+        auto const sourceBlockName = HashedString{std::string_view{sourceBlock.getTypeName()}};
+        if (auto cancelledBlock = Block::tryGetFromRegistry(sourceBlockName, sourceBlock.getData())) {
             region._blockChanged(pos, 0, *cancelledBlock, *cancelledBlock, 3, true, nullptr, nullptr);
             return *cancelledBlock;
         }
