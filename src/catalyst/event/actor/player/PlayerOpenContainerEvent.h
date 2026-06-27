@@ -11,21 +11,21 @@
 class ServerPlayer;
 namespace Catalyst {
 
-class CATALYST_API PlayerOpenContainerBeforeEvent final : public ll::event::Cancellable<ll::event::ServerPlayerEvent> {
+class CATALYST_API PlayerOpenContainerEvent : public ll::event::ServerPlayerEvent {
     ContainerID                        mContainerId;
     SharedTypes::Legacy::ContainerType mType;
     BlockPos                           mPos;
     ActorUniqueID                      mEntityUniqueID;
 
 public:
-    constexpr PlayerOpenContainerBeforeEvent(
-        ServerPlayer&                            player,
+    constexpr PlayerOpenContainerEvent(
+        ServerPlayer&                      player,
         ContainerID                        containerId,
         SharedTypes::Legacy::ContainerType type,
         BlockPos const&                    pos,
         ActorUniqueID                      entityUniqueID
     )
-    : Cancellable(player),
+    : ServerPlayerEvent(player),
       mContainerId(containerId),
       mType(type),
       mPos(pos),
@@ -39,32 +39,14 @@ public:
     ActorUniqueID                      entityUniqueID() const { return mEntityUniqueID; }
 };
 
-class CATALYST_API PlayerOpenContainerAfterEvent final : public ll::event::PlayerEvent {
-    ContainerID                        mContainerId;
-    SharedTypes::Legacy::ContainerType mType;
-    BlockPos                           mPos;
-    ActorUniqueID                      mEntityUniqueID;
-
+class CATALYST_API PlayerOpenContainerBeforeEvent final : public ll::event::Cancellable<PlayerOpenContainerEvent> {
 public:
-    constexpr PlayerOpenContainerAfterEvent(
-        ServerPlayer&                            player,
-        ContainerID                        containerId,
-        SharedTypes::Legacy::ContainerType type,
-        BlockPos const&                    pos,
-        ActorUniqueID                      entityUniqueID
-    )
-    : PlayerEvent(player),
-      mContainerId(containerId),
-      mType(type),
-      mPos(pos),
-      mEntityUniqueID(entityUniqueID) {}
+    using Cancellable::Cancellable;
+};
 
-    void serialize(CompoundTag&) const override;
-
-    ContainerID                        containerId() const { return mContainerId; }
-    SharedTypes::Legacy::ContainerType type() const { return mType; }
-    BlockPos const&                    pos() const { return mPos; }
-    ActorUniqueID                      entityUniqueID() const { return mEntityUniqueID; }
+class CATALYST_API PlayerOpenContainerAfterEvent final : public PlayerOpenContainerEvent {
+public:
+    using PlayerOpenContainerEvent::PlayerOpenContainerEvent;
 };
 
 } // namespace Catalyst

@@ -182,12 +182,7 @@ void serializeHitEventCommon(CompoundTag& nbt, HitResult const& hitResult) {
 
 } // namespace
 
-void ProjectileHitBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    serializeHitEventCommon(nbt, hitResult());
-}
-
-void ProjectileHitAfterEvent::serialize(CompoundTag& nbt) const {
+void ProjectileHitEvent::serialize(CompoundTag& nbt) const {
     ll::event::entity::ActorEvent::serialize(nbt);
     serializeHitEventCommon(nbt, hitResult());
 }

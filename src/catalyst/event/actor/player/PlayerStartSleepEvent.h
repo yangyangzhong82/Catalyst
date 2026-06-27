@@ -10,12 +10,12 @@
 
 namespace Catalyst {
 
-class CATALYST_API PlayerStartSleepBeforeEvent final : public ll::event::Cancellable<ll::event::PlayerEvent> {
+class CATALYST_API PlayerStartSleepEvent : public ll::event::PlayerEvent {
     BlockPos mBedBlockPos;
 
 public:
-    constexpr PlayerStartSleepBeforeEvent(Player& player, BlockPos const& bedBlockPos)
-    : Cancellable(player),
+    constexpr PlayerStartSleepEvent(Player& player, BlockPos const& bedBlockPos)
+    : PlayerEvent(player),
       mBedBlockPos(bedBlockPos) {}
 
     void serialize(CompoundTag&) const override;
@@ -23,19 +23,21 @@ public:
     BlockPos const& getBedBlockPos() const { return mBedBlockPos; }
 };
 
-class CATALYST_API PlayerStartSleepAfterEvent final : public ll::event::PlayerEvent {
-    BlockPos          mBedBlockPos;
+class CATALYST_API PlayerStartSleepBeforeEvent final : public ll::event::Cancellable<PlayerStartSleepEvent> {
+public:
+    using Cancellable::Cancellable;
+};
+
+class CATALYST_API PlayerStartSleepAfterEvent final : public PlayerStartSleepEvent {
     BedSleepingResult mResult;
 
 public:
     constexpr PlayerStartSleepAfterEvent(Player& player, BlockPos const& bedBlockPos, BedSleepingResult result)
-    : PlayerEvent(player),
-      mBedBlockPos(bedBlockPos),
+    : PlayerStartSleepEvent(player, bedBlockPos),
       mResult(result) {}
 
     void serialize(CompoundTag&) const override;
 
-    BlockPos const&   getBedBlockPos() const { return mBedBlockPos; }
     BedSleepingResult getResult() const { return mResult; }
 };
 

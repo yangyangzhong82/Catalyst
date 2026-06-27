@@ -10,32 +10,17 @@
 
 namespace Catalyst {
 
-void ActorEffectAddBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["effect"] = ll::event::serializeRefObj(effect());
-}
-
-void ActorEffectAddAfterEvent::serialize(CompoundTag& nbt) const {
+void ActorEffectAddEvent::serialize(CompoundTag& nbt) const {
     ll::event::entity::ActorEvent::serialize(nbt);
     nbt["effect"] = ll::event::serializeRefObj(effect());
 }
 
-void ActorEffectUpdateBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["effect"] = ll::event::serializeRefObj(effect());
-}
-
-void ActorEffectUpdateAfterEvent::serialize(CompoundTag& nbt) const {
+void ActorEffectUpdateEvent::serialize(CompoundTag& nbt) const {
     ll::event::entity::ActorEvent::serialize(nbt);
     nbt["effect"] = ll::event::serializeRefObj(effect());
 }
 
-void ActorEffectRemoveBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["effect"] = ll::event::serializeRefObj(effect());
-}
-
-void ActorEffectRemoveAfterEvent::serialize(CompoundTag& nbt) const {
+void ActorEffectRemoveEvent::serialize(CompoundTag& nbt) const {
     ll::event::entity::ActorEvent::serialize(nbt);
     nbt["effect"] = ll::event::serializeRefObj(effect());
 }

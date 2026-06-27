@@ -10,13 +10,13 @@ class BlockPos;
 
 namespace Catalyst {
 
-class CATALYST_API MobTakeBlockBeforeEvent final : public ll::event::Cancellable<ll::event::entity::MobEvent> {
+class CATALYST_API MobTakeBlockEvent : public ll::event::entity::MobEvent {
     BlockPos     mPos;
     Block const& mBlock;
 
 public:
-    MobTakeBlockBeforeEvent(Mob& mob, BlockPos const& pos, Block const& block)
-    : Cancellable(mob),
+    MobTakeBlockEvent(Mob& mob, BlockPos const& pos, Block const& block)
+    : MobEvent(mob),
       mPos(pos),
       mBlock(block) {}
 
@@ -26,20 +26,14 @@ public:
     Block const&    block() const { return mBlock; }
 };
 
-class CATALYST_API MobTakeBlockAfterEvent final : public ll::event::entity::MobEvent {
-    BlockPos     mPos;
-    Block const& mBlock;
-
+class CATALYST_API MobTakeBlockBeforeEvent final : public ll::event::Cancellable<MobTakeBlockEvent> {
 public:
-    MobTakeBlockAfterEvent(Mob& mob, BlockPos const& pos, Block const& block)
-    : MobEvent(mob),
-      mPos(pos),
-      mBlock(block) {}
+    using Cancellable::Cancellable;
+};
 
-    void serialize(CompoundTag&) const override;
-
-    BlockPos const& pos() const { return mPos; }
-    Block const&    block() const { return mBlock; }
+class CATALYST_API MobTakeBlockAfterEvent final : public MobTakeBlockEvent {
+public:
+    using MobTakeBlockEvent::MobTakeBlockEvent;
 };
 
 } // namespace Catalyst

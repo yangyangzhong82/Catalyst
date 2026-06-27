@@ -25,14 +25,7 @@
 
 namespace Catalyst {
 
-void BlockFallBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["pos"]      = ListTag{pos().x, pos().y, pos().z};
-    nbt["block"]    = ll::event::serializeRefObj(block());
-    nbt["creative"] = isCreative();
-}
-
-void BlockFallAfterEvent::serialize(CompoundTag& nbt) const {
+void BlockFallEvent::serialize(CompoundTag& nbt) const {
     ll::event::world::WorldEvent::serialize(nbt);
     nbt["pos"]      = ListTag{pos().x, pos().y, pos().z};
     nbt["block"]    = ll::event::serializeRefObj(block());

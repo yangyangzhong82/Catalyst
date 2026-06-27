@@ -10,13 +10,7 @@
 
 namespace Catalyst {
 
-void SculkCatalystAbsorbExperienceBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["blockActor"] = ll::event::serializeRefObj(blockActor());
-    nbt["actor"]      = ll::event::serializeRefObj(actor());
-}
-
-void SculkCatalystAbsorbExperienceAfterEvent::serialize(CompoundTag& nbt) const {
+void SculkCatalystAbsorbExperienceEvent::serialize(CompoundTag& nbt) const {
     ll::event::world::LevelEvent::serialize(nbt);
     nbt["blockActor"] = ll::event::serializeRefObj(blockActor());
     nbt["actor"]      = ll::event::serializeRefObj(actor());

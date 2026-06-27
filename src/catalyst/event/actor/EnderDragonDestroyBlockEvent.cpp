@@ -38,16 +38,14 @@
 
 namespace Catalyst {
 
-void EnderDragonDestroyBlockBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
+void EnderDragonDestroyBlockEvent::serialize(CompoundTag& nbt) const {
+    ll::event::entity::MobEvent::serialize(nbt);
     nbt["pos"]   = ListTag{pos().x, pos().y, pos().z};
     nbt["block"] = ll::event::serializeRefObj(block());
 }
 
 void EnderDragonDestroyBlockAfterEvent::serialize(CompoundTag& nbt) const {
-    ll::event::entity::MobEvent::serialize(nbt);
-    nbt["pos"]       = ListTag{pos().x, pos().y, pos().z};
-    nbt["block"]     = ll::event::serializeRefObj(block());
+    EnderDragonDestroyBlockEvent::serialize(nbt);
     nbt["destroyed"] = destroyed();
 }
 

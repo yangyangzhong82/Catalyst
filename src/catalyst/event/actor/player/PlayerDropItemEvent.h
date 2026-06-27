@@ -11,13 +11,13 @@ class ItemStack;
 
 namespace Catalyst {
 
-class CATALYST_API PlayerDropItemBeforeEvent final : public ll::event::Cancellable<ll::event::PlayerEvent> {
+class CATALYST_API PlayerDropItemEvent : public ll::event::PlayerEvent {
     ItemStack const& mItem;
     int              mSlot;
 
 public:
-    constexpr PlayerDropItemBeforeEvent(Player& player, ItemStack const& item, int slot)
-    : Cancellable(player),
+    constexpr PlayerDropItemEvent(Player& player, ItemStack const& item, int slot)
+    : PlayerEvent(player),
       mItem(item),
       mSlot(slot) {}
 
@@ -27,20 +27,14 @@ public:
     int              slot() const { return mSlot; }
 };
 
-class CATALYST_API PlayerDropItemAfterEvent final : public ll::event::PlayerEvent {
-    ItemStack const& mItem;
-    int              mSlot;
-
+class CATALYST_API PlayerDropItemBeforeEvent final : public ll::event::Cancellable<PlayerDropItemEvent> {
 public:
-    constexpr PlayerDropItemAfterEvent(Player& player, ItemStack const& item, int slot)
-    : PlayerEvent(player),
-      mItem(item),
-      mSlot(slot) {}
+    using Cancellable::Cancellable;
+};
 
-    void serialize(CompoundTag&) const override;
-
-    ItemStack const& item() const { return mItem; }
-    int              slot() const { return mSlot; }
+class CATALYST_API PlayerDropItemAfterEvent final : public PlayerDropItemEvent {
+public:
+    using PlayerDropItemEvent::PlayerDropItemEvent;
 };
 
 } // namespace Catalyst

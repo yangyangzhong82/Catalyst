@@ -9,26 +9,25 @@ class ItemActor;
 
 namespace Catalyst {
 
-class CATALYST_API MobPickupItemBeforeEvent final : public ll::event::Cancellable<ll::event::entity::ActorEvent> {
+class CATALYST_API MobPickupItemEvent : public ll::event::entity::ActorEvent {
     ItemActor& mItemActor;
 
 public:
-    constexpr MobPickupItemBeforeEvent(Actor& mob, ItemActor& itemActor) : Cancellable(mob), mItemActor(itemActor) {}
+    constexpr MobPickupItemEvent(Actor& mob, ItemActor& itemActor) : ActorEvent(mob), mItemActor(itemActor) {}
 
     void serialize(CompoundTag&) const override;
 
     ItemActor& itemActor() const { return mItemActor; }
 };
 
-class CATALYST_API MobPickupItemAfterEvent final : public ll::event::entity::ActorEvent {
-    ItemActor& mItemActor;
-
+class CATALYST_API MobPickupItemBeforeEvent final : public ll::event::Cancellable<MobPickupItemEvent> {
 public:
-    constexpr MobPickupItemAfterEvent(Actor& mob, ItemActor& itemActor) : ActorEvent(mob), mItemActor(itemActor) {}
+    using Cancellable::Cancellable;
+};
 
-    void serialize(CompoundTag&) const override;
-
-    ItemActor& itemActor() const { return mItemActor; }
+class CATALYST_API MobPickupItemAfterEvent final : public MobPickupItemEvent {
+public:
+    using MobPickupItemEvent::MobPickupItemEvent;
 };
 
 } // namespace Catalyst

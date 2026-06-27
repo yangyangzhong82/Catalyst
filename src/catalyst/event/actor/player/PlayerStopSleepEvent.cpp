@@ -9,13 +9,7 @@
 
 namespace Catalyst {
 
-void PlayerStopSleepBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["forcefulWakeUp"]  = isForcefulWakeUp();
-    nbt["updateLevelList"] = isUpdateLevelList();
-}
-
-void PlayerStopSleepAfterEvent::serialize(CompoundTag& nbt) const {
+void PlayerStopSleepEvent::serialize(CompoundTag& nbt) const {
     ll::event::PlayerEvent::serialize(nbt);
     nbt["forcefulWakeUp"]  = isForcefulWakeUp();
     nbt["updateLevelList"] = isUpdateLevelList();

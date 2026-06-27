@@ -13,19 +13,16 @@
 
 namespace Catalyst {
 
-void PlayerShieldBlockBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
+void PlayerShieldBlockEvent::serialize(CompoundTag& nbt) const {
+    ll::event::PlayerEvent::serialize(nbt);
     nbt["source"]  = ll::event::serializeRefObj(source());
     nbt["damage"]  = damage();
     nbt["damager"] = ll::event::serializePtrObj(damager());
 }
 
 void PlayerShieldBlockAfterEvent::serialize(CompoundTag& nbt) const {
-    ll::event::PlayerEvent::serialize(nbt);
-    nbt["source"]  = ll::event::serializeRefObj(source());
-    nbt["damage"]  = damage();
-    nbt["damager"] = ll::event::serializePtrObj(damager());
-    nbt["result"]  = result();
+    PlayerShieldBlockEvent::serialize(nbt);
+    nbt["result"] = result();
 }
 
 

@@ -10,15 +10,14 @@
 
 namespace Catalyst {
 
-void PlayerStartSleepBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
+void PlayerStartSleepEvent::serialize(CompoundTag& nbt) const {
+    ll::event::PlayerEvent::serialize(nbt);
     nbt["bedBlockPos"] = ListTag{getBedBlockPos().x, getBedBlockPos().y, getBedBlockPos().z};
 }
 
 void PlayerStartSleepAfterEvent::serialize(CompoundTag& nbt) const {
-    ll::event::PlayerEvent::serialize(nbt);
-    nbt["bedBlockPos"] = ListTag{getBedBlockPos().x, getBedBlockPos().y, getBedBlockPos().z};
-    nbt["result"]      = magic_enum::enum_name(getResult());
+    PlayerStartSleepEvent::serialize(nbt);
+    nbt["result"] = magic_enum::enum_name(getResult());
 }
 
 

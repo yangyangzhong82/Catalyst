@@ -23,22 +23,7 @@
 
 namespace Catalyst {
 
-void PlayerMendingRepairBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["orb"]          = ll::event::serializeRefObj(orb());
-    nbt["containerId"]  = (int)containerId();
-    nbt["slot"]         = slot();
-    if (armorSlot().has_value()) {
-        nbt["armorSlot"] = magic_enum::enum_name(armorSlot().value());
-    }
-    nbt["originalItem"] = ll::event::serializeRefObj(originalItem());
-    nbt["repairedItem"] = ll::event::serializeRefObj(repairedItem());
-    nbt["repairAmount"] = repairAmount();
-    nbt["oldOrbValue"]  = oldOrbValue();
-    nbt["newOrbValue"]  = newOrbValue();
-}
-
-void PlayerMendingRepairAfterEvent::serialize(CompoundTag& nbt) const {
+void PlayerMendingRepairEvent::serialize(CompoundTag& nbt) const {
     ll::event::PlayerEvent::serialize(nbt);
     nbt["orb"]          = ll::event::serializeRefObj(orb());
     nbt["containerId"]  = (int)containerId();

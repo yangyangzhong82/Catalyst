@@ -11,8 +11,8 @@
 
 namespace Catalyst {
 
-void ProjectileSpawnBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
+void ProjectileSpawnEvent::serialize(CompoundTag& nbt) const {
+    ll::event::world::WorldEvent::serialize(nbt);
     nbt["id"]        = ll::event::serializeRefObj(id());
     nbt["spawner"]   = ll::event::serializePtrObj(spawner());
     nbt["position"]  = ListTag{position().x, position().y, position().z};
@@ -20,11 +20,7 @@ void ProjectileSpawnBeforeEvent::serialize(CompoundTag& nbt) const {
 }
 
 void ProjectileSpawnAfterEvent::serialize(CompoundTag& nbt) const {
-    ll::event::world::WorldEvent::serialize(nbt);
-    nbt["id"]         = ll::event::serializeRefObj(id());
-    nbt["spawner"]    = ll::event::serializePtrObj(spawner());
-    nbt["position"]   = ListTag{position().x, position().y, position().z};
-    nbt["direction"]  = ListTag{direction().x, direction().y, direction().z};
+    ProjectileSpawnEvent::serialize(nbt);
     nbt["projectile"] = ll::event::serializePtrObj(projectile());
 }
 

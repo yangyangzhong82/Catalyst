@@ -12,15 +12,7 @@
 
 namespace Catalyst {
 
-void RedstoneUpdateBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["pos"]       = ListTag{pos().x, pos().y, pos().z};
-    nbt["strength"]  = strength();
-    nbt["firstTime"] = isFirstTime();
-    nbt["component"] = ll::event::serializePtrObj(component());
-}
-
-void RedstoneUpdateAfterEvent::serialize(CompoundTag& nbt) const {
+void RedstoneUpdateEvent::serialize(CompoundTag& nbt) const {
     ll::event::world::WorldEvent::serialize(nbt);
     nbt["pos"]       = ListTag{pos().x, pos().y, pos().z};
     nbt["strength"]  = strength();

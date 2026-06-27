@@ -10,14 +10,14 @@
 
 namespace Catalyst {
 
-class CATALYST_API FarmChangeBeforeEvent final : public ll::event::Cancellable<ll::event::world::WorldEvent> {
+class CATALYST_API FarmChangeEvent : public ll::event::world::WorldEvent {
     BlockPos mPos;
     Actor*   mActor;
     bool     mToFarmland;
 
 public:
-    constexpr FarmChangeBeforeEvent(BlockSource& blockSource, BlockPos pos, Actor* actor, bool toFarmland)
-    : Cancellable(blockSource),
+    constexpr FarmChangeEvent(BlockSource& blockSource, BlockPos pos, Actor* actor, bool toFarmland)
+    : WorldEvent(blockSource),
       mPos(pos),
       mActor(actor),
       mToFarmland(toFarmland) {}
@@ -29,23 +29,14 @@ public:
     bool            toFarmland() const { return mToFarmland; }
 };
 
-class CATALYST_API FarmChangeAfterEvent final : public ll::event::world::WorldEvent {
-    BlockPos mPos;
-    Actor*   mActor;
-    bool     mToFarmland;
-
+class CATALYST_API FarmChangeBeforeEvent final : public ll::event::Cancellable<FarmChangeEvent> {
 public:
-    constexpr FarmChangeAfterEvent(BlockSource& blockSource, BlockPos pos, Actor* actor, bool toFarmland)
-    : WorldEvent(blockSource),
-      mPos(pos),
-      mActor(actor),
-      mToFarmland(toFarmland) {}
+    using Cancellable::Cancellable;
+};
 
-    void serialize(CompoundTag&) const override;
-
-    BlockPos const& pos() const { return mPos; }
-    Actor*          actor() const { return mActor; }
-    bool            toFarmland() const { return mToFarmland; }
+class CATALYST_API FarmChangeAfterEvent final : public FarmChangeEvent {
+public:
+    using FarmChangeEvent::FarmChangeEvent;
 };
 
 } // namespace Catalyst

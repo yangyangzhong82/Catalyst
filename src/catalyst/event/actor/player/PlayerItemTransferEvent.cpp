@@ -19,20 +19,7 @@
 
 namespace Catalyst {
 
-void PlayerItemTransferBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["actionType"]    = magic_enum::enum_name(actionType());
-    nbt["srcContainer"]  = ll::event::serializeRefObj(srcContainer());
-    nbt["srcSlot"]       = (int)srcSlot();
-    nbt["dstContainer"]  = ll::event::serializeRefObj(dstContainer());
-    nbt["dstSlot"]       = (int)dstSlot();
-    nbt["amount"]        = (int)amount();
-    nbt["srcItem"]       = ll::event::serializeRefObj(srcItem());
-    nbt["dstItem"]       = ll::event::serializeRefObj(dstItem());
-    nbt["screenContext"] = ll::event::serializeRefObj(screenContext());
-}
-
-void PlayerItemTransferAfterEvent::serialize(CompoundTag& nbt) const {
+void PlayerItemTransferEvent::serialize(CompoundTag& nbt) const {
     ll::event::PlayerEvent::serialize(nbt);
     nbt["actionType"]    = magic_enum::enum_name(actionType());
     nbt["srcContainer"]  = ll::event::serializeRefObj(srcContainer());

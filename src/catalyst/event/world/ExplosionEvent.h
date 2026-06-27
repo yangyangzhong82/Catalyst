@@ -9,12 +9,12 @@
 class Vec3;
 namespace Catalyst {
 
-class CATALYST_API ExplosionBeforeEvent final : public ll::event::Cancellable<ll::event::world::WorldEvent> {
+class CATALYST_API ExplosionEvent : public ll::event::world::WorldEvent {
     Explosion& mExplosion;
 
 public:
-    constexpr ExplosionBeforeEvent(BlockSource& blockSource, Explosion& explosion)
-    : Cancellable(blockSource),
+    constexpr ExplosionEvent(BlockSource& blockSource, Explosion& explosion)
+    : WorldEvent(blockSource),
       mExplosion(explosion) {}
 
     void serialize(CompoundTag&) const override;
@@ -29,19 +29,16 @@ public:
     bool&       breaking() { return mExplosion.mBreaking; }
 };
 
-class CATALYST_API ExplosionAfterEvent final : public ll::event::world::WorldEvent {
-    Explosion& mExplosion;
-
+class CATALYST_API ExplosionBeforeEvent final : public ll::event::Cancellable<ExplosionEvent> {
 public:
-    constexpr ExplosionAfterEvent(BlockSource& blockSource, Explosion& explosion)
-    : WorldEvent(blockSource),
-      mExplosion(explosion) {}
+    using Cancellable::Cancellable;
 
     void serialize(CompoundTag&) const override;
+};
 
-    Explosion&  explosion() const { return mExplosion; }
-    Vec3 const& pos() const { return mExplosion.mPos; }
-    float       radius() const { return mExplosion.mRadius; }
+class CATALYST_API ExplosionAfterEvent final : public ExplosionEvent {
+public:
+    using ExplosionEvent::ExplosionEvent;
 };
 
 } // namespace Catalyst

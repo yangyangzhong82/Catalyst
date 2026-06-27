@@ -13,21 +13,21 @@ class ItemActor;
 
 namespace Catalyst {
 
-class CATALYST_API SpawnItemActorBeforeEvent final : public ll::event::Cancellable<ll::event::world::WorldEvent> {
+class CATALYST_API SpawnItemActorEvent : public ll::event::world::WorldEvent {
     ItemStack const& mItem;
     Actor*           mSpawner;
     Vec3 const&      mPos;
     int              mThrowTime;
 
 public:
-    constexpr SpawnItemActorBeforeEvent(
+    constexpr SpawnItemActorEvent(
         BlockSource&     blockSource,
         ItemStack const& item,
         Actor*           spawner,
         Vec3 const&      pos,
         int              throwTime
     )
-    : Cancellable(blockSource),
+    : WorldEvent(blockSource),
       mItem(item),
       mSpawner(spawner),
       mPos(pos),
@@ -41,12 +41,13 @@ public:
     int              throwTime() const { return mThrowTime; }
 };
 
-class CATALYST_API SpawnItemActorAfterEvent final : public ll::event::world::WorldEvent {
-    ItemStack const& mItem;
-    Actor*           mSpawner;
-    Vec3 const&      mPos;
-    int              mThrowTime;
-    ItemActor*       mItemActor;
+class CATALYST_API SpawnItemActorBeforeEvent final : public ll::event::Cancellable<SpawnItemActorEvent> {
+public:
+    using Cancellable::Cancellable;
+};
+
+class CATALYST_API SpawnItemActorAfterEvent final : public SpawnItemActorEvent {
+    ItemActor* mItemActor;
 
 public:
     constexpr SpawnItemActorAfterEvent(
@@ -57,20 +58,12 @@ public:
         int              throwTime,
         ItemActor*       itemActor
     )
-    : WorldEvent(blockSource),
-      mItem(item),
-      mSpawner(spawner),
-      mPos(pos),
-      mThrowTime(throwTime),
+    : SpawnItemActorEvent(blockSource, item, spawner, pos, throwTime),
       mItemActor(itemActor) {}
 
     void serialize(CompoundTag&) const override;
 
-    ItemStack const& item() const { return mItem; }
-    Actor*           spawner() const { return mSpawner; }
-    Vec3 const&      pos() const { return mPos; }
-    int              throwTime() const { return mThrowTime; }
-    ItemActor*       itemActor() const { return mItemActor; }
+    ItemActor* itemActor() const { return mItemActor; }
 };
 
 } // namespace Catalyst

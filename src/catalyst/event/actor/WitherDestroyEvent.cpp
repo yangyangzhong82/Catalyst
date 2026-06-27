@@ -11,15 +11,7 @@
 
 namespace Catalyst {
 
-void WitherDestroyBlocksBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["aabb"]       = ll::event::serializeRefObj(aabb());
-    nbt["region"]     = ll::event::serializeRefObj(region());
-    nbt["range"]      = range();
-    nbt["attackType"] = magic_enum::enum_name(attackType());
-}
-
-void WitherDestroyBlocksAfterEvent::serialize(CompoundTag& nbt) const {
+void WitherDestroyBlocksEvent::serialize(CompoundTag& nbt) const {
     ll::event::entity::MobEvent::serialize(nbt);
     nbt["aabb"]       = ll::event::serializeRefObj(aabb());
     nbt["region"]     = ll::event::serializeRefObj(region());

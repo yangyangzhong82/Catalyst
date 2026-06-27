@@ -8,10 +8,25 @@
 
 namespace Catalyst {
 
-class CATALYST_API ExperienceOrbMergeBeforeEvent final : public ll::event::Cancellable<ll::event::entity::ActorEvent> {
+class CATALYST_API ExperienceOrbMergeEvent : public ll::event::entity::ActorEvent {
     ExperienceOrb& mSourceOrb;
     int            mValue;
-    int            mMergedPickupCount;
+
+public:
+    constexpr ExperienceOrbMergeEvent(ExperienceOrb& targetOrb, ExperienceOrb& sourceOrb, int value)
+    : ActorEvent(targetOrb),
+      mSourceOrb(sourceOrb),
+      mValue(value) {}
+
+    void serialize(CompoundTag&) const override;
+
+    ExperienceOrb& targetOrb() const { return static_cast<ExperienceOrb&>(self()); }
+    ExperienceOrb& sourceOrb() const { return mSourceOrb; }
+    int            value() const { return mValue; }
+};
+
+class CATALYST_API ExperienceOrbMergeBeforeEvent final : public ll::event::Cancellable<ExperienceOrbMergeEvent> {
+    int mMergedPickupCount;
 
 public:
     constexpr ExperienceOrbMergeBeforeEvent(
@@ -20,25 +35,18 @@ public:
         int            value,
         int            mergedPickupCount
     )
-    : Cancellable(targetOrb),
-      mSourceOrb(sourceOrb),
-      mValue(value),
+    : Cancellable(targetOrb, sourceOrb, value),
       mMergedPickupCount(mergedPickupCount) {}
 
     void serialize(CompoundTag&) const override;
 
-    ExperienceOrb& targetOrb() const { return static_cast<ExperienceOrb&>(self()); }
-    ExperienceOrb& sourceOrb() const { return mSourceOrb; }
-    int            value() const { return mValue; }
-    int            mergedPickupCount() const { return mMergedPickupCount; }
-    void           setMergedPickupCount(int count) { mMergedPickupCount = count; }
+    int  mergedPickupCount() const { return mMergedPickupCount; }
+    void setMergedPickupCount(int count) { mMergedPickupCount = count; }
 };
 
-class CATALYST_API ExperienceOrbMergeAfterEvent final : public ll::event::entity::ActorEvent {
-    ExperienceOrb& mSourceOrb;
-    int            mValue;
-    int            mOldPickupCount;
-    int            mNewPickupCount;
+class CATALYST_API ExperienceOrbMergeAfterEvent final : public ExperienceOrbMergeEvent {
+    int mOldPickupCount;
+    int mNewPickupCount;
 
 public:
     constexpr ExperienceOrbMergeAfterEvent(
@@ -48,19 +56,14 @@ public:
         int            oldPickupCount,
         int            newPickupCount
     )
-    : ActorEvent(targetOrb),
-      mSourceOrb(sourceOrb),
-      mValue(value),
+    : ExperienceOrbMergeEvent(targetOrb, sourceOrb, value),
       mOldPickupCount(oldPickupCount),
       mNewPickupCount(newPickupCount) {}
 
     void serialize(CompoundTag&) const override;
 
-    ExperienceOrb& targetOrb() const { return static_cast<ExperienceOrb&>(self()); }
-    ExperienceOrb& sourceOrb() const { return mSourceOrb; }
-    int            value() const { return mValue; }
-    int            oldPickupCount() const { return mOldPickupCount; }
-    int            newPickupCount() const { return mNewPickupCount; }
+    int oldPickupCount() const { return mOldPickupCount; }
+    int newPickupCount() const { return mNewPickupCount; }
 };
 
 } // namespace Catalyst

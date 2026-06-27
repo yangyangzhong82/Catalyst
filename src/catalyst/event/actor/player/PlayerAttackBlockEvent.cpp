@@ -10,13 +10,7 @@
 
 namespace Catalyst {
 
-void PlayerAttackBlockBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["pos"]  = ListTag{pos().x, pos().y, pos().z};
-    nbt["face"] = face();
-}
-
-void PlayerAttackBlockAfterEvent::serialize(CompoundTag& nbt) const {
+void PlayerAttackBlockEvent::serialize(CompoundTag& nbt) const {
     ll::event::ServerPlayerEvent::serialize(nbt);
     nbt["pos"]  = ListTag{pos().x, pos().y, pos().z};
     nbt["face"] = face();

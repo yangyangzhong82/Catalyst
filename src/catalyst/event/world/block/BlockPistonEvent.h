@@ -11,14 +11,14 @@ namespace Catalyst {
 
 enum class PistonAction : char { Extend = 0, Retract = 1 };
 
-class CATALYST_API BlockPistonBeforeEvent final : public ll::event::Cancellable<ll::event::world::WorldEvent> {
+class CATALYST_API BlockPistonEvent : public ll::event::world::WorldEvent {
     BlockPos     mPos;
     PistonAction mAction;
     int          mDirection;
 
 public:
-    constexpr BlockPistonBeforeEvent(BlockSource& blockSource, BlockPos pos, PistonAction action, int direction)
-    : Cancellable(blockSource),
+    constexpr BlockPistonEvent(BlockSource& blockSource, BlockPos pos, PistonAction action, int direction)
+    : WorldEvent(blockSource),
       mPos(pos),
       mAction(action),
       mDirection(direction) {}
@@ -30,23 +30,14 @@ public:
     int             direction() const { return mDirection; }
 };
 
-class CATALYST_API BlockPistonAfterEvent final : public ll::event::world::WorldEvent {
-    BlockPos     mPos;
-    PistonAction mAction;
-    int          mDirection;
-
+class CATALYST_API BlockPistonBeforeEvent final : public ll::event::Cancellable<BlockPistonEvent> {
 public:
-    constexpr BlockPistonAfterEvent(BlockSource& blockSource, BlockPos pos, PistonAction action, int direction)
-    : WorldEvent(blockSource),
-      mPos(pos),
-      mAction(action),
-      mDirection(direction) {}
+    using Cancellable::Cancellable;
+};
 
-    void serialize(CompoundTag&) const override;
-
-    BlockPos const& pos() const { return mPos; }
-    PistonAction    action() const { return mAction; }
-    int             direction() const { return mDirection; }
+class CATALYST_API BlockPistonAfterEvent final : public BlockPistonEvent {
+public:
+    using BlockPistonEvent::BlockPistonEvent;
 };
 
 } // namespace Catalyst

@@ -131,15 +131,7 @@ LL_TYPE_INSTANCE_HOOK(
 
 namespace Catalyst {
 
-void ReceivePacketBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["networkId"]   = ll::event::serializeRefObj(networkId());
-    nbt["packet"]      = ll::event::serializeRefObj(packet());
-    nbt["subClientId"] = (int)subClientId();
-    nbt["player"]      = ll::event::serializePtrObj(player());
-}
-
-void ReceivePacketAfterEvent::serialize(CompoundTag& nbt) const {
+void ReceivePacketEvent::serialize(CompoundTag& nbt) const {
     ll::event::Event::serialize(nbt);
     nbt["networkId"]   = ll::event::serializeRefObj(networkId());
     nbt["packet"]      = ll::event::serializeRefObj(packet());

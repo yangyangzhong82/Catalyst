@@ -12,12 +12,7 @@
 
 namespace Catalyst {
 
-void BlockExplodedBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["pos"] = ListTag{pos().x, pos().y, pos().z};
-}
-
-void BlockExplodedAfterEvent::serialize(CompoundTag& nbt) const {
+void BlockExplodedEvent::serialize(CompoundTag& nbt) const {
     ll::event::world::WorldEvent::serialize(nbt);
     nbt["pos"] = ListTag{pos().x, pos().y, pos().z};
 }

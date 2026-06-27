@@ -10,20 +10,17 @@
 
 namespace Catalyst {
 
-void ExplosionBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["explosion"] = ll::event::serializeRefObj(explosion());
-    nbt["pos"]       = ListTag{pos().x, pos().y, pos().z};
-    nbt["radius"]    = radius();
-    nbt["fire"]      = fire();
-    nbt["breaking"]  = breaking();
-}
-
-void ExplosionAfterEvent::serialize(CompoundTag& nbt) const {
+void ExplosionEvent::serialize(CompoundTag& nbt) const {
     ll::event::world::WorldEvent::serialize(nbt);
     nbt["explosion"] = ll::event::serializeRefObj(explosion());
     nbt["pos"]       = ListTag{pos().x, pos().y, pos().z};
     nbt["radius"]    = radius();
+}
+
+void ExplosionBeforeEvent::serialize(CompoundTag& nbt) const {
+    Cancellable::serialize(nbt);
+    nbt["fire"]     = fire();
+    nbt["breaking"] = breaking();
 }
 LL_TYPE_INSTANCE_HOOK(
     ExplosionEventHook,

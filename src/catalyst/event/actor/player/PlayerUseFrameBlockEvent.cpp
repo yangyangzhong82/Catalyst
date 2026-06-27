@@ -12,12 +12,7 @@
 
 namespace Catalyst {
 
-void PlayerUseFrameBlockBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["pos"] = ListTag{pos().x, pos().y, pos().z};
-}
-
-void PlayerUseFrameBlockAfterEvent::serialize(CompoundTag& nbt) const {
+void PlayerUseFrameBlockEvent::serialize(CompoundTag& nbt) const {
     ll::event::PlayerEvent::serialize(nbt);
     nbt["pos"] = ListTag{pos().x, pos().y, pos().z};
 }

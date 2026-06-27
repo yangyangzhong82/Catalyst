@@ -12,16 +12,14 @@
 
 namespace Catalyst {
 
-void PlayerInteractEntityBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
+void PlayerInteractEntityEvent::serialize(CompoundTag& nbt) const {
+    ll::event::PlayerEvent::serialize(nbt);
     nbt["actor"]    = ll::event::serializeRefObj(actor());
     nbt["location"] = ListTag{location().x, location().y, location().z};
 }
 
 void PlayerInteractEntityAfterEvent::serialize(CompoundTag& nbt) const {
-    ll::event::PlayerEvent::serialize(nbt);
-    nbt["actor"]         = ll::event::serializeRefObj(actor());
-    nbt["location"]      = ListTag{location().x, location().y, location().z};
+    PlayerInteractEntityEvent::serialize(nbt);
     nbt["resultSuccess"] = result().mSuccess;
     nbt["resultSwing"]   = result().mSwing;
 }

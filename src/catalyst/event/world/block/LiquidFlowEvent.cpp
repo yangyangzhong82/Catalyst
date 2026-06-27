@@ -15,16 +15,7 @@
 
 namespace Catalyst {
 
-void LiquidFlowBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["liquidBlock"]       = ll::event::serializeRefObj(liquidBlock());
-    nbt["toPos"]             = ListTag{toPos().x, toPos().y, toPos().z};
-    nbt["neighbor"]          = neighbor();
-    nbt["fromPos"]           = ListTag{fromPos().x, fromPos().y, fromPos().z};
-    nbt["flowFromDirection"] = (int)flowFromDirection();
-}
-
-void LiquidFlowAfterEvent::serialize(CompoundTag& nbt) const {
+void LiquidFlowEvent::serialize(CompoundTag& nbt) const {
     ll::event::world::WorldEvent::serialize(nbt);
     nbt["liquidBlock"]       = ll::event::serializeRefObj(liquidBlock());
     nbt["toPos"]             = ListTag{toPos().x, toPos().y, toPos().z};

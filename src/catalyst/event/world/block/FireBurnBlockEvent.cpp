@@ -38,29 +38,14 @@
 
 namespace Catalyst {
 
-void FireBurnBlockBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["burnPos"] = ListTag{burnPos().x, burnPos().y, burnPos().z};
-    nbt["firePos"] = ListTag{firePos().x, firePos().y, firePos().z};
-    nbt["age"]     = age();
-}
-
-void FireBurnBlockAfterEvent::serialize(CompoundTag& nbt) const {
+void FireBurnBlockEvent::serialize(CompoundTag& nbt) const {
     ll::event::world::WorldEvent::serialize(nbt);
     nbt["burnPos"] = ListTag{burnPos().x, burnPos().y, burnPos().z};
     nbt["firePos"] = ListTag{firePos().x, firePos().y, firePos().z};
     nbt["age"]     = age();
 }
 
-void FireSpreadBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["spreadPos"] = ListTag{spreadPos().x, spreadPos().y, spreadPos().z};
-    nbt["firePos"]   = ListTag{firePos().x, firePos().y, firePos().z};
-    nbt["newAge"]    = newAge();
-    nbt["sourceAge"] = sourceAge();
-}
-
-void FireSpreadAfterEvent::serialize(CompoundTag& nbt) const {
+void FireSpreadEvent::serialize(CompoundTag& nbt) const {
     ll::event::world::WorldEvent::serialize(nbt);
     nbt["spreadPos"] = ListTag{spreadPos().x, spreadPos().y, spreadPos().z};
     nbt["firePos"]   = ListTag{firePos().x, firePos().y, firePos().z};

@@ -10,42 +10,14 @@ class BaseCircuitComponent;
 
 namespace Catalyst {
 
-class CATALYST_API RedstoneUpdateBeforeEvent final : public ll::event::Cancellable<ll::event::world::WorldEvent> {
+class CATALYST_API RedstoneUpdateEvent : public ll::event::world::WorldEvent {
     BlockPos const&       mPos;
     int                   mStrength;
     bool                  mIsFirstTime;
     BaseCircuitComponent* mComponent;
 
 public:
-    constexpr RedstoneUpdateBeforeEvent(
-        BlockSource&          region,
-        BlockPos const&       pos,
-        int                   strength,
-        bool                  isFirstTime,
-        BaseCircuitComponent* component
-    )
-    : Cancellable(region),
-      mPos(pos),
-      mStrength(strength),
-      mIsFirstTime(isFirstTime),
-      mComponent(component) {}
-
-    void serialize(CompoundTag&) const override;
-
-    BlockPos const&       pos() const { return mPos; }
-    int                   strength() const { return mStrength; }
-    bool                  isFirstTime() const { return mIsFirstTime; }
-    BaseCircuitComponent* component() const { return mComponent; }
-};
-
-class CATALYST_API RedstoneUpdateAfterEvent final : public ll::event::world::WorldEvent {
-    BlockPos const&       mPos;
-    int                   mStrength;
-    bool                  mIsFirstTime;
-    BaseCircuitComponent* mComponent;
-
-public:
-    constexpr RedstoneUpdateAfterEvent(
+    constexpr RedstoneUpdateEvent(
         BlockSource&          region,
         BlockPos const&       pos,
         int                   strength,
@@ -64,6 +36,16 @@ public:
     int                   strength() const { return mStrength; }
     bool                  isFirstTime() const { return mIsFirstTime; }
     BaseCircuitComponent* component() const { return mComponent; }
+};
+
+class CATALYST_API RedstoneUpdateBeforeEvent final : public ll::event::Cancellable<RedstoneUpdateEvent> {
+public:
+    using Cancellable::Cancellable;
+};
+
+class CATALYST_API RedstoneUpdateAfterEvent final : public RedstoneUpdateEvent {
+public:
+    using RedstoneUpdateEvent::RedstoneUpdateEvent;
 };
 
 } // namespace Catalyst

@@ -13,13 +13,7 @@
 
 namespace Catalyst {
 
-void ActorChangeDimensionBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["fromDimensionId"] = fromDimensionId();
-    nbt["toDimensionId"]   = toDimensionId();
-}
-
-void ActorChangeDimensionAfterEvent::serialize(CompoundTag& nbt) const {
+void ActorChangeDimensionEvent::serialize(CompoundTag& nbt) const {
     ll::event::entity::ActorEvent::serialize(nbt);
     nbt["fromDimensionId"] = fromDimensionId();
     nbt["toDimensionId"]   = toDimensionId();

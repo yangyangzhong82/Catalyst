@@ -10,14 +10,7 @@
 
 namespace Catalyst {
 
-void FarmChangeBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["pos"]        = ListTag{pos().x, pos().y, pos().z};
-    nbt["actor"]      = ll::event::serializePtrObj(actor());
-    nbt["toFarmland"] = toFarmland();
-}
-
-void FarmChangeAfterEvent::serialize(CompoundTag& nbt) const {
+void FarmChangeEvent::serialize(CompoundTag& nbt) const {
     ll::event::world::WorldEvent::serialize(nbt);
     nbt["pos"]        = ListTag{pos().x, pos().y, pos().z};
     nbt["actor"]      = ll::event::serializePtrObj(actor());

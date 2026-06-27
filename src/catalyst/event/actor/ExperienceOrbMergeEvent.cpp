@@ -16,17 +16,19 @@
 
 namespace Catalyst {
 
+void ExperienceOrbMergeEvent::serialize(CompoundTag& nbt) const {
+    ll::event::entity::ActorEvent::serialize(nbt);
+    nbt["sourceOrb"] = ll::event::serializeRefObj(sourceOrb());
+    nbt["value"]     = value();
+}
+
 void ExperienceOrbMergeBeforeEvent::serialize(CompoundTag& nbt) const {
     Cancellable::serialize(nbt);
-    nbt["sourceOrb"]        = ll::event::serializeRefObj(sourceOrb());
-    nbt["value"]            = value();
     nbt["mergedPickupCount"] = mergedPickupCount();
 }
 
 void ExperienceOrbMergeAfterEvent::serialize(CompoundTag& nbt) const {
-    ll::event::entity::ActorEvent::serialize(nbt);
-    nbt["sourceOrb"]      = ll::event::serializeRefObj(sourceOrb());
-    nbt["value"]          = value();
+    ExperienceOrbMergeEvent::serialize(nbt);
     nbt["oldPickupCount"] = oldPickupCount();
     nbt["newPickupCount"] = newPickupCount();
 }

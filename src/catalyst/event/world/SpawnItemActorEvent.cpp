@@ -11,8 +11,8 @@
 
 namespace Catalyst {
 
-void SpawnItemActorBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
+void SpawnItemActorEvent::serialize(CompoundTag& nbt) const {
+    ll::event::world::WorldEvent::serialize(nbt);
     nbt["item"]      = ll::event::serializeRefObj(item());
     nbt["spawner"]   = ll::event::serializePtrObj(spawner());
     nbt["pos"]       = ListTag{pos().x, pos().y, pos().z};
@@ -20,11 +20,7 @@ void SpawnItemActorBeforeEvent::serialize(CompoundTag& nbt) const {
 }
 
 void SpawnItemActorAfterEvent::serialize(CompoundTag& nbt) const {
-    ll::event::world::WorldEvent::serialize(nbt);
-    nbt["item"]      = ll::event::serializeRefObj(item());
-    nbt["spawner"]   = ll::event::serializePtrObj(spawner());
-    nbt["pos"]       = ListTag{pos().x, pos().y, pos().z};
-    nbt["throwTime"] = throwTime();
+    SpawnItemActorEvent::serialize(nbt);
     nbt["itemActor"] = ll::event::serializePtrObj(itemActor());
 }
 

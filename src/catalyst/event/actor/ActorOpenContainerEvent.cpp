@@ -77,13 +77,7 @@ static bool SafeCheckVftable(void* ptr, void** expectedVftable) noexcept {
     return *reinterpret_cast<void***>(ptr) == expectedVftable;
 }
 
-void Catalyst::ActorOpenContainerBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["containerType"] = magic_enum::enum_name(containerType());
-    nbt["blockActor"]    = ll::event::serializePtrObj(blockActor());
-}
-
-void Catalyst::ActorOpenContainerAfterEvent::serialize(CompoundTag& nbt) const {
+void Catalyst::ActorOpenContainerEvent::serialize(CompoundTag& nbt) const {
     ll::event::ActorEvent::serialize(nbt);
     nbt["containerType"] = magic_enum::enum_name(containerType());
     nbt["blockActor"]    = ll::event::serializePtrObj(blockActor());

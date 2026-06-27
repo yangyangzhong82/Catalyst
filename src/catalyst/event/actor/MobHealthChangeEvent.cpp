@@ -12,14 +12,7 @@
 
 namespace Catalyst {
 
-void MobHealthChangeBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["oldValue"] = oldValue();
-    nbt["newValue"] = newValue();
-    nbt["buff"]     = ll::event::serializeRefObj(buff());
-}
-
-void MobHealthChangeAfterEvent::serialize(CompoundTag& nbt) const {
+void MobHealthChangeEvent::serialize(CompoundTag& nbt) const {
     ll::event::entity::MobEvent::serialize(nbt);
     nbt["oldValue"] = oldValue();
     nbt["newValue"] = newValue();

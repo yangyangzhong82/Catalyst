@@ -16,16 +16,7 @@
 
 namespace Catalyst {
 
-void PlayerEditSignBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["pos"]          = ListTag{pos().x, pos().y, pos().z};
-    nbt["oldFrontText"] = oldFrontText();
-    nbt["oldBackText"]  = oldBackText();
-    nbt["newFrontText"] = newFrontText();
-    nbt["newBackText"]  = newBackText();
-}
-
-void PlayerEditSignAfterEvent::serialize(CompoundTag& nbt) const {
+void PlayerEditSignEvent::serialize(CompoundTag& nbt) const {
     ll::event::ServerPlayerEvent::serialize(nbt);
     nbt["pos"]          = ListTag{pos().x, pos().y, pos().z};
     nbt["oldFrontText"] = oldFrontText();

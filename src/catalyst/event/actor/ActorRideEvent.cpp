@@ -10,12 +10,7 @@
 
 namespace Catalyst {
 
-void ActorRideBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["passenger"] = ll::event::serializeRefObj(passenger());
-}
-
-void ActorRideAfterEvent::serialize(CompoundTag& nbt) const {
+void ActorRideEvent::serialize(CompoundTag& nbt) const {
     ll::event::entity::ActorEvent::serialize(nbt);
     nbt["passenger"] = ll::event::serializeRefObj(passenger());
 }

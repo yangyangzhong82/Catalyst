@@ -16,13 +16,7 @@
 
 namespace Catalyst {
 
-void ActorDestroyBlockBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["pos"]   = ListTag{pos().x, pos().y, pos().z};
-    nbt["block"] = ll::event::serializeRefObj(block());
-}
-
-void ActorDestroyBlockAfterEvent::serialize(CompoundTag& nbt) const {
+void ActorDestroyBlockEvent::serialize(CompoundTag& nbt) const {
     ll::event::entity::ActorEvent::serialize(nbt);
     nbt["pos"]   = ListTag{pos().x, pos().y, pos().z};
     nbt["block"] = ll::event::serializeRefObj(block());

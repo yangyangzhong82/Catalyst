@@ -10,14 +10,7 @@
 
 namespace Catalyst {
 
-void MossGrowthBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["origin"]  = ListTag{origin().x, origin().y, origin().z};
-    nbt["xRadius"] = xRadius();
-    nbt["zRadius"] = zRadius();
-}
-
-void MossGrowthAfterEvent::serialize(CompoundTag& nbt) const {
+void MossGrowthEvent::serialize(CompoundTag& nbt) const {
     ll::event::world::WorldEvent::serialize(nbt);
     nbt["origin"]  = ListTag{origin().x, origin().y, origin().z};
     nbt["xRadius"] = xRadius();

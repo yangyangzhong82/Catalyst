@@ -16,14 +16,8 @@
 
 namespace Catalyst {
 
-void PlayerDropItemBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["item"] = ll::event::serializeRefObj(item());
-    nbt["slot"] = slot();
-}
-
-void PlayerDropItemAfterEvent::serialize(CompoundTag& nbt) const {
-    ll::event::PlayerEvent::serialize(nbt);
+void PlayerDropItemEvent::serialize(CompoundTag& nbt) const {
+    PlayerEvent::serialize(nbt);
     nbt["item"] = ll::event::serializeRefObj(item());
     nbt["slot"] = slot();
 }

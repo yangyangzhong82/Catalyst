@@ -7,13 +7,13 @@
 
 namespace Catalyst {
 
-class CATALYST_API PlayerStopSleepBeforeEvent final : public ll::event::Cancellable<ll::event::PlayerEvent> {
+class CATALYST_API PlayerStopSleepEvent : public ll::event::PlayerEvent {
     bool mForcefulWakeUp;
     bool mUpdateLevelList;
 
 public:
-    constexpr PlayerStopSleepBeforeEvent(Player& player, bool forcefulWakeUp, bool updateLevelList)
-    : Cancellable(player),
+    constexpr PlayerStopSleepEvent(Player& player, bool forcefulWakeUp, bool updateLevelList)
+    : PlayerEvent(player),
       mForcefulWakeUp(forcefulWakeUp),
       mUpdateLevelList(updateLevelList) {}
 
@@ -23,20 +23,14 @@ public:
     bool isUpdateLevelList() const { return mUpdateLevelList; }
 };
 
-class CATALYST_API PlayerStopSleepAfterEvent final : public ll::event::PlayerEvent {
-    bool mForcefulWakeUp;
-    bool mUpdateLevelList;
-
+class CATALYST_API PlayerStopSleepBeforeEvent final : public ll::event::Cancellable<PlayerStopSleepEvent> {
 public:
-    constexpr PlayerStopSleepAfterEvent(Player& player, bool forcefulWakeUp, bool updateLevelList)
-    : PlayerEvent(player),
-      mForcefulWakeUp(forcefulWakeUp),
-      mUpdateLevelList(updateLevelList) {}
+    using Cancellable::Cancellable;
+};
 
-    void serialize(CompoundTag&) const override;
-
-    bool isForcefulWakeUp() const { return mForcefulWakeUp; }
-    bool isUpdateLevelList() const { return mUpdateLevelList; }
+class CATALYST_API PlayerStopSleepAfterEvent final : public PlayerStopSleepEvent {
+public:
+    using PlayerStopSleepEvent::PlayerStopSleepEvent;
 };
 
 } // namespace Catalyst

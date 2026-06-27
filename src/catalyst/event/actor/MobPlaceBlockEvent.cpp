@@ -27,13 +27,7 @@
 
 namespace Catalyst {
 
-void MobPlaceBlockBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["pos"]   = ListTag{pos().x, pos().y, pos().z};
-    nbt["block"] = ll::event::serializeRefObj(block());
-}
-
-void MobPlaceBlockAfterEvent::serialize(CompoundTag& nbt) const {
+void MobPlaceBlockEvent::serialize(CompoundTag& nbt) const {
     ll::event::entity::MobEvent::serialize(nbt);
     nbt["pos"]   = ListTag{pos().x, pos().y, pos().z};
     nbt["block"] = ll::event::serializeRefObj(block());

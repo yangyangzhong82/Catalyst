@@ -11,12 +11,7 @@
 
 namespace Catalyst {
 
-void PlayerCompleteUsingItemBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["item"] = ll::event::serializeRefObj(item());
-}
-
-void PlayerCompleteUsingItemAfterEvent::serialize(CompoundTag& nbt) const {
+void PlayerCompleteUsingItemEvent::serialize(CompoundTag& nbt) const {
     ll::event::PlayerEvent::serialize(nbt);
     nbt["item"] = ll::event::serializeRefObj(item());
 }

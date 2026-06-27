@@ -13,12 +13,7 @@
 
 namespace Catalyst {
 
-void MobPickupItemBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["itemActor"] = ll::event::serializeRefObj(itemActor());
-}
-
-void MobPickupItemAfterEvent::serialize(CompoundTag& nbt) const {
+void MobPickupItemEvent::serialize(CompoundTag& nbt) const {
     ll::event::entity::ActorEvent::serialize(nbt);
     nbt["itemActor"] = ll::event::serializeRefObj(itemActor());
 }

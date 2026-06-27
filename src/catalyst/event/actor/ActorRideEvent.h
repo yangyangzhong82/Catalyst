@@ -7,26 +7,25 @@
 
 namespace Catalyst {
 
-class CATALYST_API ActorRideBeforeEvent final : public ll::event::Cancellable<ll::event::entity::ActorEvent> {
+class CATALYST_API ActorRideEvent : public ll::event::entity::ActorEvent {
     Actor& mPassenger;
 
 public:
-    constexpr ActorRideBeforeEvent(Actor& vehicle, Actor& passenger) : Cancellable(vehicle), mPassenger(passenger) {}
+    constexpr ActorRideEvent(Actor& vehicle, Actor& passenger) : ActorEvent(vehicle), mPassenger(passenger) {}
 
     void serialize(CompoundTag&) const override;
 
     Actor& passenger() const { return mPassenger; }
 };
 
-class CATALYST_API ActorRideAfterEvent final : public ll::event::entity::ActorEvent {
-    Actor& mPassenger;
-
+class CATALYST_API ActorRideBeforeEvent final : public ll::event::Cancellable<ActorRideEvent> {
 public:
-    constexpr ActorRideAfterEvent(Actor& vehicle, Actor& passenger) : ActorEvent(vehicle), mPassenger(passenger) {}
+    using Cancellable::Cancellable;
+};
 
-    void serialize(CompoundTag&) const override;
-
-    Actor& passenger() const { return mPassenger; }
+class CATALYST_API ActorRideAfterEvent final : public ActorRideEvent {
+public:
+    using ActorRideEvent::ActorRideEvent;
 };
 
 } // namespace Catalyst

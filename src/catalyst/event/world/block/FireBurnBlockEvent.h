@@ -8,38 +8,13 @@
 
 namespace Catalyst {
 
-// Event fired when fire burns (destroys) a block
-class CATALYST_API FireBurnBlockBeforeEvent final : public ll::event::Cancellable<ll::event::world::WorldEvent> {
+class CATALYST_API FireBurnBlockEvent : public ll::event::world::WorldEvent {
     BlockPos mBurnPos;  // Position of the block being burned
     BlockPos mFirePos;  // Position of the fire causing the burn
     int      mAge;      // Age of the fire
 
 public:
-    constexpr FireBurnBlockBeforeEvent(
-        BlockSource&      blockSource,
-        BlockPos const&   burnPos,
-        BlockPos const&   firePos,
-        int               age
-    )
-    : Cancellable(blockSource),
-      mBurnPos(burnPos),
-      mFirePos(firePos),
-      mAge(age) {}
-
-    void serialize(CompoundTag&) const override;
-
-    BlockPos const& burnPos() const { return mBurnPos; }
-    BlockPos const& firePos() const { return mFirePos; }
-    int             age() const { return mAge; }
-};
-
-class CATALYST_API FireBurnBlockAfterEvent final : public ll::event::world::WorldEvent {
-    BlockPos mBurnPos;
-    BlockPos mFirePos;
-    int      mAge;
-
-public:
-    constexpr FireBurnBlockAfterEvent(
+    constexpr FireBurnBlockEvent(
         BlockSource&      blockSource,
         BlockPos const&   burnPos,
         BlockPos const&   firePos,
@@ -55,6 +30,17 @@ public:
     BlockPos const& burnPos() const { return mBurnPos; }
     BlockPos const& firePos() const { return mFirePos; }
     int             age() const { return mAge; }
+};
+
+// Event fired when fire burns (destroys) a block
+class CATALYST_API FireBurnBlockBeforeEvent final : public ll::event::Cancellable<FireBurnBlockEvent> {
+public:
+    using Cancellable::Cancellable;
+};
+
+class CATALYST_API FireBurnBlockAfterEvent final : public FireBurnBlockEvent {
+public:
+    using FireBurnBlockEvent::FireBurnBlockEvent;
 };
 
 } // namespace Catalyst

@@ -10,14 +10,13 @@
 
 namespace Catalyst {
 
-class CATALYST_API SculkCatalystAbsorbExperienceBeforeEvent final
-: public ll::event::Cancellable<ll::event::world::LevelEvent> {
+class CATALYST_API SculkCatalystAbsorbExperienceEvent : public ll::event::world::LevelEvent {
     SculkCatalystBlockActor& mBlockActor;
     Actor&                   mActor;
 
 public:
-    constexpr SculkCatalystAbsorbExperienceBeforeEvent(SculkCatalystBlockActor& blockActor, Level& level, Actor& actor)
-    : Cancellable(level),
+    constexpr SculkCatalystAbsorbExperienceEvent(SculkCatalystBlockActor& blockActor, Level& level, Actor& actor)
+    : LevelEvent(level),
       mBlockActor(blockActor),
       mActor(actor) {}
 
@@ -27,20 +26,15 @@ public:
     Actor&                   actor() const { return mActor; }
 };
 
-class CATALYST_API SculkCatalystAbsorbExperienceAfterEvent final : public ll::event::world::LevelEvent {
-    SculkCatalystBlockActor& mBlockActor;
-    Actor&                   mActor;
-
+class CATALYST_API SculkCatalystAbsorbExperienceBeforeEvent final
+: public ll::event::Cancellable<SculkCatalystAbsorbExperienceEvent> {
 public:
-    constexpr SculkCatalystAbsorbExperienceAfterEvent(SculkCatalystBlockActor& blockActor, Level& level, Actor& actor)
-    : LevelEvent(level),
-      mBlockActor(blockActor),
-      mActor(actor) {}
+    using Cancellable::Cancellable;
+};
 
-    void serialize(CompoundTag&) const override;
-
-    SculkCatalystBlockActor& blockActor() const { return mBlockActor; }
-    Actor&                   actor() const { return mActor; }
+class CATALYST_API SculkCatalystAbsorbExperienceAfterEvent final : public SculkCatalystAbsorbExperienceEvent {
+public:
+    using SculkCatalystAbsorbExperienceEvent::SculkCatalystAbsorbExperienceEvent;
 };
 
 } // namespace Catalyst

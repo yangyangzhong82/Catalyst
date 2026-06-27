@@ -9,12 +9,7 @@
 
 namespace Catalyst {
 
-void SculkBlockGrowthBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["pos"] = ListTag{pos().x, pos().y, pos().z};
-}
-
-void SculkBlockGrowthAfterEvent::serialize(CompoundTag& nbt) const {
+void SculkBlockGrowthEvent::serialize(CompoundTag& nbt) const {
     ll::event::world::WorldEvent::serialize(nbt);
     nbt["pos"] = ListTag{pos().x, pos().y, pos().z};
 }

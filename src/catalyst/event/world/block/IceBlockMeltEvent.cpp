@@ -23,15 +23,7 @@
 
 namespace Catalyst {
 
-void IceBlockMeltBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["pos"]         = ListTag{pos().x, pos().y, pos().z};
-    nbt["sourceBlock"] = ll::event::serializeRefObj(sourceBlock());
-    nbt["meltedBlock"] = ll::event::serializeRefObj(meltedBlock());
-    nbt["inNether"]    = isInNether();
-}
-
-void IceBlockMeltAfterEvent::serialize(CompoundTag& nbt) const {
+void IceBlockMeltEvent::serialize(CompoundTag& nbt) const {
     ll::event::world::WorldEvent::serialize(nbt);
     nbt["pos"]         = ListTag{pos().x, pos().y, pos().z};
     nbt["sourceBlock"] = ll::event::serializeRefObj(sourceBlock());
