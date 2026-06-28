@@ -5,7 +5,7 @@
 #include <optional>
 
 #include "catalyst/mod/Gloabl.h"
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/entity/components/ActorEquipmentComponent.h"
@@ -300,22 +300,10 @@ LL_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class PlayerMendingRepairBeforeEventEmitter
-: public ll::event::Emitter<beforeEmitterFactory, PlayerMendingRepairBeforeEvent> {
-    ll::memory::HookRegistrar<PlayerMendingRepairEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<PlayerMendingRepairBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerMendingRepairAfterEventEmitter
-: public ll::event::Emitter<afterEmitterFactory, PlayerMendingRepairAfterEvent> {
-    ll::memory::HookRegistrar<PlayerMendingRepairEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<PlayerMendingRepairAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    PlayerMendingRepairBeforeEvent,
+    PlayerMendingRepairAfterEvent,
+    PlayerMendingRepairEventHook
+)
 
 } // namespace Catalyst

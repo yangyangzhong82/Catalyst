@@ -6,7 +6,7 @@
 #include <limits>
 #include <utility>
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/Actor.h"
@@ -591,22 +591,10 @@ LL_TYPE_INSTANCE_HOOK(
     return record;
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class NetherPortalCreateBeforeEventEmitter
-: public ll::event::Emitter<beforeEmitterFactory, NetherPortalCreateBeforeEvent> {
-    ll::memory::HookRegistrar<NetherPortalCreateEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<NetherPortalCreateBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class NetherPortalCreateAfterEventEmitter
-: public ll::event::Emitter<afterEmitterFactory, NetherPortalCreateAfterEvent> {
-    ll::memory::HookRegistrar<NetherPortalCreateEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<NetherPortalCreateAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    NetherPortalCreateBeforeEvent,
+    NetherPortalCreateAfterEvent,
+    NetherPortalCreateEventHook
+)
 
 } // namespace Catalyst

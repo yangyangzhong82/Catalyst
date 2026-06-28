@@ -1,6 +1,6 @@
 #include "IceBlockMeltEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/deps/core/math/Vec3.h"
@@ -94,20 +94,10 @@ LL_STATIC_HOOK(
     return meltedBlock;
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class IceBlockMeltBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, IceBlockMeltBeforeEvent> {
-    ll::memory::HookRegistrar<IceBlockMeltHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<IceBlockMeltBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class IceBlockMeltAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, IceBlockMeltAfterEvent> {
-    ll::memory::HookRegistrar<IceBlockMeltHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<IceBlockMeltAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    IceBlockMeltBeforeEvent,
+    IceBlockMeltAfterEvent,
+    IceBlockMeltHook
+)
 
 } // namespace Catalyst

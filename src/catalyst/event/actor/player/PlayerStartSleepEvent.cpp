@@ -1,7 +1,7 @@
 #include "PlayerStartSleepEvent.h"
 
 #include "catalyst/mod/Gloabl.h"
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/player/Player.h"
@@ -55,21 +55,10 @@ LL_TYPE_INSTANCE_HOOK(
     return result;
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class PlayerStartSleepBeforeEventEmitter
-: public ll::event::Emitter<beforeEmitterFactory, PlayerStartSleepBeforeEvent> {
-    ll::memory::HookRegistrar<PlayerStartSleepEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<PlayerStartSleepBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerStartSleepAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerStartSleepAfterEvent> {
-    ll::memory::HookRegistrar<PlayerStartSleepEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<PlayerStartSleepAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    PlayerStartSleepBeforeEvent,
+    PlayerStartSleepAfterEvent,
+    PlayerStartSleepEventHook
+)
 
 } // namespace Catalyst

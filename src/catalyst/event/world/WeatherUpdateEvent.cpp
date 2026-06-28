@@ -1,6 +1,6 @@
 #include "WeatherUpdateEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/level/Level.h"
@@ -41,20 +41,10 @@ LL_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class WeatherUpdateBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, WeatherUpdateBeforeEvent> {
-    ll::memory::HookRegistrar<WeatherUpdateHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<WeatherUpdateBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class WeatherUpdateAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, WeatherUpdateAfterEvent> {
-    ll::memory::HookRegistrar<WeatherUpdateHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<WeatherUpdateAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    WeatherUpdateBeforeEvent,
+    WeatherUpdateAfterEvent,
+    WeatherUpdateHook
+)
 
 } // namespace Catalyst

@@ -1,6 +1,6 @@
 #include "PlayerShieldBlockEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/Actor.h"
@@ -54,21 +54,10 @@ LL_TYPE_INSTANCE_HOOK(
     return result;
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class PlayerShieldBlockBeforeEventEmitter
-: public ll::event::Emitter<beforeEmitterFactory, PlayerShieldBlockBeforeEvent> {
-    ll::memory::HookRegistrar<PlayerShieldBlockEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<PlayerShieldBlockBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerShieldBlockAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerShieldBlockAfterEvent> {
-    ll::memory::HookRegistrar<PlayerShieldBlockEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<PlayerShieldBlockAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    PlayerShieldBlockBeforeEvent,
+    PlayerShieldBlockAfterEvent,
+    PlayerShieldBlockEventHook
+)
 
 } // namespace Catalyst

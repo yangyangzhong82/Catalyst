@@ -1,6 +1,6 @@
 #include "ActorRideEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/Actor.h"
@@ -38,20 +38,10 @@ LL_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class ActorRideBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, ActorRideBeforeEvent> {
-    ll::memory::HookRegistrar<ActorRideEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<ActorRideBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class ActorRideAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, ActorRideAfterEvent> {
-    ll::memory::HookRegistrar<ActorRideEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<ActorRideAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    ActorRideBeforeEvent,
+    ActorRideAfterEvent,
+    ActorRideEventHook
+)
 
 } // namespace Catalyst

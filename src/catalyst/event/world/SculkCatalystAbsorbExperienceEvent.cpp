@@ -1,6 +1,6 @@
 #include "SculkCatalystAbsorbExperienceEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/level/block/actor/SculkCatalystBlockActor.h"
@@ -41,21 +41,10 @@ LL_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class SculkCatalystAbsorbExperienceBeforeEventEmitter
-: public ll::event::Emitter<beforeEmitterFactory, SculkCatalystAbsorbExperienceBeforeEvent> {
-    ll::memory::HookRegistrar<SculkCatalystAbsorbExperienceEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<SculkCatalystAbsorbExperienceBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class SculkCatalystAbsorbExperienceAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, SculkCatalystAbsorbExperienceAfterEvent> {
-    ll::memory::HookRegistrar<SculkCatalystAbsorbExperienceEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<SculkCatalystAbsorbExperienceAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    SculkCatalystAbsorbExperienceBeforeEvent,
+    SculkCatalystAbsorbExperienceAfterEvent,
+    SculkCatalystAbsorbExperienceEventHook
+)
 
 } // namespace Catalyst

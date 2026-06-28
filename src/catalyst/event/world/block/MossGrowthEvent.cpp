@@ -1,6 +1,6 @@
 #include "MossGrowthEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/level/WorldBlockTarget.h"
@@ -48,20 +48,10 @@ LL_TYPE_INSTANCE_HOOK(
     return result;
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class MossGrowthBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, MossGrowthBeforeEvent> {
-    ll::memory::HookRegistrar<MossGrowthEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<MossGrowthBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class MossGrowthAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, MossGrowthAfterEvent> {
-    ll::memory::HookRegistrar<MossGrowthEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<MossGrowthAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    MossGrowthBeforeEvent,
+    MossGrowthAfterEvent,
+    MossGrowthEventHook
+)
 
 } // namespace Catalyst

@@ -1,7 +1,7 @@
 #include "WitherDestroyEvent.h"
 
 #include "catalyst/mod/Gloabl.h"
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 
@@ -46,22 +46,10 @@ LL_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class WitherDestroyBlocksBeforeEventEmitter
-: public ll::event::Emitter<beforeEmitterFactory, WitherDestroyBlocksBeforeEvent> {
-    ll::memory::HookRegistrar<WitherDestroyBlocksEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<WitherDestroyBlocksBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class WitherDestroyBlocksAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, WitherDestroyBlocksAfterEvent> {
-    ll::memory::HookRegistrar<WitherDestroyBlocksEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<WitherDestroyBlocksAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    WitherDestroyBlocksBeforeEvent,
+    WitherDestroyBlocksAfterEvent,
+    WitherDestroyBlocksEventHook
+)
 
 } // namespace Catalyst

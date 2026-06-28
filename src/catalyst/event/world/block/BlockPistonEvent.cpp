@@ -1,7 +1,7 @@
 #include "BlockPistonEvent.h"
 
 #include "catalyst/mod/Gloabl.h"
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/level/BlockSource.h"
@@ -126,20 +126,10 @@ LL_TYPE_INSTANCE_HOOK(
     }
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class BlockPistonBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, BlockPistonBeforeEvent> {
-    ll::memory::HookRegistrar<PistonBlockEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<BlockPistonBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class BlockPistonAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, BlockPistonAfterEvent> {
-    ll::memory::HookRegistrar<PistonBlockEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<BlockPistonAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    BlockPistonBeforeEvent,
+    BlockPistonAfterEvent,
+    PistonBlockEventHook
+)
 
 } // namespace Catalyst

@@ -1,7 +1,7 @@
 #include "SendPacketEvent.h"
 
 #include "catalyst/mod/Gloabl.h"
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
@@ -49,20 +49,10 @@ LL_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class SendPacketBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, SendPacketBeforeEvent> {
-    ll::memory::HookRegistrar<SendPacketEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<SendPacketBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class SendPacketAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, SendPacketAfterEvent> {
-    ll::memory::HookRegistrar<SendPacketEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<SendPacketAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    SendPacketBeforeEvent,
+    SendPacketAfterEvent,
+    SendPacketEventHook
+)
 
 } // namespace Catalyst

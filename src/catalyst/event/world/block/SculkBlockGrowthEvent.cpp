@@ -1,6 +1,6 @@
 #include "SculkBlockGrowthEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/level/block/SculkBlockBehavior.h"
@@ -58,21 +58,10 @@ LL_STATIC_HOOK(
     bus.publish(afterEvent);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class SculkBlockGrowthBeforeEventEmitter
-: public ll::event::Emitter<beforeEmitterFactory, SculkBlockGrowthBeforeEvent> {
-    ll::memory::HookRegistrar<SculkBlockGrowthHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<SculkBlockGrowthBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class SculkBlockGrowthAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, SculkBlockGrowthAfterEvent> {
-    ll::memory::HookRegistrar<SculkBlockGrowthHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<SculkBlockGrowthAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    SculkBlockGrowthBeforeEvent,
+    SculkBlockGrowthAfterEvent,
+    SculkBlockGrowthHook
+)
 
 } // namespace Catalyst

@@ -4,6 +4,7 @@
 #include "mc/world/level/block/actor/BlockActor.h"
 #include "mc/world/level/block/actor/HopperBlockActor.h"
 
+#include "catalyst/event/EmitterRegistration.h"
 #include "catalyst/event/actor/ActorOpenContainerEvent.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/EventRefObjSerializer.h"
@@ -283,3 +284,19 @@ LL_TYPE_INSTANCE_HOOK(
         bus.publish(afterEvent);
     }
 }
+
+namespace Catalyst {
+
+CATALYST_HOOKED_EVENT_PAIR(
+    ActorOpenContainerBeforeEvent,
+    ActorOpenContainerAfterEvent,
+    HopperBlockActorStartOpenHook,
+    BarrelBlockActorStartOpenHook,
+    ChestBlockActorStartOpenHook,
+    EnderChestContainerStartOpenHook,
+    FurnaceBlockActorStartOpenHook,
+    ShulkerBoxBlockActorStartOpenHook,
+    BrewingStandBlockActorStartOpenHook
+)
+
+} // namespace Catalyst

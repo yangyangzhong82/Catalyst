@@ -1,6 +1,6 @@
 #include "MobTakeBlockEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/gameplayhandlers/CoordinatorResult.h"
@@ -136,20 +136,10 @@ LL_TYPE_INSTANCE_HOOK(TakeBlockGoalTickHook, HookPriority::Normal, TakeBlockGoal
     bus.publish(afterEvent);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class MobTakeBlockBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, MobTakeBlockBeforeEvent> {
-    ll::memory::HookRegistrar<TakeBlockGoalTickHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<MobTakeBlockBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class MobTakeBlockAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, MobTakeBlockAfterEvent> {
-    ll::memory::HookRegistrar<TakeBlockGoalTickHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<MobTakeBlockAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    MobTakeBlockBeforeEvent,
+    MobTakeBlockAfterEvent,
+    TakeBlockGoalTickHook
+)
 
 } // namespace Catalyst

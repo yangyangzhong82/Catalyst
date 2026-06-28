@@ -1,6 +1,6 @@
 ﻿#include "ClientLoginEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
@@ -127,21 +127,8 @@ LL_TYPE_INSTANCE_HOOK(
     origin(source, request, playerInfo, hostMessToken);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class ClientLoginBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, ClientLoginBeforeEvent> {
-    ll::memory::HookRegistrar<ClientLoginBeforeEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<ClientLoginBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class ClientLoginAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, ClientLoginAfterEvent> {
-    ll::memory::HookRegistrar<ClientLoginAfterEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<ClientLoginAfterEventEmitter>();
-}
+CATALYST_HOOKED_EMITTER(ClientLoginBeforeEvent, ClientLoginBeforeEventHook)
+CATALYST_HOOKED_EMITTER(ClientLoginAfterEvent, ClientLoginAfterEventHook)
 
 // ClientLoginAfterEvent::disconnect implementation
 void ClientLoginAfterEvent::disconnect(std::string const& message) const {

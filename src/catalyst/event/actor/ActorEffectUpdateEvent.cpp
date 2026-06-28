@@ -1,6 +1,6 @@
 #include "ActorEffectUpdateEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/Actor.h"
@@ -92,54 +92,8 @@ LL_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> addBeforeEmitterFactory();
-class ActorEffectAddBeforeEventEmitter : public ll::event::Emitter<addBeforeEmitterFactory, ActorEffectAddBeforeEvent> {
-    ll::memory::HookRegistrar<ActorEffectAddEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> addBeforeEmitterFactory() {
-    return std::make_unique<ActorEffectAddBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> addAfterEmitterFactory();
-class ActorEffectAddAfterEventEmitter : public ll::event::Emitter<addAfterEmitterFactory, ActorEffectAddAfterEvent> {
-    ll::memory::HookRegistrar<ActorEffectAddEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> addAfterEmitterFactory() {
-    return std::make_unique<ActorEffectAddAfterEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> updateBeforeEmitterFactory();
-class ActorEffectUpdateBeforeEventEmitter
-: public ll::event::Emitter<updateBeforeEmitterFactory, ActorEffectUpdateBeforeEvent> {
-    ll::memory::HookRegistrar<ActorEffectUpdateEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> updateBeforeEmitterFactory() {
-    return std::make_unique<ActorEffectUpdateBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> updateAfterEmitterFactory();
-class ActorEffectUpdateAfterEventEmitter : public ll::event::Emitter<updateAfterEmitterFactory, ActorEffectUpdateAfterEvent> {
-    ll::memory::HookRegistrar<ActorEffectUpdateEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> updateAfterEmitterFactory() {
-    return std::make_unique<ActorEffectUpdateAfterEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> removeBeforeEmitterFactory();
-class ActorEffectRemoveBeforeEventEmitter
-: public ll::event::Emitter<removeBeforeEmitterFactory, ActorEffectRemoveBeforeEvent> {
-    ll::memory::HookRegistrar<ActorEffectRemoveEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> removeBeforeEmitterFactory() {
-    return std::make_unique<ActorEffectRemoveBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> removeAfterEmitterFactory();
-class ActorEffectRemoveAfterEventEmitter : public ll::event::Emitter<removeAfterEmitterFactory, ActorEffectRemoveAfterEvent> {
-    ll::memory::HookRegistrar<ActorEffectRemoveEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> removeAfterEmitterFactory() {
-    return std::make_unique<ActorEffectRemoveAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(ActorEffectAddBeforeEvent, ActorEffectAddAfterEvent, ActorEffectAddEventHook)
+CATALYST_HOOKED_EVENT_PAIR(ActorEffectUpdateBeforeEvent, ActorEffectUpdateAfterEvent, ActorEffectUpdateEventHook)
+CATALYST_HOOKED_EVENT_PAIR(ActorEffectRemoveBeforeEvent, ActorEffectRemoveAfterEvent, ActorEffectRemoveEventHook)
 
 } // namespace Catalyst

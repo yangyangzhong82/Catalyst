@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/Actor.h"
@@ -111,20 +111,10 @@ LL_TYPE_INSTANCE_HOOK(
     }
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class ExperienceOrbMergeBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, ExperienceOrbMergeBeforeEvent> {
-    ll::memory::HookRegistrar<ExperienceOrbMergeEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<ExperienceOrbMergeBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class ExperienceOrbMergeAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, ExperienceOrbMergeAfterEvent> {
-    ll::memory::HookRegistrar<ExperienceOrbMergeEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<ExperienceOrbMergeAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    ExperienceOrbMergeBeforeEvent,
+    ExperienceOrbMergeAfterEvent,
+    ExperienceOrbMergeEventHook
+)
 
 } // namespace Catalyst

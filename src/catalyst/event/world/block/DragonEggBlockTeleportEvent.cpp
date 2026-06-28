@@ -1,7 +1,7 @@
 #include "DragonEggBlockTeleportEvent.h"
 
 #include "catalyst/mod/Gloabl.h"
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/deps/shared_types/legacy/LevelEvent.h"
@@ -120,22 +120,10 @@ LL_STATIC_HOOK(
     bus.publish(afterEvent);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class DragonEggBlockTeleportBeforeEventEmitter
-: public ll::event::Emitter<beforeEmitterFactory, DragonEggBlockTeleportBeforeEvent> {
-    ll::memory::HookRegistrar<DragonEggBlockTeleportEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<DragonEggBlockTeleportBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class DragonEggBlockTeleportAfterEventEmitter
-: public ll::event::Emitter<afterEmitterFactory, DragonEggBlockTeleportAfterEvent> {
-    ll::memory::HookRegistrar<DragonEggBlockTeleportEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<DragonEggBlockTeleportAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    DragonEggBlockTeleportBeforeEvent,
+    DragonEggBlockTeleportAfterEvent,
+    DragonEggBlockTeleportEventHook
+)
 
 } // namespace Catalyst

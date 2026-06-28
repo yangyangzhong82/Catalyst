@@ -5,7 +5,7 @@
 #include "mc/deps/shared_types/legacy/LevelEvent.h"
 #include "mc/deps/shared_types/legacy/actor/ActorDamageCause.h"
 #include "mc/entity/components/FallDistanceComponent.h"
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/ActorDamageSource.h"
@@ -155,21 +155,10 @@ LL_TYPE_INSTANCE_HOOK(
     return result;
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class MobTotemResurrectBeforeEventEmitter
-: public ll::event::Emitter<beforeEmitterFactory, MobTotemResurrectBeforeEvent> {
-    ll::memory::HookRegistrar<MobTotemResurrectHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<MobTotemResurrectBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class MobTotemResurrectAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, MobTotemResurrectAfterEvent> {
-    ll::memory::HookRegistrar<MobTotemResurrectHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<MobTotemResurrectAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    MobTotemResurrectBeforeEvent,
+    MobTotemResurrectAfterEvent,
+    MobTotemResurrectHook
+)
 
 } // namespace Catalyst

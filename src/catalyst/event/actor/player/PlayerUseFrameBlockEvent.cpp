@@ -1,6 +1,6 @@
 #include "PlayerUseFrameBlockEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/player/Player.h"
@@ -65,23 +65,11 @@ LL_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class PlayerUseFrameBlockBeforeEventEmitter
-: public ll::event::Emitter<beforeEmitterFactory, PlayerUseFrameBlockBeforeEvent> {
-    ll::memory::HookRegistrar<PlayerUseFrameBlockEventHook>  hook1;
-    ll::memory::HookRegistrar<PlayerUseFrameBlockEventHook2> hook2;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<PlayerUseFrameBlockBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerUseFrameBlockAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerUseFrameBlockAfterEvent> {
-    ll::memory::HookRegistrar<PlayerUseFrameBlockEventHook>  hook1;
-    ll::memory::HookRegistrar<PlayerUseFrameBlockEventHook2> hook2;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<PlayerUseFrameBlockAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    PlayerUseFrameBlockBeforeEvent,
+    PlayerUseFrameBlockAfterEvent,
+    PlayerUseFrameBlockEventHook,
+    PlayerUseFrameBlockEventHook2
+)
 
 } // namespace Catalyst

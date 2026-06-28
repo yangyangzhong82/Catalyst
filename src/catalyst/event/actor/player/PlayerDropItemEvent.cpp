@@ -1,6 +1,6 @@
 #include "PlayerDropItemEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/player/Inventory.h"
@@ -92,20 +92,10 @@ LL_TYPE_INSTANCE_HOOK(
     return origin(player, isSenderAuthority);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class PlayerDropItemBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, PlayerDropItemBeforeEvent> {
-    ll::memory::HookRegistrar<PlayerDropItemEventHook2> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<PlayerDropItemBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerDropItemAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerDropItemAfterEvent> {
-    ll::memory::HookRegistrar<PlayerDropItemEventHook2> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<PlayerDropItemAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    PlayerDropItemBeforeEvent,
+    PlayerDropItemAfterEvent,
+    PlayerDropItemEventHook2
+)
 
 } // namespace Catalyst

@@ -1,7 +1,7 @@
 #include "MobPlaceBlockEvent.h"
 
 #include "catalyst/mod/Gloabl.h"
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/util/Random.h"
@@ -175,20 +175,10 @@ LL_TYPE_INSTANCE_HOOK(
     }
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class MobPlaceBlockBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, MobPlaceBlockBeforeEvent> {
-    ll::memory::HookRegistrar<MobPlaceBlockEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<MobPlaceBlockBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class MobPlaceBlockAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, MobPlaceBlockAfterEvent> {
-    ll::memory::HookRegistrar<MobPlaceBlockEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<MobPlaceBlockAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    MobPlaceBlockBeforeEvent,
+    MobPlaceBlockAfterEvent,
+    MobPlaceBlockEventHook
+)
 
 } // namespace Catalyst

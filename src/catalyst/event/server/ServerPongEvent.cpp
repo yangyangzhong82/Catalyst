@@ -9,7 +9,7 @@
 #include <utility>
 
 #include "fmt/format.h"
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/EventRefObjSerializer.h"
 #include "ll/api/memory/Hook.h"
@@ -350,21 +350,7 @@ LL_TYPE_STATIC_HOOK(
     }
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class ServerPongBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, ServerPongBeforeEvent> {
-    ll::memory::HookRegistrar<ServerPongEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<ServerPongBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class ServerPongAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, ServerPongAfterEvent> {
-    ll::memory::HookRegistrar<ServerPongEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<ServerPongAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(ServerPongBeforeEvent, ServerPongAfterEvent, ServerPongEventHook)
 
 #endif
 

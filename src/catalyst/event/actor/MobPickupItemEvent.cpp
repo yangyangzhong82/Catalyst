@@ -1,7 +1,7 @@
 
 #include "MobPickupItemEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/Mob.h"
@@ -43,20 +43,10 @@ LL_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class MobPickupItemBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, MobPickupItemBeforeEvent> {
-    ll::memory::HookRegistrar<MobPickupItemHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<MobPickupItemBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class MobPickupItemAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, MobPickupItemAfterEvent> {
-    ll::memory::HookRegistrar<MobPickupItemHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<MobPickupItemAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    MobPickupItemBeforeEvent,
+    MobPickupItemAfterEvent,
+    MobPickupItemHook
+)
 
 } // namespace Catalyst

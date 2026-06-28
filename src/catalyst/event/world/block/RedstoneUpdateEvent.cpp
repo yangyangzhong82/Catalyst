@@ -1,6 +1,6 @@
 #include "RedstoneUpdateEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/redstone/circuit/ChunkCircuitComponentList.h"
@@ -90,20 +90,10 @@ LL_TYPE_INSTANCE_HOOK(
     }
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class RedstoneUpdateBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, RedstoneUpdateBeforeEvent> {
-    ll::memory::HookRegistrar<RedstoneUpdateEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<RedstoneUpdateBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class RedstoneUpdateAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, RedstoneUpdateAfterEvent> {
-    ll::memory::HookRegistrar<RedstoneUpdateEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<RedstoneUpdateAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    RedstoneUpdateBeforeEvent,
+    RedstoneUpdateAfterEvent,
+    RedstoneUpdateEventHook
+)
 
 } // namespace Catalyst

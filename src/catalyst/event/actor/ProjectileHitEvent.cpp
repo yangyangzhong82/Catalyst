@@ -1,6 +1,6 @@
 #include "ProjectileHitEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/EventRefObjSerializer.h"
 #include "ll/api/memory/Hook.h"
@@ -258,20 +258,10 @@ LL_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class ProjectileHitBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, ProjectileHitBeforeEvent> {
-    ll::memory::HookRegistrar<ProjectileHitEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<ProjectileHitBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class ProjectileHitAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, ProjectileHitAfterEvent> {
-    ll::memory::HookRegistrar<ProjectileHitEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<ProjectileHitAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    ProjectileHitBeforeEvent,
+    ProjectileHitAfterEvent,
+    ProjectileHitEventHook
+)
 
 } // namespace Catalyst

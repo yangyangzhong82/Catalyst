@@ -7,7 +7,7 @@
 #include <memory>
 
 #include "catalyst/mod/Gloabl.h"
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/deps/core/math/Vec3.h"
@@ -239,22 +239,10 @@ LL_TYPE_INSTANCE_HOOK(
     }
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class EnderDragonDestroyBlockBeforeEventEmitter
-: public ll::event::Emitter<beforeEmitterFactory, EnderDragonDestroyBlockBeforeEvent> {
-    ll::memory::HookRegistrar<EnderDragonCheckWallsHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<EnderDragonDestroyBlockBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class EnderDragonDestroyBlockAfterEventEmitter
-: public ll::event::Emitter<afterEmitterFactory, EnderDragonDestroyBlockAfterEvent> {
-    ll::memory::HookRegistrar<EnderDragonCheckWallsHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<EnderDragonDestroyBlockAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    EnderDragonDestroyBlockBeforeEvent,
+    EnderDragonDestroyBlockAfterEvent,
+    EnderDragonCheckWallsHook
+)
 
 } // namespace Catalyst

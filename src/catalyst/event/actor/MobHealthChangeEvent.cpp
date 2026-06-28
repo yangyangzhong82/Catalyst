@@ -1,6 +1,6 @@
 #include "MobHealthChangeEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/Mob.h"
@@ -51,20 +51,10 @@ LL_TYPE_INSTANCE_HOOK(
     return result;
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class MobHealthChangeBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, MobHealthChangeBeforeEvent> {
-    ll::memory::HookRegistrar<MobHealthChangeHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<MobHealthChangeBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class MobHealthChangeAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, MobHealthChangeAfterEvent> {
-    ll::memory::HookRegistrar<MobHealthChangeHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<MobHealthChangeAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    MobHealthChangeBeforeEvent,
+    MobHealthChangeAfterEvent,
+    MobHealthChangeHook
+)
 
 } // namespace Catalyst
