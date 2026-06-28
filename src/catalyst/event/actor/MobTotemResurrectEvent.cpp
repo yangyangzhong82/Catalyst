@@ -5,7 +5,7 @@
 #include "mc/deps/shared_types/legacy/LevelEvent.h"
 #include "mc/deps/shared_types/legacy/actor/ActorDamageCause.h"
 #include "mc/entity/components/FallDistanceComponent.h"
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/ActorDamageSource.h"
@@ -30,8 +30,8 @@
 
 namespace Catalyst {
 
-void MobTotemResurrectBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
+void MobTotemResurrectEvent::serialize(CompoundTag& nbt) const {
+    ll::event::entity::MobEvent::serialize(nbt);
     nbt["killingDamage"] = ll::event::serializeRefObj(killingDamage());
     nbt["totem"]         = ll::event::serializeRefObj(totem());
     nbt["hasTotem"]      = hasTotem();
@@ -48,21 +48,8 @@ void MobTotemResurrectBeforeEvent::serialize(CompoundTag& nbt) const {
 }
 
 void MobTotemResurrectAfterEvent::serialize(CompoundTag& nbt) const {
-    ll::event::entity::MobEvent::serialize(nbt);
-    nbt["killingDamage"] = ll::event::serializeRefObj(killingDamage());
-    nbt["totem"]         = ll::event::serializeRefObj(totem());
-    nbt["hasTotem"]      = hasTotem();
-    nbt["result"]        = result();
-    ListTag effectsList;
-    for (auto const& eff : effects()) {
-        CompoundTag effTag;
-        effTag["effect"]        = ll::event::serializePtrObj(eff.effect);
-        effTag["durationTicks"] = eff.durationTicks;
-        effTag["amplifier"]     = eff.amplifier;
-        effTag["visible"]       = eff.visible;
-        effectsList.emplace_back(std::move(effTag));
-    }
-    nbt["effects"] = std::move(effectsList);
+    MobTotemResurrectEvent::serialize(nbt);
+    nbt["result"] = result();
 }
 
 
@@ -168,21 +155,10 @@ LL_TYPE_INSTANCE_HOOK(
     return result;
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class MobTotemResurrectBeforeEventEmitter
-: public ll::event::Emitter<beforeEmitterFactory, MobTotemResurrectBeforeEvent> {
-    ll::memory::HookRegistrar<MobTotemResurrectHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<MobTotemResurrectBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class MobTotemResurrectAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, MobTotemResurrectAfterEvent> {
-    ll::memory::HookRegistrar<MobTotemResurrectHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<MobTotemResurrectAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    MobTotemResurrectBeforeEvent,
+    MobTotemResurrectAfterEvent,
+    MobTotemResurrectHook
+)
 
 } // namespace Catalyst

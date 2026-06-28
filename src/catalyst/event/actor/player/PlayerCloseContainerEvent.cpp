@@ -13,15 +13,8 @@
 
 namespace Catalyst {
 
-void PlayerCloseContainerBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["containerId"]          = (int)containerId();
-    nbt["containerType"]        = magic_enum::enum_name(containerType());
-    nbt["serverInitiatedClose"] = serverInitiatedClose();
-}
-
-void PlayerCloseContainerAfterEvent::serialize(CompoundTag& nbt) const {
-    ll::event::PlayerEvent::serialize(nbt);
+void PlayerCloseContainerEvent::serialize(CompoundTag& nbt) const {
+    ll::event::ServerPlayerEvent::serialize(nbt);
     nbt["containerId"]          = (int)containerId();
     nbt["containerType"]        = magic_enum::enum_name(containerType());
     nbt["serverInitiatedClose"] = serverInitiatedClose();

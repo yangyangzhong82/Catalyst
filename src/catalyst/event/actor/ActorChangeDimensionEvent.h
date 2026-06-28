@@ -7,14 +7,13 @@
 
 namespace Catalyst {
 
-class CATALYST_API ActorChangeDimensionBeforeEvent final
-: public ll::event::Cancellable<ll::event::entity::ActorEvent> {
+class CATALYST_API ActorChangeDimensionEvent : public ll::event::entity::ActorEvent {
     int mFromDimensionId;
     int mToDimensionId;
 
 public:
-    constexpr ActorChangeDimensionBeforeEvent(Actor& actor, int fromDimensionId, int toDimensionId)
-    : Cancellable(actor),
+    constexpr ActorChangeDimensionEvent(Actor& actor, int fromDimensionId, int toDimensionId)
+    : ActorEvent(actor),
       mFromDimensionId(fromDimensionId),
       mToDimensionId(toDimensionId) {}
 
@@ -24,20 +23,15 @@ public:
     int toDimensionId() const { return mToDimensionId; }
 };
 
-class CATALYST_API ActorChangeDimensionAfterEvent final : public ll::event::entity::ActorEvent {
-    int mFromDimensionId;
-    int mToDimensionId;
-
+class CATALYST_API ActorChangeDimensionBeforeEvent final
+: public ll::event::Cancellable<ActorChangeDimensionEvent> {
 public:
-    constexpr ActorChangeDimensionAfterEvent(Actor& actor, int fromDimensionId, int toDimensionId)
-    : ActorEvent(actor),
-      mFromDimensionId(fromDimensionId),
-      mToDimensionId(toDimensionId) {}
+    using Cancellable::Cancellable;
+};
 
-    void serialize(CompoundTag&) const override;
-
-    int fromDimensionId() const { return mFromDimensionId; }
-    int toDimensionId() const { return mToDimensionId; }
+class CATALYST_API ActorChangeDimensionAfterEvent final : public ActorChangeDimensionEvent {
+public:
+    using ActorChangeDimensionEvent::ActorChangeDimensionEvent;
 };
 
 } // namespace Catalyst

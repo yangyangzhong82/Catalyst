@@ -1,6 +1,6 @@
 #include "PlayerInteractEntityEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/Actor.h"
@@ -12,16 +12,14 @@
 
 namespace Catalyst {
 
-void PlayerInteractEntityBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
+void PlayerInteractEntityEvent::serialize(CompoundTag& nbt) const {
+    ll::event::PlayerEvent::serialize(nbt);
     nbt["actor"]    = ll::event::serializeRefObj(actor());
     nbt["location"] = ListTag{location().x, location().y, location().z};
 }
 
 void PlayerInteractEntityAfterEvent::serialize(CompoundTag& nbt) const {
-    ll::event::PlayerEvent::serialize(nbt);
-    nbt["actor"]         = ll::event::serializeRefObj(actor());
-    nbt["location"]      = ListTag{location().x, location().y, location().z};
+    PlayerInteractEntityEvent::serialize(nbt);
     nbt["resultSuccess"] = result().mSuccess;
     nbt["resultSwing"]   = result().mSwing;
 }
@@ -52,21 +50,10 @@ LL_TYPE_INSTANCE_HOOK(
     return result;
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class PlayerInteractEntityBeforeEventEmitter
-: public ll::event::Emitter<beforeEmitterFactory, PlayerInteractEntityBeforeEvent> {
-    ll::memory::HookRegistrar<InteractEntityHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<PlayerInteractEntityBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerInteractEntityAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerInteractEntityAfterEvent> {
-    ll::memory::HookRegistrar<InteractEntityHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<PlayerInteractEntityAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    PlayerInteractEntityBeforeEvent,
+    PlayerInteractEntityAfterEvent,
+    InteractEntityHook
+)
 
 } // namespace Catalyst

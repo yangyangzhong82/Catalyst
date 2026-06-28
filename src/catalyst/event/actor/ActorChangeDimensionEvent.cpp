@@ -1,6 +1,6 @@
 #include "ActorChangeDimensionEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/deps/nbt/CompoundTag.h"
@@ -13,13 +13,7 @@
 
 namespace Catalyst {
 
-void ActorChangeDimensionBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["fromDimensionId"] = fromDimensionId();
-    nbt["toDimensionId"]   = toDimensionId();
-}
-
-void ActorChangeDimensionAfterEvent::serialize(CompoundTag& nbt) const {
+void ActorChangeDimensionEvent::serialize(CompoundTag& nbt) const {
     ll::event::entity::ActorEvent::serialize(nbt);
     nbt["fromDimensionId"] = fromDimensionId();
     nbt["toDimensionId"]   = toDimensionId();
@@ -52,21 +46,10 @@ LL_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class ActorChangeDimensionBeforeEventEmitter
-: public ll::event::Emitter<beforeEmitterFactory, ActorChangeDimensionBeforeEvent> {
-    ll::memory::HookRegistrar<ActorChangeDimensionEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<ActorChangeDimensionBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class ActorChangeDimensionAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, ActorChangeDimensionAfterEvent> {
-    ll::memory::HookRegistrar<ActorChangeDimensionEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<ActorChangeDimensionAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    ActorChangeDimensionBeforeEvent,
+    ActorChangeDimensionAfterEvent,
+    ActorChangeDimensionEventHook
+)
 
 } // namespace Catalyst

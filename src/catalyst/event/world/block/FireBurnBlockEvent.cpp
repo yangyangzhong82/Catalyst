@@ -1,7 +1,7 @@
 #include "FireBurnBlockEvent.h"
 #include "FireSpreadEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 
@@ -38,29 +38,14 @@
 
 namespace Catalyst {
 
-void FireBurnBlockBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["burnPos"] = ListTag{burnPos().x, burnPos().y, burnPos().z};
-    nbt["firePos"] = ListTag{firePos().x, firePos().y, firePos().z};
-    nbt["age"]     = age();
-}
-
-void FireBurnBlockAfterEvent::serialize(CompoundTag& nbt) const {
+void FireBurnBlockEvent::serialize(CompoundTag& nbt) const {
     ll::event::world::WorldEvent::serialize(nbt);
     nbt["burnPos"] = ListTag{burnPos().x, burnPos().y, burnPos().z};
     nbt["firePos"] = ListTag{firePos().x, firePos().y, firePos().z};
     nbt["age"]     = age();
 }
 
-void FireSpreadBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["spreadPos"] = ListTag{spreadPos().x, spreadPos().y, spreadPos().z};
-    nbt["firePos"]   = ListTag{firePos().x, firePos().y, firePos().z};
-    nbt["newAge"]    = newAge();
-    nbt["sourceAge"] = sourceAge();
-}
-
-void FireSpreadAfterEvent::serialize(CompoundTag& nbt) const {
+void FireSpreadEvent::serialize(CompoundTag& nbt) const {
     ll::event::world::WorldEvent::serialize(nbt);
     nbt["spreadPos"] = ListTag{spreadPos().x, spreadPos().y, spreadPos().z};
     nbt["firePos"]   = ListTag{firePos().x, firePos().y, firePos().z};
@@ -544,41 +529,17 @@ LABEL_55:
     }
 }
 
-// Emitters for FireBurnBlockEvent
-static std::unique_ptr<ll::event::EmitterBase> burnBeforeEmitterFactory();
-class FireBurnBlockBeforeEventEmitter
-: public ll::event::Emitter<burnBeforeEmitterFactory, FireBurnBlockBeforeEvent> {
-    ll::memory::HookRegistrar<FireBurnBlockHook> hook;
-    ll::memory::HookRegistrar<FireTickHook>      tickHook;
-};
-static std::unique_ptr<ll::event::EmitterBase> burnBeforeEmitterFactory() {
-    return std::make_unique<FireBurnBlockBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> burnAfterEmitterFactory();
-class FireBurnBlockAfterEventEmitter : public ll::event::Emitter<burnAfterEmitterFactory, FireBurnBlockAfterEvent> {
-    ll::memory::HookRegistrar<FireBurnBlockHook> hook;
-    ll::memory::HookRegistrar<FireTickHook>      tickHook;
-};
-static std::unique_ptr<ll::event::EmitterBase> burnAfterEmitterFactory() {
-    return std::make_unique<FireBurnBlockAfterEventEmitter>();
-}
-
-// Emitters for FireSpreadEvent
-static std::unique_ptr<ll::event::EmitterBase> spreadBeforeEmitterFactory();
-class FireSpreadBeforeEventEmitter
-: public ll::event::Emitter<spreadBeforeEmitterFactory, FireSpreadBeforeEvent> {};
-static std::unique_ptr<ll::event::EmitterBase> spreadBeforeEmitterFactory() {
-    return std::make_unique<FireSpreadBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> spreadAfterEmitterFactory();
-class FireSpreadAfterEventEmitter : public ll::event::Emitter<spreadAfterEmitterFactory, FireSpreadAfterEvent> {
-    ll::memory::HookRegistrar<FireBurnBlockHook> hook;
-    ll::memory::HookRegistrar<FireTickHook>      tickHook;
-};
-static std::unique_ptr<ll::event::EmitterBase> spreadAfterEmitterFactory() {
-    return std::make_unique<FireSpreadAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    FireBurnBlockBeforeEvent,
+    FireBurnBlockAfterEvent,
+    FireBurnBlockHook,
+    FireTickHook
+)
+CATALYST_HOOKED_EVENT_PAIR(
+    FireSpreadBeforeEvent,
+    FireSpreadAfterEvent,
+    FireBurnBlockHook,
+    FireTickHook
+)
 
 } // namespace Catalyst

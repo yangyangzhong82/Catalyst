@@ -14,20 +14,13 @@
 
 namespace Catalyst {
 
-void PlayerOpenContainerBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
+void PlayerOpenContainerEvent::serialize(CompoundTag& nbt) const {
+    ll::event::ServerPlayerEvent::serialize(nbt);
     nbt["containerId"]    = (int)containerId();
     nbt["type"]           = magic_enum::enum_name(type());
     nbt["pos"]            = ListTag{pos().x, pos().y, pos().z};
-    nbt["entityUniqueID"] = ll::event::serializeRefObj(mEntityUniqueID);
-}
-
-void PlayerOpenContainerAfterEvent::serialize(CompoundTag& nbt) const {
-    ll::event::PlayerEvent::serialize(nbt);
-    nbt["containerId"]    = (int)containerId();
-    nbt["type"]           = magic_enum::enum_name(type());
-    nbt["pos"]            = ListTag{pos().x, pos().y, pos().z};
-    nbt["entityUniqueID"] = ll::event::serializeRefObj(mEntityUniqueID);
+    auto entityId         = entityUniqueID();
+    nbt["entityUniqueID"] = ll::event::serializeRefObj(entityId);
 }
 
 

@@ -1,6 +1,6 @@
 #include "SpawnItemActorEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/item/ItemActor.h"
@@ -11,8 +11,8 @@
 
 namespace Catalyst {
 
-void SpawnItemActorBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
+void SpawnItemActorEvent::serialize(CompoundTag& nbt) const {
+    ll::event::world::WorldEvent::serialize(nbt);
     nbt["item"]      = ll::event::serializeRefObj(item());
     nbt["spawner"]   = ll::event::serializePtrObj(spawner());
     nbt["pos"]       = ListTag{pos().x, pos().y, pos().z};
@@ -20,11 +20,7 @@ void SpawnItemActorBeforeEvent::serialize(CompoundTag& nbt) const {
 }
 
 void SpawnItemActorAfterEvent::serialize(CompoundTag& nbt) const {
-    ll::event::world::WorldEvent::serialize(nbt);
-    nbt["item"]      = ll::event::serializeRefObj(item());
-    nbt["spawner"]   = ll::event::serializePtrObj(spawner());
-    nbt["pos"]       = ListTag{pos().x, pos().y, pos().z};
-    nbt["throwTime"] = throwTime();
+    SpawnItemActorEvent::serialize(nbt);
     nbt["itemActor"] = ll::event::serializePtrObj(itemActor());
 }
 
@@ -58,20 +54,10 @@ LL_TYPE_INSTANCE_HOOK(
     return result;
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class SpawnItemActorBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, SpawnItemActorBeforeEvent> {
-    ll::memory::HookRegistrar<SpawnItemActorEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<SpawnItemActorBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class SpawnItemActorAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, SpawnItemActorAfterEvent> {
-    ll::memory::HookRegistrar<SpawnItemActorEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<SpawnItemActorAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    SpawnItemActorBeforeEvent,
+    SpawnItemActorAfterEvent,
+    SpawnItemActorEventHook
+)
 
 } // namespace Catalyst

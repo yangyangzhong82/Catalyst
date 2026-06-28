@@ -10,13 +10,13 @@ class Block;
 
 namespace Catalyst {
 
-class CATALYST_API ActorDestroyBlockBeforeEvent final : public ll::event::Cancellable<ll::event::entity::ActorEvent> {
+class CATALYST_API ActorDestroyBlockEvent : public ll::event::entity::ActorEvent {
     Vec3 const&  mPos;
     Block const& mBlock;
 
 public:
-    constexpr ActorDestroyBlockBeforeEvent(Actor& actor, Vec3 const& pos, Block const& block)
-    : Cancellable(actor),
+    constexpr ActorDestroyBlockEvent(Actor& actor, Vec3 const& pos, Block const& block)
+    : ActorEvent(actor),
       mPos(pos),
       mBlock(block) {}
 
@@ -26,20 +26,14 @@ public:
     Block const& block() const { return mBlock; }
 };
 
-class CATALYST_API ActorDestroyBlockAfterEvent final : public ll::event::entity::ActorEvent {
-    Vec3 const&  mPos;
-    Block const& mBlock;
-
+class CATALYST_API ActorDestroyBlockBeforeEvent final : public ll::event::Cancellable<ActorDestroyBlockEvent> {
 public:
-    constexpr ActorDestroyBlockAfterEvent(Actor& actor, Vec3 const& pos, Block const& block)
-    : ActorEvent(actor),
-      mPos(pos),
-      mBlock(block) {}
+    using Cancellable::Cancellable;
+};
 
-    void serialize(CompoundTag&) const override;
-
-    Vec3 const&  pos() const { return mPos; }
-    Block const& block() const { return mBlock; }
+class CATALYST_API ActorDestroyBlockAfterEvent final : public ActorDestroyBlockEvent {
+public:
+    using ActorDestroyBlockEvent::ActorDestroyBlockEvent;
 };
 
 } // namespace Catalyst

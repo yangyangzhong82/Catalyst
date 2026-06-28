@@ -1,6 +1,6 @@
 #include "LeavesDecayEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/level/BlockPos.h"
@@ -50,21 +50,11 @@ LL_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class LeavesDecayBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, LeavesDecayBeforeEvent> {
-    ll::memory::HookRegistrar<LeavesDecayHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<LeavesDecayBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class LeavesDecayAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, LeavesDecayAfterEvent> {
-    ll::memory::HookRegistrar<LeavesDecayHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<LeavesDecayAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    LeavesDecayBeforeEvent,
+    LeavesDecayAfterEvent,
+    LeavesDecayHook
+)
 
 } // namespace Catalyst
 */

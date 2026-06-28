@@ -7,7 +7,7 @@
 #include <memory>
 
 #include "catalyst/mod/Gloabl.h"
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/deps/core/math/Vec3.h"
@@ -38,16 +38,14 @@
 
 namespace Catalyst {
 
-void EnderDragonDestroyBlockBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
+void EnderDragonDestroyBlockEvent::serialize(CompoundTag& nbt) const {
+    ll::event::entity::MobEvent::serialize(nbt);
     nbt["pos"]   = ListTag{pos().x, pos().y, pos().z};
     nbt["block"] = ll::event::serializeRefObj(block());
 }
 
 void EnderDragonDestroyBlockAfterEvent::serialize(CompoundTag& nbt) const {
-    ll::event::entity::MobEvent::serialize(nbt);
-    nbt["pos"]       = ListTag{pos().x, pos().y, pos().z};
-    nbt["block"]     = ll::event::serializeRefObj(block());
+    EnderDragonDestroyBlockEvent::serialize(nbt);
     nbt["destroyed"] = destroyed();
 }
 
@@ -241,22 +239,10 @@ LL_TYPE_INSTANCE_HOOK(
     }
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class EnderDragonDestroyBlockBeforeEventEmitter
-: public ll::event::Emitter<beforeEmitterFactory, EnderDragonDestroyBlockBeforeEvent> {
-    ll::memory::HookRegistrar<EnderDragonCheckWallsHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<EnderDragonDestroyBlockBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class EnderDragonDestroyBlockAfterEventEmitter
-: public ll::event::Emitter<afterEmitterFactory, EnderDragonDestroyBlockAfterEvent> {
-    ll::memory::HookRegistrar<EnderDragonCheckWallsHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<EnderDragonDestroyBlockAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    EnderDragonDestroyBlockBeforeEvent,
+    EnderDragonDestroyBlockAfterEvent,
+    EnderDragonCheckWallsHook
+)
 
 } // namespace Catalyst

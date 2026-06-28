@@ -9,24 +9,11 @@
 class MobEffectInstance;
 namespace Catalyst {
 
-class CATALYST_API ActorEffectAddBeforeEvent final : public ll::event::Cancellable<ll::event::entity::ActorEvent> {
+class CATALYST_API ActorEffectAddEvent : public ll::event::entity::ActorEvent {
     MobEffectInstance const& mEffect;
 
 public:
-    constexpr ActorEffectAddBeforeEvent(Actor& actor, MobEffectInstance const& effect)
-    : Cancellable(actor),
-      mEffect(effect) {}
-
-    void serialize(CompoundTag&) const override;
-
-    MobEffectInstance const& effect() const { return mEffect; }
-};
-
-class CATALYST_API ActorEffectAddAfterEvent final : public ll::event::entity::ActorEvent {
-    MobEffectInstance const& mEffect;
-
-public:
-    constexpr ActorEffectAddAfterEvent(Actor& actor, MobEffectInstance const& effect)
+    constexpr ActorEffectAddEvent(Actor& actor, MobEffectInstance const& effect)
     : ActorEvent(actor),
       mEffect(effect) {}
 
@@ -35,24 +22,21 @@ public:
     MobEffectInstance const& effect() const { return mEffect; }
 };
 
-class CATALYST_API ActorEffectUpdateBeforeEvent final : public ll::event::Cancellable<ll::event::entity::ActorEvent> {
-    MobEffectInstance& mEffect;
-
+class CATALYST_API ActorEffectAddBeforeEvent final : public ll::event::Cancellable<ActorEffectAddEvent> {
 public:
-    constexpr ActorEffectUpdateBeforeEvent(Actor& actor, MobEffectInstance& effect)
-    : Cancellable(actor),
-      mEffect(effect) {}
-
-    void serialize(CompoundTag&) const override;
-
-    MobEffectInstance& effect() const { return mEffect; }
+    using Cancellable::Cancellable;
 };
 
-class CATALYST_API ActorEffectUpdateAfterEvent final : public ll::event::entity::ActorEvent {
+class CATALYST_API ActorEffectAddAfterEvent final : public ActorEffectAddEvent {
+public:
+    using ActorEffectAddEvent::ActorEffectAddEvent;
+};
+
+class CATALYST_API ActorEffectUpdateEvent : public ll::event::entity::ActorEvent {
     MobEffectInstance& mEffect;
 
 public:
-    constexpr ActorEffectUpdateAfterEvent(Actor& actor, MobEffectInstance& effect)
+    constexpr ActorEffectUpdateEvent(Actor& actor, MobEffectInstance& effect)
     : ActorEvent(actor),
       mEffect(effect) {}
 
@@ -61,12 +45,22 @@ public:
     MobEffectInstance& effect() const { return mEffect; }
 };
 
-class CATALYST_API ActorEffectRemoveBeforeEvent final : public ll::event::Cancellable<ll::event::entity::ActorEvent> {
+class CATALYST_API ActorEffectUpdateBeforeEvent final : public ll::event::Cancellable<ActorEffectUpdateEvent> {
+public:
+    using Cancellable::Cancellable;
+};
+
+class CATALYST_API ActorEffectUpdateAfterEvent final : public ActorEffectUpdateEvent {
+public:
+    using ActorEffectUpdateEvent::ActorEffectUpdateEvent;
+};
+
+class CATALYST_API ActorEffectRemoveEvent : public ll::event::entity::ActorEvent {
     MobEffectInstance& mEffect;
 
 public:
-    constexpr ActorEffectRemoveBeforeEvent(Actor& actor, MobEffectInstance& effect)
-    : Cancellable(actor),
+    constexpr ActorEffectRemoveEvent(Actor& actor, MobEffectInstance& effect)
+    : ActorEvent(actor),
       mEffect(effect) {}
 
     void serialize(CompoundTag&) const override;
@@ -74,17 +68,14 @@ public:
     MobEffectInstance& effect() const { return mEffect; }
 };
 
-class CATALYST_API ActorEffectRemoveAfterEvent final : public ll::event::entity::ActorEvent {
-    MobEffectInstance& mEffect;
-
+class CATALYST_API ActorEffectRemoveBeforeEvent final : public ll::event::Cancellable<ActorEffectRemoveEvent> {
 public:
-    constexpr ActorEffectRemoveAfterEvent(Actor& actor, MobEffectInstance& effect)
-    : ActorEvent(actor),
-      mEffect(effect) {}
+    using Cancellable::Cancellable;
+};
 
-    void serialize(CompoundTag&) const override;
-
-    MobEffectInstance& effect() const { return mEffect; }
+class CATALYST_API ActorEffectRemoveAfterEvent final : public ActorEffectRemoveEvent {
+public:
+    using ActorEffectRemoveEvent::ActorEffectRemoveEvent;
 };
 
 } // namespace Catalyst

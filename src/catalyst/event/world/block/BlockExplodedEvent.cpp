@@ -1,6 +1,6 @@
 #include "BlockExplodedEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/events/ExplosionStartedEvent.h"
@@ -12,12 +12,7 @@
 
 namespace Catalyst {
 
-void BlockExplodedBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["pos"] = ListTag{pos().x, pos().y, pos().z};
-}
-
-void BlockExplodedAfterEvent::serialize(CompoundTag& nbt) const {
+void BlockExplodedEvent::serialize(CompoundTag& nbt) const {
     ll::event::world::WorldEvent::serialize(nbt);
     nbt["pos"] = ListTag{pos().x, pos().y, pos().z};
 }
@@ -72,22 +67,11 @@ LL_TYPE_INSTANCE_HOOK(
     }
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class BlockExplodedBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, BlockExplodedBeforeEvent> {
-    ll::memory::HookRegistrar<BlockExplodedHook1> hook1;
-    ll::memory::HookRegistrar<BlockExplodedHook2> hook2;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<BlockExplodedBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class BlockExplodedAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, BlockExplodedAfterEvent> {
-    ll::memory::HookRegistrar<BlockExplodedHook1> hook1;
-    ll::memory::HookRegistrar<BlockExplodedHook2> hook2;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<BlockExplodedAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    BlockExplodedBeforeEvent,
+    BlockExplodedAfterEvent,
+    BlockExplodedHook1,
+    BlockExplodedHook2
+)
 
 } // namespace Catalyst

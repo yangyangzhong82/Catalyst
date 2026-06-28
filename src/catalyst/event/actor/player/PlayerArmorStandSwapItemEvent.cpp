@@ -1,6 +1,6 @@
 #include "PlayerArmorStandSwapItemEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/ArmorStand.h"
@@ -11,13 +11,7 @@
 
 namespace Catalyst {
 
-void PlayerArmorStandSwapItemBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["armorStand"] = ll::event::serializeRefObj(armorStand());
-    nbt["slot"]       = magic_enum::enum_name(slot());
-}
-
-void PlayerArmorStandSwapItemAfterEvent::serialize(CompoundTag& nbt) const {
+void PlayerArmorStandSwapItemEvent::serialize(CompoundTag& nbt) const {
     ll::event::PlayerEvent::serialize(nbt);
     nbt["armorStand"] = ll::event::serializeRefObj(armorStand());
     nbt["slot"]       = magic_enum::enum_name(slot());
@@ -50,21 +44,10 @@ LL_TYPE_INSTANCE_HOOK(
     return result;
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class PlayerArmorStandSwapItemBeforeEventEmitter
-: public ll::event::Emitter<beforeEmitterFactory, PlayerArmorStandSwapItemBeforeEvent> {
-    ll::memory::HookRegistrar<ArmorStandSwapItemHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<PlayerArmorStandSwapItemBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerArmorStandSwapItemAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerArmorStandSwapItemAfterEvent> {
-    ll::memory::HookRegistrar<ArmorStandSwapItemHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<PlayerArmorStandSwapItemAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    PlayerArmorStandSwapItemBeforeEvent,
+    PlayerArmorStandSwapItemAfterEvent,
+    ArmorStandSwapItemHook
+)
 
 } // namespace Catalyst

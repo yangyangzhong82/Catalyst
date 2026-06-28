@@ -1,7 +1,7 @@
 #include "ActorDestroyBlockEvent.h"
 
 #include "catalyst/mod/Gloabl.h"
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/deps/ecs/gamerefs_entity/EntityContext.h"
@@ -16,13 +16,7 @@
 
 namespace Catalyst {
 
-void ActorDestroyBlockBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["pos"]   = ListTag{pos().x, pos().y, pos().z};
-    nbt["block"] = ll::event::serializeRefObj(block());
-}
-
-void ActorDestroyBlockAfterEvent::serialize(CompoundTag& nbt) const {
+void ActorDestroyBlockEvent::serialize(CompoundTag& nbt) const {
     ll::event::entity::ActorEvent::serialize(nbt);
     nbt["pos"]   = ListTag{pos().x, pos().y, pos().z};
     nbt["block"] = ll::event::serializeRefObj(block());
@@ -87,21 +81,10 @@ LL_TYPE_INSTANCE_HOOK(
     }
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class ActorDestroyBlockBeforeEventEmitter
-: public ll::event::Emitter<beforeEmitterFactory, ActorDestroyBlockBeforeEvent> {
-    ll::memory::HookRegistrar<ActorDestroyBlockHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<ActorDestroyBlockBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class ActorDestroyBlockAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, ActorDestroyBlockAfterEvent> {
-    ll::memory::HookRegistrar<ActorDestroyBlockHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<ActorDestroyBlockAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    ActorDestroyBlockBeforeEvent,
+    ActorDestroyBlockAfterEvent,
+    ActorDestroyBlockHook
+)
 
 } // namespace Catalyst

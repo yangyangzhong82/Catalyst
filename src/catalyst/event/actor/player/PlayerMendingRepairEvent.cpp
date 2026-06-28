@@ -5,7 +5,7 @@
 #include <optional>
 
 #include "catalyst/mod/Gloabl.h"
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/entity/components/ActorEquipmentComponent.h"
@@ -23,22 +23,7 @@
 
 namespace Catalyst {
 
-void PlayerMendingRepairBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["orb"]          = ll::event::serializeRefObj(orb());
-    nbt["containerId"]  = (int)containerId();
-    nbt["slot"]         = slot();
-    if (armorSlot().has_value()) {
-        nbt["armorSlot"] = magic_enum::enum_name(armorSlot().value());
-    }
-    nbt["originalItem"] = ll::event::serializeRefObj(originalItem());
-    nbt["repairedItem"] = ll::event::serializeRefObj(repairedItem());
-    nbt["repairAmount"] = repairAmount();
-    nbt["oldOrbValue"]  = oldOrbValue();
-    nbt["newOrbValue"]  = newOrbValue();
-}
-
-void PlayerMendingRepairAfterEvent::serialize(CompoundTag& nbt) const {
+void PlayerMendingRepairEvent::serialize(CompoundTag& nbt) const {
     ll::event::PlayerEvent::serialize(nbt);
     nbt["orb"]          = ll::event::serializeRefObj(orb());
     nbt["containerId"]  = (int)containerId();
@@ -315,22 +300,10 @@ LL_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class PlayerMendingRepairBeforeEventEmitter
-: public ll::event::Emitter<beforeEmitterFactory, PlayerMendingRepairBeforeEvent> {
-    ll::memory::HookRegistrar<PlayerMendingRepairEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<PlayerMendingRepairBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerMendingRepairAfterEventEmitter
-: public ll::event::Emitter<afterEmitterFactory, PlayerMendingRepairAfterEvent> {
-    ll::memory::HookRegistrar<PlayerMendingRepairEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<PlayerMendingRepairAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    PlayerMendingRepairBeforeEvent,
+    PlayerMendingRepairAfterEvent,
+    PlayerMendingRepairEventHook
+)
 
 } // namespace Catalyst

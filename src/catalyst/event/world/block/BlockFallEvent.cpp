@@ -1,7 +1,7 @@
 #include "BlockFallEvent.h"
 
 #include "catalyst/mod/Gloabl.h"
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/deps/ecs/gamerefs_entity/EntityContext.h"
@@ -25,14 +25,7 @@
 
 namespace Catalyst {
 
-void BlockFallBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["pos"]      = ListTag{pos().x, pos().y, pos().z};
-    nbt["block"]    = ll::event::serializeRefObj(block());
-    nbt["creative"] = isCreative();
-}
-
-void BlockFallAfterEvent::serialize(CompoundTag& nbt) const {
+void BlockFallEvent::serialize(CompoundTag& nbt) const {
     ll::event::world::WorldEvent::serialize(nbt);
     nbt["pos"]      = ListTag{pos().x, pos().y, pos().z};
     nbt["block"]    = ll::event::serializeRefObj(block());
@@ -136,20 +129,10 @@ LL_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class BlockFallBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, BlockFallBeforeEvent> {
-    ll::memory::HookRegistrar<BlockFallEventHook5> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<BlockFallBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class BlockFallAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, BlockFallAfterEvent> {
-    ll::memory::HookRegistrar<BlockFallEventHook5> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<BlockFallAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    BlockFallBeforeEvent,
+    BlockFallAfterEvent,
+    BlockFallEventHook5
+)
 
 } // namespace Catalyst

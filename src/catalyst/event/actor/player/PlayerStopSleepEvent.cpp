@@ -1,6 +1,6 @@
 #include "PlayerStopSleepEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/player/Player.h"
@@ -9,13 +9,7 @@
 
 namespace Catalyst {
 
-void PlayerStopSleepBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["forcefulWakeUp"]  = isForcefulWakeUp();
-    nbt["updateLevelList"] = isUpdateLevelList();
-}
-
-void PlayerStopSleepAfterEvent::serialize(CompoundTag& nbt) const {
+void PlayerStopSleepEvent::serialize(CompoundTag& nbt) const {
     ll::event::PlayerEvent::serialize(nbt);
     nbt["forcefulWakeUp"]  = isForcefulWakeUp();
     nbt["updateLevelList"] = isUpdateLevelList();
@@ -45,20 +39,10 @@ LL_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class PlayerStopSleepBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, PlayerStopSleepBeforeEvent> {
-    ll::memory::HookRegistrar<PlayerStopSleepEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<PlayerStopSleepBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerStopSleepAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerStopSleepAfterEvent> {
-    ll::memory::HookRegistrar<PlayerStopSleepEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<PlayerStopSleepAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    PlayerStopSleepBeforeEvent,
+    PlayerStopSleepAfterEvent,
+    PlayerStopSleepEventHook
+)
 
 } // namespace Catalyst

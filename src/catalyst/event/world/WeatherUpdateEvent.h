@@ -10,21 +10,21 @@ class Level;
 
 namespace Catalyst {
 
-class CATALYST_API WeatherUpdateBeforeEvent final : public ll::event::Cancellable<ll::event::world::LevelEvent> {
+class CATALYST_API WeatherUpdateEvent : public ll::event::world::LevelEvent {
     float mRainLevel;
     int   mRainTime;
     float mLightningLevel;
     int   mLightningTime;
 
 public:
-    constexpr WeatherUpdateBeforeEvent(
+    constexpr WeatherUpdateEvent(
         Level& level,
         float  rainLevel,
         int    rainTime,
         float  lightningLevel,
         int    lightningTime
     )
-    : Cancellable(level),
+    : LevelEvent(level),
       mRainLevel(rainLevel),
       mRainTime(rainTime),
       mLightningLevel(lightningLevel),
@@ -42,32 +42,14 @@ public:
     int&   lightningTime() { return mLightningTime; }
 };
 
-class CATALYST_API WeatherUpdateAfterEvent final : public ll::event::world::LevelEvent {
-    float mRainLevel;
-    int   mRainTime;
-    float mLightningLevel;
-    int   mLightningTime;
-
+class CATALYST_API WeatherUpdateBeforeEvent final : public ll::event::Cancellable<WeatherUpdateEvent> {
 public:
-    constexpr WeatherUpdateAfterEvent(
-        Level& level,
-        float  rainLevel,
-        int    rainTime,
-        float  lightningLevel,
-        int    lightningTime
-    )
-    : LevelEvent(level),
-      mRainLevel(rainLevel),
-      mRainTime(rainTime),
-      mLightningLevel(lightningLevel),
-      mLightningTime(lightningTime) {}
+    using Cancellable::Cancellable;
+};
 
-    void serialize(CompoundTag&) const override;
-
-    float rainLevel() const { return mRainLevel; }
-    int   rainTime() const { return mRainTime; }
-    float lightningLevel() const { return mLightningLevel; }
-    int   lightningTime() const { return mLightningTime; }
+class CATALYST_API WeatherUpdateAfterEvent final : public WeatherUpdateEvent {
+public:
+    using WeatherUpdateEvent::WeatherUpdateEvent;
 };
 
 } // namespace Catalyst

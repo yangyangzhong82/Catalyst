@@ -1,7 +1,7 @@
 
 #include "MobPickupItemEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/Mob.h"
@@ -13,12 +13,7 @@
 
 namespace Catalyst {
 
-void MobPickupItemBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["itemActor"] = ll::event::serializeRefObj(itemActor());
-}
-
-void MobPickupItemAfterEvent::serialize(CompoundTag& nbt) const {
+void MobPickupItemEvent::serialize(CompoundTag& nbt) const {
     ll::event::entity::ActorEvent::serialize(nbt);
     nbt["itemActor"] = ll::event::serializeRefObj(itemActor());
 }
@@ -48,20 +43,10 @@ LL_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class MobPickupItemBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, MobPickupItemBeforeEvent> {
-    ll::memory::HookRegistrar<MobPickupItemHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<MobPickupItemBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class MobPickupItemAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, MobPickupItemAfterEvent> {
-    ll::memory::HookRegistrar<MobPickupItemHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<MobPickupItemAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    MobPickupItemBeforeEvent,
+    MobPickupItemAfterEvent,
+    MobPickupItemHook
+)
 
 } // namespace Catalyst

@@ -10,14 +10,14 @@ class BlockPos;
 
 namespace Catalyst {
 
-class CATALYST_API MossGrowthBeforeEvent final : public ll::event::Cancellable<ll::event::world::WorldEvent> {
+class CATALYST_API MossGrowthEvent : public ll::event::world::WorldEvent {
     BlockPos mOrigin;
     int      mXRadius;
     int      mZRadius;
 
 public:
-    constexpr MossGrowthBeforeEvent(BlockSource& blockSource, BlockPos origin, int xRadius, int zRadius)
-    : Cancellable(blockSource),
+    constexpr MossGrowthEvent(BlockSource& blockSource, BlockPos origin, int xRadius, int zRadius)
+    : WorldEvent(blockSource),
       mOrigin(origin),
       mXRadius(xRadius),
       mZRadius(zRadius) {}
@@ -29,23 +29,14 @@ public:
     int             zRadius() const { return mZRadius; }
 };
 
-class CATALYST_API MossGrowthAfterEvent final : public ll::event::world::WorldEvent {
-    BlockPos mOrigin;
-    int      mXRadius;
-    int      mZRadius;
-
+class CATALYST_API MossGrowthBeforeEvent final : public ll::event::Cancellable<MossGrowthEvent> {
 public:
-    constexpr MossGrowthAfterEvent(BlockSource& blockSource, BlockPos origin, int xRadius, int zRadius)
-    : WorldEvent(blockSource),
-      mOrigin(origin),
-      mXRadius(xRadius),
-      mZRadius(zRadius) {}
+    using Cancellable::Cancellable;
+};
 
-    void serialize(CompoundTag&) const override;
-
-    BlockPos const& origin() const { return mOrigin; }
-    int             xRadius() const { return mXRadius; }
-    int             zRadius() const { return mZRadius; }
+class CATALYST_API MossGrowthAfterEvent final : public MossGrowthEvent {
+public:
+    using MossGrowthEvent::MossGrowthEvent;
 };
 
 } // namespace Catalyst

@@ -1,7 +1,7 @@
 
 #include "PlayerEditSignEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/network/ServerNetworkHandler.h"
@@ -16,16 +16,7 @@
 
 namespace Catalyst {
 
-void PlayerEditSignBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["pos"]          = ListTag{pos().x, pos().y, pos().z};
-    nbt["oldFrontText"] = oldFrontText();
-    nbt["oldBackText"]  = oldBackText();
-    nbt["newFrontText"] = newFrontText();
-    nbt["newBackText"]  = newBackText();
-}
-
-void PlayerEditSignAfterEvent::serialize(CompoundTag& nbt) const {
+void PlayerEditSignEvent::serialize(CompoundTag& nbt) const {
     ll::event::ServerPlayerEvent::serialize(nbt);
     nbt["pos"]          = ListTag{pos().x, pos().y, pos().z};
     nbt["oldFrontText"] = oldFrontText();
@@ -35,7 +26,7 @@ void PlayerEditSignAfterEvent::serialize(CompoundTag& nbt) const {
 }
 
 
-LL_TYPE_INSTANCE_HOOK(
+LL_AUTO_TYPE_INSTANCE_HOOK(
     PlayerEditSignEventHook,
     HookPriority::Normal,
     ServerNetworkHandler,
@@ -71,6 +62,8 @@ LL_TYPE_INSTANCE_HOOK(
     std::string newFrontText     = newFrontTextData["Text"].get<StringTag>();
     std::string newBackText      = newBackTextData["Text"].get<StringTag>();
 
+
+
     if (oldFrontText == newFrontText && oldBackText == newBackText) {
         return origin(source, packet);
     }
@@ -89,20 +82,10 @@ LL_TYPE_INSTANCE_HOOK(
     bus.publish(afterEvent);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class PlayerEditSignBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, PlayerEditSignBeforeEvent> {
-    ll::memory::HookRegistrar<PlayerEditSignEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<PlayerEditSignBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerEditSignAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerEditSignAfterEvent> {
-    ll::memory::HookRegistrar<PlayerEditSignEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<PlayerEditSignAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    PlayerEditSignBeforeEvent,
+    PlayerEditSignAfterEvent,
+    PlayerEditSignEventHook
+)
 
 } // namespace Catalyst

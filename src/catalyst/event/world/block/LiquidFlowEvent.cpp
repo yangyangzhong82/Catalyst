@@ -1,6 +1,6 @@
 #include "LiquidFlowEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/level/BlockPos.h"
@@ -15,16 +15,7 @@
 
 namespace Catalyst {
 
-void LiquidFlowBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["liquidBlock"]       = ll::event::serializeRefObj(liquidBlock());
-    nbt["toPos"]             = ListTag{toPos().x, toPos().y, toPos().z};
-    nbt["neighbor"]          = neighbor();
-    nbt["fromPos"]           = ListTag{fromPos().x, fromPos().y, fromPos().z};
-    nbt["flowFromDirection"] = (int)flowFromDirection();
-}
-
-void LiquidFlowAfterEvent::serialize(CompoundTag& nbt) const {
+void LiquidFlowEvent::serialize(CompoundTag& nbt) const {
     ll::event::world::WorldEvent::serialize(nbt);
     nbt["liquidBlock"]       = ll::event::serializeRefObj(liquidBlock());
     nbt["toPos"]             = ListTag{toPos().x, toPos().y, toPos().z};
@@ -96,20 +87,10 @@ LL_TYPE_INSTANCE_HOOK(
     origin(region, pos, neighbor, flowFromPos, flowFromDirection);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class LiquidFlowBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, LiquidFlowBeforeEvent> {
-    ll::memory::HookRegistrar<LiquidFlowHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<LiquidFlowBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class LiquidFlowAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, LiquidFlowAfterEvent> {
-    ll::memory::HookRegistrar<LiquidFlowHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<LiquidFlowAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    LiquidFlowBeforeEvent,
+    LiquidFlowAfterEvent,
+    LiquidFlowHook
+)
 
 } // namespace Catalyst

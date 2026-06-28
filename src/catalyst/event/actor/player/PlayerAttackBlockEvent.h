@@ -8,13 +8,13 @@
 
 namespace Catalyst {
 
-class CATALYST_API PlayerAttackBlockBeforeEvent final : public ll::event::Cancellable<ll::event::ServerPlayerEvent> {
+class CATALYST_API PlayerAttackBlockEvent : public ll::event::ServerPlayerEvent {
     BlockPos mPos;
     int      mFace;
 
 public:
-    constexpr PlayerAttackBlockBeforeEvent(ServerPlayer& player, BlockPos pos, int face)
-    : Cancellable(player),
+    constexpr PlayerAttackBlockEvent(ServerPlayer& player, BlockPos pos, int face)
+    : ServerPlayerEvent(player),
       mPos(pos),
       mFace(face) {}
 
@@ -24,20 +24,14 @@ public:
     int             face() const { return mFace; }
 };
 
-class CATALYST_API PlayerAttackBlockAfterEvent final : public ll::event::ServerPlayerEvent {
-    BlockPos mPos;
-    int      mFace;
-
+class CATALYST_API PlayerAttackBlockBeforeEvent final : public ll::event::Cancellable<PlayerAttackBlockEvent> {
 public:
-    constexpr PlayerAttackBlockAfterEvent(ServerPlayer& player, BlockPos pos, int face)
-    : ServerPlayerEvent(player),
-      mPos(pos),
-      mFace(face) {}
+    using Cancellable::Cancellable;
+};
 
-    void serialize(CompoundTag&) const override;
-
-    BlockPos const& pos() const { return mPos; }
-    int             face() const { return mFace; }
+class CATALYST_API PlayerAttackBlockAfterEvent final : public PlayerAttackBlockEvent {
+public:
+    using PlayerAttackBlockEvent::PlayerAttackBlockEvent;
 };
 
 } // namespace Catalyst

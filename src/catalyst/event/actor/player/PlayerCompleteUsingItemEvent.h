@@ -10,12 +10,12 @@ class ItemStack;
 
 namespace Catalyst {
 
-class CATALYST_API PlayerCompleteUsingItemBeforeEvent final : public ll::event::Cancellable<ll::event::PlayerEvent> {
+class CATALYST_API PlayerCompleteUsingItemEvent : public ll::event::PlayerEvent {
     ItemStack const& mItem;
 
 public:
-    constexpr PlayerCompleteUsingItemBeforeEvent(Player& player, ItemStack const& item)
-    : Cancellable(player),
+    constexpr PlayerCompleteUsingItemEvent(Player& player, ItemStack const& item)
+    : PlayerEvent(player),
       mItem(item) {}
 
     void serialize(CompoundTag&) const override;
@@ -23,17 +23,15 @@ public:
     ItemStack const& item() const { return mItem; }
 };
 
-class CATALYST_API PlayerCompleteUsingItemAfterEvent final : public ll::event::PlayerEvent {
-    ItemStack const& mItem;
-
+class CATALYST_API PlayerCompleteUsingItemBeforeEvent final
+: public ll::event::Cancellable<PlayerCompleteUsingItemEvent> {
 public:
-    constexpr PlayerCompleteUsingItemAfterEvent(Player& player, ItemStack const& item)
-    : PlayerEvent(player),
-      mItem(item) {}
+    using Cancellable::Cancellable;
+};
 
-    void serialize(CompoundTag&) const override;
-
-    ItemStack const& item() const { return mItem; }
+class CATALYST_API PlayerCompleteUsingItemAfterEvent final : public PlayerCompleteUsingItemEvent {
+public:
+    using PlayerCompleteUsingItemEvent::PlayerCompleteUsingItemEvent;
 };
 
 } // namespace Catalyst

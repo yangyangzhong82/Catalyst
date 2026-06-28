@@ -1,6 +1,6 @@
 #include "PlayerAttackBlockEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/network/ServerPlayerBlockUseHandler.h"
@@ -10,13 +10,7 @@
 
 namespace Catalyst {
 
-void PlayerAttackBlockBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["pos"]  = ListTag{pos().x, pos().y, pos().z};
-    nbt["face"] = face();
-}
-
-void PlayerAttackBlockAfterEvent::serialize(CompoundTag& nbt) const {
+void PlayerAttackBlockEvent::serialize(CompoundTag& nbt) const {
     ll::event::ServerPlayerEvent::serialize(nbt);
     nbt["pos"]  = ListTag{pos().x, pos().y, pos().z};
     nbt["face"] = face();
@@ -46,21 +40,10 @@ LL_STATIC_HOOK(
     bus.publish(afterEvent);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class PlayerAttackBlockBeforeEventEmitter
-: public ll::event::Emitter<beforeEmitterFactory, PlayerAttackBlockBeforeEvent> {
-    ll::memory::HookRegistrar<PlayerAttackBlockEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<PlayerAttackBlockBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerAttackBlockAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerAttackBlockAfterEvent> {
-    ll::memory::HookRegistrar<PlayerAttackBlockEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<PlayerAttackBlockAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    PlayerAttackBlockBeforeEvent,
+    PlayerAttackBlockAfterEvent,
+    PlayerAttackBlockEventHook
+)
 
 } // namespace Catalyst

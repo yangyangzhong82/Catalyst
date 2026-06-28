@@ -10,14 +10,14 @@ class ActorDamageSource;
 
 namespace Catalyst {
 
-class CATALYST_API PlayerShieldBlockBeforeEvent final : public ll::event::Cancellable<ll::event::PlayerEvent> {
+class CATALYST_API PlayerShieldBlockEvent : public ll::event::PlayerEvent {
     ActorDamageSource const& mSource;
     float                    mDamage;
     Actor*                   mDamager;
 
 public:
-    constexpr PlayerShieldBlockBeforeEvent(Player& player, ActorDamageSource const& source, float damage, Actor* damager)
-    : Cancellable(player),
+    constexpr PlayerShieldBlockEvent(Player& player, ActorDamageSource const& source, float damage, Actor* damager)
+    : PlayerEvent(player),
       mSource(source),
       mDamage(damage),
       mDamager(damager) {}
@@ -29,32 +29,28 @@ public:
     Actor*                   damager() const { return mDamager; }
 };
 
-class CATALYST_API PlayerShieldBlockAfterEvent final : public ll::event::PlayerEvent {
-    ActorDamageSource const& mSource;
-    float                    mDamage;
-    Actor*                   mDamager;
-    bool                     mResult;
+class CATALYST_API PlayerShieldBlockBeforeEvent final : public ll::event::Cancellable<PlayerShieldBlockEvent> {
+public:
+    using Cancellable::Cancellable;
+};
+
+class CATALYST_API PlayerShieldBlockAfterEvent final : public PlayerShieldBlockEvent {
+    bool mResult;
 
 public:
     constexpr PlayerShieldBlockAfterEvent(
-        Player&                 player,
+        Player&                  player,
         ActorDamageSource const& source,
-        float                   damage,
-        Actor*                  damager,
-        bool                    result
+        float                    damage,
+        Actor*                   damager,
+        bool                     result
     )
-    : PlayerEvent(player),
-      mSource(source),
-      mDamage(damage),
-      mDamager(damager),
+    : PlayerShieldBlockEvent(player, source, damage, damager),
       mResult(result) {}
 
     void serialize(CompoundTag&) const override;
 
-    ActorDamageSource const& source() const { return mSource; }
-    float                    damage() const { return mDamage; }
-    Actor*                   damager() const { return mDamager; }
-    bool                     result() const { return mResult; }
+    bool result() const { return mResult; }
 };
 
 } // namespace Catalyst

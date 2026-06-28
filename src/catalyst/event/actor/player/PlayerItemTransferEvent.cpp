@@ -1,6 +1,6 @@
 #include "PlayerItemTransferEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/player/Inventory.h"
@@ -19,20 +19,7 @@
 
 namespace Catalyst {
 
-void PlayerItemTransferBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["actionType"]    = magic_enum::enum_name(actionType());
-    nbt["srcContainer"]  = ll::event::serializeRefObj(srcContainer());
-    nbt["srcSlot"]       = (int)srcSlot();
-    nbt["dstContainer"]  = ll::event::serializeRefObj(dstContainer());
-    nbt["dstSlot"]       = (int)dstSlot();
-    nbt["amount"]        = (int)amount();
-    nbt["srcItem"]       = ll::event::serializeRefObj(srcItem());
-    nbt["dstItem"]       = ll::event::serializeRefObj(dstItem());
-    nbt["screenContext"] = ll::event::serializeRefObj(screenContext());
-}
-
-void PlayerItemTransferAfterEvent::serialize(CompoundTag& nbt) const {
+void PlayerItemTransferEvent::serialize(CompoundTag& nbt) const {
     ll::event::PlayerEvent::serialize(nbt);
     nbt["actionType"]    = magic_enum::enum_name(actionType());
     nbt["srcContainer"]  = ll::event::serializeRefObj(srcContainer());
@@ -121,21 +108,10 @@ LL_TYPE_INSTANCE_HOOK(
     return result;
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class PlayerItemTransferBeforeEventEmitter
-: public ll::event::Emitter<beforeEmitterFactory, PlayerItemTransferBeforeEvent> {
-    ll::memory::HookRegistrar<PlayerItemTransferEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<PlayerItemTransferBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class PlayerItemTransferAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, PlayerItemTransferAfterEvent> {
-    ll::memory::HookRegistrar<PlayerItemTransferEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<PlayerItemTransferAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    PlayerItemTransferBeforeEvent,
+    PlayerItemTransferAfterEvent,
+    PlayerItemTransferEventHook
+)
 
 } // namespace Catalyst

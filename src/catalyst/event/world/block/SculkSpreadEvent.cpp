@@ -1,6 +1,6 @@
 #include "SculkSpreadEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/level/WorldBlockTarget.h"
@@ -10,15 +10,7 @@
 
 namespace Catalyst {
 
-void SculkSpreadBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["pos"]             = ListTag{pos().x, pos().y, pos().z};
-    nbt["targetPos"]       = ListTag{targetPos().x, targetPos().y, targetPos().z};
-    nbt["startingFace"]    = (int)startingFace();
-    nbt["spreadDirection"] = (int)spreadDirection();
-}
-
-void SculkSpreadAfterEvent::serialize(CompoundTag& nbt) const {
+void SculkSpreadEvent::serialize(CompoundTag& nbt) const {
     ll::event::world::WorldEvent::serialize(nbt);
     nbt["pos"]             = ListTag{pos().x, pos().y, pos().z};
     nbt["targetPos"]       = ListTag{targetPos().x, targetPos().y, targetPos().z};
@@ -64,20 +56,10 @@ LL_TYPE_INSTANCE_HOOK(
     return result;
 }
 
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory();
-class SculkSpreadBeforeEventEmitter : public ll::event::Emitter<beforeEmitterFactory, SculkSpreadBeforeEvent> {
-    ll::memory::HookRegistrar<SculkSpreadHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> beforeEmitterFactory() {
-    return std::make_unique<SculkSpreadBeforeEventEmitter>();
-}
-
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory();
-class SculkSpreadAfterEventEmitter : public ll::event::Emitter<afterEmitterFactory, SculkSpreadAfterEvent> {
-    ll::memory::HookRegistrar<SculkSpreadHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> afterEmitterFactory() {
-    return std::make_unique<SculkSpreadAfterEventEmitter>();
-}
+CATALYST_HOOKED_EVENT_PAIR(
+    SculkSpreadBeforeEvent,
+    SculkSpreadAfterEvent,
+    SculkSpreadHook
+)
 
 } // namespace Catalyst

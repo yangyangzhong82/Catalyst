@@ -4,6 +4,7 @@
 #include "mc/world/level/block/actor/BlockActor.h"
 #include "mc/world/level/block/actor/HopperBlockActor.h"
 
+#include "catalyst/event/EmitterRegistration.h"
 #include "catalyst/event/actor/ActorOpenContainerEvent.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/EventRefObjSerializer.h"
@@ -77,13 +78,7 @@ static bool SafeCheckVftable(void* ptr, void** expectedVftable) noexcept {
     return *reinterpret_cast<void***>(ptr) == expectedVftable;
 }
 
-void Catalyst::ActorOpenContainerBeforeEvent::serialize(CompoundTag& nbt) const {
-    Cancellable::serialize(nbt);
-    nbt["containerType"] = magic_enum::enum_name(containerType());
-    nbt["blockActor"]    = ll::event::serializePtrObj(blockActor());
-}
-
-void Catalyst::ActorOpenContainerAfterEvent::serialize(CompoundTag& nbt) const {
+void Catalyst::ActorOpenContainerEvent::serialize(CompoundTag& nbt) const {
     ll::event::ActorEvent::serialize(nbt);
     nbt["containerType"] = magic_enum::enum_name(containerType());
     nbt["blockActor"]    = ll::event::serializePtrObj(blockActor());
@@ -289,3 +284,19 @@ LL_TYPE_INSTANCE_HOOK(
         bus.publish(afterEvent);
     }
 }
+
+namespace Catalyst {
+
+CATALYST_HOOKED_EVENT_PAIR(
+    ActorOpenContainerBeforeEvent,
+    ActorOpenContainerAfterEvent,
+    HopperBlockActorStartOpenHook,
+    BarrelBlockActorStartOpenHook,
+    ChestBlockActorStartOpenHook,
+    EnderChestContainerStartOpenHook,
+    FurnaceBlockActorStartOpenHook,
+    ShulkerBoxBlockActorStartOpenHook,
+    BrewingStandBlockActorStartOpenHook
+)
+
+} // namespace Catalyst

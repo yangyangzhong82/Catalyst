@@ -1,6 +1,6 @@
 #include "ActorPressurePlateTriggerEvent.h"
 
-#include "ll/api/event/Emitter.h"
+#include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/level/BlockPos.h"
@@ -41,13 +41,6 @@ LL_TYPE_INSTANCE_HOOK(
     return origin(region, pos, entity);
 }
 
-static std::unique_ptr<ll::event::EmitterBase> emitterFactory();
-class ActorPressurePlateTriggerBeforeEventEmitter
-: public ll::event::Emitter<emitterFactory, ActorPressurePlateTriggerBeforeEvent> {
-    ll::memory::HookRegistrar<ActorPressurePlateTriggerEventHook> hook;
-};
-static std::unique_ptr<ll::event::EmitterBase> emitterFactory() {
-    return std::make_unique<ActorPressurePlateTriggerBeforeEventEmitter>();
-}
+CATALYST_HOOKED_EMITTER(ActorPressurePlateTriggerBeforeEvent, ActorPressurePlateTriggerEventHook)
 
 } // namespace Catalyst

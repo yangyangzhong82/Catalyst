@@ -12,13 +12,13 @@ namespace Catalyst {
 
 enum class ContainerType { Hopper, Barrel, Chest, EnderChest, Furnace, ShulkerBox, BrewingStand, Unknown };
 
-class CATALYST_API ActorOpenContainerBeforeEvent final : public ll::event::Cancellable<ll::event::ActorEvent> {
+class CATALYST_API ActorOpenContainerEvent : public ll::event::ActorEvent {
     ContainerType mContainerType;
     BlockActor*   mBlockActor;
 
 public:
-    constexpr ActorOpenContainerBeforeEvent(Actor& actor, ContainerType containerType, BlockActor* blockActor)
-    : Cancellable(actor),
+    constexpr ActorOpenContainerEvent(Actor& actor, ContainerType containerType, BlockActor* blockActor)
+    : ActorEvent(actor),
       mContainerType(containerType),
       mBlockActor(blockActor) {}
 
@@ -28,20 +28,14 @@ public:
     BlockActor*   blockActor() const { return mBlockActor; }
 };
 
-class CATALYST_API ActorOpenContainerAfterEvent final : public ll::event::ActorEvent {
-    ContainerType mContainerType;
-    BlockActor*   mBlockActor;
-
+class CATALYST_API ActorOpenContainerBeforeEvent final : public ll::event::Cancellable<ActorOpenContainerEvent> {
 public:
-    constexpr ActorOpenContainerAfterEvent(Actor& actor, ContainerType containerType, BlockActor* blockActor)
-    : ActorEvent(actor),
-      mContainerType(containerType),
-      mBlockActor(blockActor) {}
+    using Cancellable::Cancellable;
+};
 
-    void serialize(CompoundTag&) const override;
-
-    ContainerType containerType() const { return mContainerType; }
-    BlockActor*   blockActor() const { return mBlockActor; }
+class CATALYST_API ActorOpenContainerAfterEvent final : public ActorOpenContainerEvent {
+public:
+    using ActorOpenContainerEvent::ActorOpenContainerEvent;
 };
 
 } // namespace Catalyst
