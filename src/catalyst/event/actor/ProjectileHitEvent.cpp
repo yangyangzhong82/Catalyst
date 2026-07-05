@@ -4,13 +4,10 @@
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/EventRefObjSerializer.h"
 #include "ll/api/memory/Hook.h"
-#include "mc/common/WeakPtr.h"
-#include "mc/deps/ecs/gamerefs_entity/EntityContext.h"
-#include "mc/deps/ecs/gamerefs_entity/StackResultStorageEntity.h"
 #include "mc/deps/nbt/CompoundTag.h"
+#include "mc/deps/shared_types/legacy/actor/ActorDamageCause.h"
 #include "mc/deps/vanilla_components/ActorTypeComponent.h"
 #include "mc/entity/components/ActorGameTypeComponent.h"
-#include "mc/entity/components/ActorOwnerComponent.h"
 #include "mc/entity/components/ActorRotationComponent.h"
 #include "mc/entity/components_json_legacy/OnHitSubcomponent.h"
 #include "mc/entity/components_json_legacy/ProjectileComponent.h"
@@ -18,6 +15,8 @@
 #include "mc/gameplayhandlers/CoordinatorResult.h"
 #include "mc/legacy/ActorUniqueID.h"
 #include "mc/world/actor/Actor.h"
+#include "mc/world/actor/ActorDamageByActorSource.h"
+#include "mc/world/actor/ActorDamageByChildActorSource.h"
 #include "mc/world/actor/projectile/ThrownTrident.h"
 #include "mc/world/events/ActorEventCoordinator.h"
 #include "mc/world/events/ActorGameplayEvent.h"
@@ -36,6 +35,8 @@
 #include "mc/world/level/block/VanillaBlockTypeGroups.h"
 #include "mc/world/level/block/VanillaStates.h"
 #include "mc/world/level/block/registry/BlockTypeRegistry.h"
+#include "mc/world/level/storage/GameRuleId.h"
+#include "mc/world/level/storage/GameRules.h"
 #include "mc/world/phys/HitResultType.h"
 
 namespace Catalyst {
@@ -66,17 +67,7 @@ void playProjectileHitSound(Actor& owner, SharedTypes::Legacy::LevelSoundEvent s
 }
 
 Actor* resolveHitActor(HitResult const& hitResult) {
-    StackResultStorageEntity hitEntity(hitResult.mEntity);
-    if (!hitEntity) {
-        return nullptr;
-    }
-
-    auto actorOwner = hitEntity->tryGetComponent<ActorOwnerComponent>();
-    if (!actorOwner) {
-        return nullptr;
-    }
-
-    return actorOwner->mActor.get();
+    return hitResult.getEntity();
 }
 
 bool shouldIgnoreHitEntity(Actor* hitActor) {
@@ -84,6 +75,14 @@ bool shouldIgnoreHitEntity(Actor* hitActor) {
 }
 
 bool tryIgniteTntOnHit(Actor& owner, BlockSource& region, BlockPos const& pos, Block const& block) {
+    GameRuleId doTntExplodeId;
+    doTntExplodeId.mValue = static_cast<int>(GameRules::GameRulesIndex::DoTntExplode);
+
+    auto& gameRules = owner.getLevel().getGameRules();
+    if (!gameRules.hasRule(doTntExplodeId) || !gameRules.getBool(doTntExplodeId, false)) {
+        return false;
+    }
+
     auto const& tntIds     = VanillaBlockTypeGroups::TntIds();
     auto const& blockName  = block.getBlockType().mNameInfo->mFullName.get();
     auto        isTntBlock = std::any_of(tntIds.begin(), tntIds.end(), [&](auto const& entry) {
@@ -138,7 +137,12 @@ bool applyStopOnHurtMotion(ProjectileComponent& component, Actor& owner, Actor* 
         return false;
     }
 
-    auto look                                                  = hitActor->getViewVector(1.0f).normalized();
+    auto look = hitActor->getViewVector(1.0f);
+    if (auto length = look.length(); length >= 0.0001) {
+        look = look / static_cast<float>(length);
+    } else {
+        look = Vec3::ZERO();
+    }
     owner.mBuiltInComponents->mStateVectorComponent->mPosDelta = look * 0.5f;
     return true;
 }
@@ -167,6 +171,26 @@ void handleReturningProjectileOwner(ProjectileComponent& component, Actor& owner
     component.mDamageOwner               = true;
     component.mWaitingForServerHitGround = true;
     component.mCachedHitResult           = HitResult{};
+}
+
+void tryReflectHitProjectileOnHurt(Actor& owner, Actor* hitActor) {
+    if (hitActor == nullptr) {
+        return;
+    }
+
+    auto hitProjectile = hitActor->getEntityContext().tryGetComponent<ProjectileComponent>();
+    if (!hitProjectile) {
+        return;
+    }
+
+    auto* sourceActor = owner.getLevel().fetchEntity(owner.getSourceUniqueID(), false);
+    if (sourceActor != nullptr) {
+        ActorDamageByChildActorSource damageSource(owner, *sourceActor, SharedTypes::Legacy::ActorDamageCause::Projectile);
+        hitProjectile->_tryReflectOnHurt(*hitActor, damageSource);
+    } else {
+        ActorDamageByActorSource damageSource(owner, SharedTypes::Legacy::ActorDamageCause::Projectile);
+        hitProjectile->_tryReflectOnHurt(*hitActor, damageSource);
+    }
 }
 
 void serializeHitEventCommon(CompoundTag& nbt, HitResult const& hitResult) {
@@ -215,7 +239,7 @@ LL_TYPE_INSTANCE_HOOK(
     mHitActor  = hitResult.mType == HitResultType::Entity;
     mHitWater  = hitResult.mIsHitLiquid;
 
-    if (sendProjectileHitEvent(owner, mHitResult.get()) != CoordinatorResult::Continue) {
+    if (sendProjectileHitEvent(owner, mHitResult.get()) == CoordinatorResult::Cancel) {
         return;
     }
 
@@ -229,6 +253,8 @@ LL_TYPE_INSTANCE_HOOK(
     if (_tryReflect(owner, owner.getLevel())) {
         return;
     }
+
+    tryReflectHitProjectileOnHurt(owner, hitActor);
 
     for (auto* subcomponent : mOnHitCommands.get()) {
         if (subcomponent != nullptr) {
@@ -265,3 +291,4 @@ CATALYST_HOOKED_EVENT_PAIR(
 )
 
 } // namespace Catalyst
+

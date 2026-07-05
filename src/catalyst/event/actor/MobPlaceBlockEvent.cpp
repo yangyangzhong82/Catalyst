@@ -1,26 +1,21 @@
 #include "MobPlaceBlockEvent.h"
 
-#include "catalyst/mod/Gloabl.h"
 #include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
+#include "mc/util/BlockUtils.h"
 #include "mc/util/Random.h"
 #include "mc/util/VariantParameterList.h"
 #include "mc/util/VariantParameterListConst.h"
 #include "mc/world/actor/ActorDefinitionDescriptor.h"
 #include "mc/world/actor/Mob.h"
 #include "mc/world/actor/ai/goal/PlaceBlockGoal.h"
-#include "mc/deps/core/math/Vec3.h"
 #include "mc/world/events/gameevents/GameEventRegistry.h"
 #include "mc/world/item/ItemStack.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/BlockSource.h"
-#include "mc/world/level/Level.h"
-#include "mc/world/level/block/ActorChangeContext.h"
 #include "mc/world/level/block/BlockChangeContext.h"
 #include "mc/world/level/block/Block.h"
-#include "mc/world/level/dimension/Dimension.h"
-#include "mc/network/packet/MobEquipmentPacket.h"
 
 #include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
@@ -43,29 +38,16 @@ LL_TYPE_INSTANCE_HOOK(
     void
 ) {
     auto& mob    = this->mMob;
-    auto& level  = mob.getLevel();
-    auto& random = level.getThreadRandom();
-
-    BlockPos targetPos(mob.getPosition());
+    auto& random = mob.getRandom();
 
     // 获取范围配置
-    auto& def     = this->mDefinition.get();
-    auto& xzRange = def.mXZRange.get();
-    auto& yRange  = def.mYRange.get();
-
-    int xzMin = xzRange.rangeMin;
-    int xzMax = xzRange.rangeMax;
-    int yMin  = yRange.rangeMin;
-    int yMax  = yRange.rangeMax;
-
-    // 随机化X坐标
-    targetPos.x += (xzMin < xzMax) ? (random.nextInt(xzMax - xzMin + 1) + xzMin) : xzMin;
-
-    // 随机化Y坐标
-    targetPos.y += (yMin < yMax) ? (random.nextInt(yMax - yMin + 1) + yMin) : yMin;
-
-    // 随机化Z坐标
-    targetPos.z += (xzMin < xzMax) ? (random.nextInt(xzMax - xzMin + 1) + xzMin) : xzMin;
+    auto&    def       = this->mDefinition.get();
+    BlockPos targetPos = BlockUtils::getRandomPos(
+        random,
+        BlockPos(mob.getPosition()),
+        def.mXZRange.get(),
+        def.mYRange.get()
+    );
 
     auto& blockSource = mob.getDimensionBlockSource();
     auto& targetBlock = blockSource.getBlock(targetPos);
@@ -80,7 +62,7 @@ LL_TYPE_INSTANCE_HOOK(
     belowPos.y        -= 1;
     auto& belowBlock   = blockSource.getBlock(belowPos);
 
-    if (belowBlock.isAir() || !blockSource.isSolidBlockingBlock(belowPos)) {
+    if (belowBlock.isAir() || !belowBlock.isSolidBlockingBlock()) {
         return;
     }
 
@@ -88,17 +70,8 @@ LL_TYPE_INSTANCE_HOOK(
 
     // 区分两种放置模式
     VariantParameterList triggerParams{};
-    triggerParams.mSelf   = &mob;
-    triggerParams.mTarget = mob.getTarget();
-    triggerParams.mBlock  = &targetPos;
-
-    VariantParameterListConst blockPickParams{};
-    blockPickParams.mSelf   = &mob;
-    blockPickParams.mTarget = mob.getTarget();
-    blockPickParams.mBlock  = &targetPos;
-
-    BlockChangeContext changeContext;
-    changeContext.mContextSource = ActorChangeContext{&mob};
+    mob.initParams(triggerParams);
+    triggerParams.mBlock = &targetPos;
 
     auto& randomBlocks = def.mRandomlyPlaceableBlocks.get();
 
@@ -116,25 +89,8 @@ LL_TYPE_INSTANCE_HOOK(
         if (beforeEvent.isCancelled()) {
             return;
         }
-        // 调用 _tryPlaceCarriedBlock
-        if (!blockSource.mayPlace(*toPlace, targetPos, 1, &mob, false, Vec3(0.0f, 0.0f, 0.0f))) {
-            return;
-        }
 
-        mob.setCarriedItem(ItemStack::EMPTY_ITEM());
-        {
-            MobEquipmentPacket pkt(mob.getRuntimeID(), ItemStack::EMPTY_ITEM(), 0, 0, ContainerID::Inventory);
-            mob.getDimension().sendPacketForEntity(mob, pkt, nullptr);
-        }
-
-        if (!blockSource.setBlock(targetPos, *toPlace, 3, nullptr, changeContext)) {
-            return;
-        }
-
-        blockSource.postGameEvent(&mob, GameEventRegistry::blockPlace(), targetPos, toPlace);
-
-        std::vector<std::pair<std::string const, std::string const>> eventStack;
-        ActorDefinitionDescriptor::_executeTrigger(mob, def.mOnPlace.get(), eventStack, triggerParams);
+        this->_tryPlaceCarriedBlock(blockSource, targetPos, triggerParams);
 
         // 发布 AfterEvent
         auto& afterBlock = blockSource.getBlock(targetPos);
@@ -144,6 +100,7 @@ LL_TYPE_INSTANCE_HOOK(
         }
     } else {
         // 模式B:  (_tryGetRandomPlaceBlock)
+        VariantParameterListConst blockPickParams = static_cast<VariantParameterListConst>(triggerParams);
         auto const* randomBlock = this->_tryGetRandomPlaceBlock(blockPickParams, random);
 
         if (randomBlock) {
@@ -155,15 +112,14 @@ LL_TYPE_INSTANCE_HOOK(
             }
 
             // 调用 _placeBlock
+            BlockChangeContext changeContext{};
             if (!blockSource.setBlock(targetPos, *randomBlock, 3, nullptr, changeContext)) {
                 return;
             }
 
             blockSource.postGameEvent(&mob, GameEventRegistry::blockPlace(), targetPos, randomBlock);
 
-            std::vector<std::pair<std::string const, std::string const>> eventStack;
-            ActorDefinitionDescriptor::_executeTrigger(mob, def.mOnPlace.get(), eventStack, triggerParams);
-            // 执行触发器 (_executeTrigger)
+            ActorDefinitionDescriptor::executeTrigger(mob, def.mOnPlace.get(), triggerParams);
 
             // 发布 AfterEvent
             auto& afterBlock = blockSource.getBlock(targetPos);
@@ -182,3 +138,4 @@ CATALYST_HOOKED_EVENT_PAIR(
 )
 
 } // namespace Catalyst
+

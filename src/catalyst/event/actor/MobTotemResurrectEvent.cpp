@@ -1,24 +1,21 @@
 #include "MobTotemResurrectEvent.h"
 
 #include <algorithm>
+#include <optional>
 
 #include "mc/deps/shared_types/legacy/LevelEvent.h"
 #include "mc/deps/shared_types/legacy/actor/ActorDamageCause.h"
-#include "mc/entity/components/FallDistanceComponent.h"
 #include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/ActorDamageSource.h"
 #include "mc/world/actor/ActorEvent.h"
 #include "mc/world/actor/Mob.h"
+#include "mc/world/attribute/AttributeInstanceForwarder.h"
 #include "mc/world/attribute/AttributeBuffType.h"
-#include "mc/world/attribute/Attribute.h"
-#include "mc/world/attribute/AttributeInstance.h"
-#include "mc/world/attribute/AttributeInstanceRef.h"
-#include "mc/world/attribute/AttributeModificationContext.h"
-#include "mc/world/attribute/BaseAttributeMap.h"
 #include "mc/world/attribute/InstantaneousAttributeBuff.h"
 #include "mc/world/attribute/SharedAttributes.h"
+#include "mc/world/attribute/ValidMutableAttributeWithContext.h"
 #include "mc/world/effect/EffectDuration.h"
 #include "mc/world/effect/MobEffect.h"
 #include "mc/world/effect/MobEffectInstance.h"
@@ -58,19 +55,19 @@ LL_TYPE_INSTANCE_HOOK(
     HookPriority::Normal,
     Mob,
     &Mob::checkTotemDeathProtection,
-    bool,
+    std::optional<float>,
     ::ActorDamageSource const& killingDamage
 ) {
-    auto const damageCause = killingDamage.mCause;
+    auto const damageCause = killingDamage.getCause();
     if (
         damageCause == SharedTypes::Legacy::ActorDamageCause::Void
         || damageCause == SharedTypes::Legacy::ActorDamageCause::SelfDestruct
     ) {
-        return false;
+        return std::nullopt;
     }
 
     auto const& beforeTotem = this->getEquippedTotem();
-    bool        hadTotem    = !beforeTotem.isNull();
+    bool        hadTotem    = this->hasTotemEquipped();
 
     auto& bus = ll::event::EventBus::getInstance();
 
@@ -90,66 +87,56 @@ LL_TYPE_INSTANCE_HOOK(
     MobTotemResurrectBeforeEvent beforeEvent(*this, killingDamage, beforeTotem, hadTotem, std::move(totemEffects));
     bus.publish(beforeEvent);
     if (beforeEvent.isCancelled()) {
-        return false;
+        return std::nullopt;
     }
 
     auto const effectsToApply = beforeEvent.effects();
     auto const& totem         = this->getEquippedTotem();
-    bool        hasTotem      = !totem.isNull();
+    bool        hasTotem      = this->hasTotemEquipped();
 
-    bool result = false;
+    std::optional<float> result;
     if (hasTotem) {
         // Restore health to exactly 1.0f, same behavior as vanilla totem protection path.
-        auto*                attributeMap = const_cast<BaseAttributeMap*>(this->getAttributes().get());
-        AttributeInstanceRef healthRef    = attributeMap->getMutableInstance(SharedAttributes::HEALTH().mIDValue);
-        if (healthRef.mPtr) {
-            AttributeModificationContext context{};
-            context.mAttributeMap = attributeMap;
+        auto health = this->getValidMutableAttribute(SharedAttributes::HEALTH());
+        float const currentHealth = health->getCurrentValue();
+        InstantaneousAttributeBuff healthBuff(1.0f - currentHealth, AttributeBuffType::TotemOfUndying);
+        result = health->addBuff(healthBuff);
 
-            float const healthBuffValue = 1.0f - healthRef.mPtr->mCurrentValue;
-            if (healthBuffValue > 0.0f) {
-                InstantaneousAttributeBuff healthBuff(healthBuffValue, AttributeBuffType::None);
-                healthRef.mPtr->addBuff(healthBuff, context);
+        if (result) {
+            this->removeAllEffects();
+
+            auto applyTotemEffect = [this](MobTotemResurrectEffect const& config) {
+                MobEffect* effect = config.effect;
+                if (!effect) {
+                    return;
+                }
+                EffectDuration duration{};
+                duration.mValue = std::max(0, config.durationTicks);
+                MobEffectInstance effectInstance(effect->mId, duration, std::max(0, config.amplifier));
+                effectInstance.mEffectVisible = config.visible;
+                this->addEffect(effectInstance);
+            };
+
+            for (auto const& effect : effectsToApply) {
+                applyTotemEffect(effect);
             }
+
+            this->setFallDistance(0.0f);
+
+            auto& level = this->getLevel();
+            level.broadcastActorEvent(*this, ActorEvent::TalismanActivate, 0, std::nullopt);
+            level.broadcastLocalEvent(
+                this->getDimensionBlockSource(),
+                SharedTypes::Legacy::LevelEvent::SoundTotemUsed,
+                this->getPosition(),
+                0
+            );
+
+            this->consumeTotem();
         }
-
-        this->removeAllEffects();
-
-        auto applyTotemEffect = [this](MobTotemResurrectEffect const& config) {
-            MobEffect* effect = config.effect;
-            if (!effect) {
-                return;
-            }
-            MobEffectInstance effectInstance(effect->mId);
-            EffectDuration duration{};
-            duration.mValue              = std::max(0, config.durationTicks);
-            effectInstance.mDuration     = duration;
-            effectInstance.mAmplifier    = std::max(0, config.amplifier);
-            effectInstance.mEffectVisible = config.visible;
-            this->addEffect(effectInstance);
-        };
-
-        for (auto const& effect : effectsToApply) {
-            applyTotemEffect(effect);
-        }
-
-        auto& fallDistance = this->getEntityContext().getOrAddComponent<FallDistanceComponent>();
-        fallDistance.mValue = 0.0f;
-
-        auto& level = this->getLevel();
-        level.broadcastActorEvent(*this, ActorEvent::TalismanActivate, 0);
-        level.broadcastLocalEvent(
-            this->getDimensionBlockSource(),
-            SharedTypes::Legacy::LevelEvent::SoundTotemUsed,
-            this->getPosition(),
-            0
-        );
-
-        this->consumeTotem();
-        result = true;
     }
 
-    MobTotemResurrectAfterEvent afterEvent(*this, killingDamage, totem, hasTotem, result, effectsToApply);
+    MobTotemResurrectAfterEvent afterEvent(*this, killingDamage, totem, hasTotem, result.has_value(), effectsToApply);
     bus.publish(afterEvent);
 
     return result;

@@ -29,7 +29,7 @@
 #include "mc/world/level/block/VanillaBlockTypeGroups.h"
 #include "mc/world/level/block/VanillaBlockTypeIds.h"
 #include "mc/world/level/material/Material.h"
-#include "mc/world/level/material/MaterialType.h"
+#include "mc/deps/shared_types/v1_26_20/block/MaterialType.h"
 #include "mc/world/level/storage/GameRuleId.h"
 #include "mc/world/level/storage/GameRules.h"
 
@@ -164,7 +164,7 @@ LL_TYPE_INSTANCE_HOOK(
                     }
 
                     auto const materialType = block.mBlockType->mMaterial.mType;
-                    if (materialType == MaterialType::Air || materialType == MaterialType::Fire) {
+                    if (materialType == SharedTypes::v1_26_20::MaterialType::Air || materialType == SharedTypes::v1_26_20::MaterialType::Fire) {
                         continue;
                     }
 
