@@ -142,8 +142,7 @@ void ClientLoginAfterEvent::disconnect(std::string const& message) const {
             SubClientId::PrimaryClient,
             Connection::DisconnectFailReason::Kicked,
             message,
-            std::nullopt,
-            false
+            std::nullopt
         );
         return;
     }
@@ -159,8 +158,7 @@ void ClientLoginAfterEvent::disconnect(std::string const& message) const {
                 SubClientId::PrimaryClient,
                 Connection::DisconnectFailReason::Kicked,
                 message,
-                std::nullopt,
-                false
+                std::nullopt
             );
             break;
         }

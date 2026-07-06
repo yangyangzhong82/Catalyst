@@ -27,7 +27,7 @@
 #include "mc/world/level/chunk/LevelChunk.h"
 #include "mc/world/level/dimension/Dimension.h"
 #include "mc/world/level/material/Material.h"
-#include "mc/world/level/material/MaterialType.h"
+#include "mc/deps/shared_types/v1_26_20/block/MaterialType.h"
 #include "mc/world/level/storage/GameRuleId.h"
 #include "mc/world/level/storage/GameRules.h"
 
@@ -78,6 +78,17 @@ static bool isBeehiveBlock(Block const& block) {
     auto const nameHash = block.mBlockType->mNameInfo.get().mFullName.get().mStrHash;
     return nameHash == VanillaBlockTypeIds::Beehive().mStrHash
         || nameHash == VanillaBlockTypeIds::BeeNest().mStrHash;
+}
+
+static void tryAddFireToTickingQueue(
+    FireBlock const& fireBlock,
+    BlockSource&     region,
+    BlockPos const&  pos,
+    IRandom&         random
+) {
+    if (!region.isInstaticking(pos) && !region.hasTickInPendingTicks(pos)) {
+        region.addToRandomTickingQueue(pos, fireBlock.getDefaultState(), random.nextInt(10) + 30, 0, false);
+    }
 }
 
 // checkBurn hook: 按照原版逻辑重写
@@ -280,7 +291,7 @@ LL_TYPE_INSTANCE_HOOK(
     doFireTickId.mValue = static_cast<int>(GameRules::GameRulesIndex::DoFireTick);
 
     if (!gameRules.getBool(doFireTickId, true)) {
-        _tryAddToTickingQueue(region, firePos, random);
+        tryAddFireToTickingQueue(*this, region, firePos, random);
         return;
     }
 
@@ -344,14 +355,14 @@ LL_TYPE_INSTANCE_HOOK(
             region.setBlock(firePos, *newBlock, 1, nullptr, ctx);
         }
 
-        _tryAddToTickingQueue(region, firePos, random);
+        tryAddFireToTickingQueue(*this, region, firePos, random);
 
         // 进入 LABEL_45 逻辑 (有效性检查)
         goto LABEL_45;
     }
 
     // 对于无限燃烧方块或 age >= 15
-    _tryAddToTickingQueue(region, firePos, random);
+    tryAddFireToTickingQueue(*this, region, firePos, random);
 
     if (!isInfiniburn) {
         // age >= 15 的情况
@@ -366,7 +377,7 @@ LABEL_45:
     // 有效性检查逻辑
     {
         // TNT 材质检查
-        if (belowMaterialType == MaterialType::Explosive && !gameRules.getBool(doTntExplodeId, true)) {
+        if (belowMaterialType == SharedTypes::v1_26_20::MaterialType::Explosive && !gameRules.getBool(doTntExplodeId, true)) {
             // 材质是爆炸物且禁止TNT爆炸，跳过有效性检查
             goto CHECK_AGE_REMOVE;
         }
@@ -378,7 +389,7 @@ LABEL_45:
             BlockPos belowFirePos(firePos.x, firePos.y - 1, firePos.z);
             auto const& liquidBelow = region.getLiquidBlock(belowFirePos);
 
-            if (liquidBelow.mBlockType->mMaterial.mType != MaterialType::Water) {
+            if (liquidBelow.mBlockType->mMaterial.mType != SharedTypes::v1_26_20::MaterialType::Water) {
                 // 没有水，检查 flameOdds/age/random 条件
                 auto const& blockBelowFire = region.getBlock(belowFirePos);
                 auto        flameOdds      = static_cast<ushort>(blockBelowFire.mDirectData.get().mFlameOdds);
@@ -396,7 +407,7 @@ LABEL_45:
 
         // 无效位置或有水，检查下方是否为实心顶面方块
         BlockPos belowFirePos(firePos.x, firePos.y - 1, firePos.z);
-        if (!FireBlock::isSolidToppedBlock(region, belowFirePos)) {
+        if (!region.getBlock(belowFirePos).canProvideFullSupport(1u)) {
             goto REMOVE_FIRE;
         }
         // 有实心顶面，继续
@@ -517,7 +528,7 @@ LABEL_55:
                     if (newFireBlock) {
                         BlockChangeContext ctx{};
                         region.setBlock(testPos, *newFireBlock, 1, nullptr, ctx);
-                        _tryAddToTickingQueue(region, testPos, random);
+                        tryAddFireToTickingQueue(*this, region, testPos, random);
 
                         // 发布 after 事件
                         FireSpreadAfterEvent spreadAfterEvent(region, testPos, firePos, newFireAge, age);

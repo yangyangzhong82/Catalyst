@@ -8,7 +8,7 @@
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/block/LiquidBlock.h"
 #include "mc/world/level/material/Material.h"
-#include "mc/world/level/material/MaterialType.h"
+#include "mc/deps/shared_types/v1_26_20/block/MaterialType.h"
 
 #include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
@@ -46,7 +46,7 @@ bool liquidBlockCanSpreadTo(
 
     if (const auto& block = region.getLiquidBlock(pos);
         materialsAreEqual(block.getBlockType().mMaterial, liquidBlock.mMaterial)
-        || block.getBlockType().mMaterial.mType == MaterialType::Lava
+        || block.getBlockType().mMaterial.mType == SharedTypes::v1_26_20::MaterialType::Lava
         || liquidBlock._isLiquidBlocking(region, pos, flowFromPos, flowFromDirection)) {
         return false;
     }

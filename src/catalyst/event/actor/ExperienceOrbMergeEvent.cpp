@@ -13,7 +13,7 @@
 
 #include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
-
+#include "mc/world/actor/DataItem.h"
 namespace Catalyst {
 
 void ExperienceOrbMergeEvent::serialize(CompoundTag& nbt) const {
@@ -32,7 +32,9 @@ void ExperienceOrbMergeAfterEvent::serialize(CompoundTag& nbt) const {
     nbt["oldPickupCount"] = oldPickupCount();
     nbt["newPickupCount"] = newPickupCount();
 }
-
+int getOrbValue(ExperienceOrb& orb) {
+    return orb.mEntityData->getInt(static_cast<ushort>(ActorDataIDs::Value));
+}
 
 LL_TYPE_INSTANCE_HOOK(
     ExperienceOrbMergeEventHook,
@@ -44,7 +46,7 @@ LL_TYPE_INSTANCE_HOOK(
     auto& bus    = ll::event::EventBus::getInstance();
     auto& region = this->getDimensionBlockSource();
     auto  range  = this->getAABB().cloneAndGrow(Vec3{0.5f, 0.5f, 0.5f});
-    int   selfValue = this->getValue();
+    int   selfValue = getOrbValue(*this);
     auto  selfId    = this->getOrCreateUniqueID();
 
     auto xpOrbs = region.fetchEntities(
@@ -67,7 +69,7 @@ LL_TYPE_INSTANCE_HOOK(
         auto* otherOrb = static_cast<ExperienceOrb*>(actor);
 
         // Must have same value.
-        if (otherOrb->getValue() != selfValue) {
+        if (getOrbValue(*otherOrb) != selfValue) {
             continue;
         }
 

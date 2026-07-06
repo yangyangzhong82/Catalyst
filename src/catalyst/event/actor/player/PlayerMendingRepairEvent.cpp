@@ -8,15 +8,11 @@
 #include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
-#include "mc/entity/components/ActorEquipmentComponent.h"
 #include "mc/entity/components/SynchedActorDataComponent.h"
-#include "mc/world/SimpleContainer.h"
 #include "mc/world/actor/ActorDataIDs.h"
 #include "mc/world/actor/DataItem.h"
 #include "mc/world/actor/item/ExperienceOrb.h"
-#include "mc/world/actor/player/Inventory.h"
 #include "mc/world/actor/player/Player.h"
-#include "mc/world/actor/player/PlayerInventory.h"
 #include "mc/world/item/enchanting/EnchantUtils.h"
 #include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
@@ -58,38 +54,21 @@ bool isRepairableMendingItem(ItemStack const& item) {
 }
 
 std::optional<MendingTarget> resolveMendingTarget(Player& player, ItemStack const& targetItem) {
-    if (!player.mInventory) {
-        return std::nullopt;
+    ItemStack const& selectedItem = player.getSelectedItem();
+    if (isSameStack(targetItem, selectedItem)) {
+        return MendingTarget{ContainerID::Inventory, player.getSelectedItemSlot(), std::nullopt};
     }
 
-    PlayerInventory& playerInventory = *player.mInventory;
-
-    if (playerInventory.mSelectedContainerId == ContainerID::Inventory) {
-        ItemStack const& selectedItem = playerInventory.mInventory->getItem(playerInventory.mSelected);
-        if (isSameStack(targetItem, selectedItem)) {
-            return MendingTarget{ContainerID::Inventory, playerInventory.mSelected, std::nullopt};
-        }
+    ItemStack const& offhandItem = player.getOffhandSlot();
+    if (isSameStack(targetItem, offhandItem)) {
+        return MendingTarget{ContainerID::Offhand, 1, std::nullopt};
     }
 
-    auto equipment = player.getEntityContext().tryGetComponent<ActorEquipmentComponent>();
-    if (!equipment) {
-        return std::nullopt;
-    }
-
-    if (equipment->mHand) {
-        ItemStack const& offhandItem = equipment->mHand->getItem(1);
-        if (isSameStack(targetItem, offhandItem)) {
-            return MendingTarget{ContainerID::Offhand, 1, std::nullopt};
-        }
-    }
-
-    if (equipment->mArmor) {
-        for (int slot = 0; slot < static_cast<int>(SharedTypes::Legacy::ArmorSlot::HumanoidCount); ++slot) {
-            auto const       armorSlot = static_cast<SharedTypes::Legacy::ArmorSlot>(slot);
-            ItemStack const& armorItem = equipment->mArmor->getItem(slot);
-            if (isSameStack(targetItem, armorItem)) {
-                return MendingTarget{ContainerID::Armor, slot, armorSlot};
-            }
+    for (int slot = 0; slot < static_cast<int>(SharedTypes::Legacy::ArmorSlot::HumanoidCount); ++slot) {
+        auto const       armorSlot = static_cast<SharedTypes::Legacy::ArmorSlot>(slot);
+        ItemStack const& armorItem = player.getArmor(armorSlot);
+        if (isSameStack(targetItem, armorItem)) {
+            return MendingTarget{ContainerID::Armor, slot, armorSlot};
         }
     }
 
@@ -97,27 +76,16 @@ std::optional<MendingTarget> resolveMendingTarget(Player& player, ItemStack cons
 }
 
 ItemStack const* getMendingTargetItem(Player& player, MendingTarget const& target) {
-    if (!player.mInventory) {
-        return nullptr;
-    }
-
     switch (target.containerId) {
     case ContainerID::Inventory:
-        return std::addressof(player.mInventory->mInventory->getItem(target.slot));
-    case ContainerID::Offhand: {
-        auto equipment = player.getEntityContext().tryGetComponent<ActorEquipmentComponent>();
-        if (!equipment || !equipment->mHand) {
+        return std::addressof(player.getSelectedItem());
+    case ContainerID::Offhand:
+        return std::addressof(player.getOffhandSlot());
+    case ContainerID::Armor:
+        if (!target.armorSlot) {
             return nullptr;
         }
-        return std::addressof(equipment->mHand->getItem(target.slot));
-    }
-    case ContainerID::Armor: {
-        auto equipment = player.getEntityContext().tryGetComponent<ActorEquipmentComponent>();
-        if (!equipment || !equipment->mArmor) {
-            return nullptr;
-        }
-        return std::addressof(equipment->mArmor->getItem(target.slot));
-    }
+        return std::addressof(player.getArmor(*target.armorSlot));
     default:
         return nullptr;
     }
@@ -136,11 +104,15 @@ DataItem* getOrbValueDataItem(ExperienceOrb& orb) {
     }
 
     DataItem* dataItem = (*items)[index].get();
-    if (!dataItem || !dataItem->getData<short>()) {
+    if (!dataItem || !dataItem->getData<int>()) {
         return nullptr;
     }
 
     return dataItem;
+}
+
+int getOrbValue(ExperienceOrb& orb) {
+    return orb.mEntityData->getInt(static_cast<ushort>(ActorDataIDs::Value));
 }
 
 bool setOrbValue(ExperienceOrb& orb, DataItem& dataItem, int value) {
@@ -149,12 +121,12 @@ bool setOrbValue(ExperienceOrb& orb, DataItem& dataItem, int value) {
         return false;
     }
 
-    auto dataRef = dataItem.getData<short>();
+    auto dataRef = dataItem.getData<int>();
     if (!dataRef) {
         return false;
     }
 
-    auto newValue = static_cast<short>(std::max(0, value));
+    int newValue = std::max(0, value);
     if (*dataRef != newValue) {
         *dataRef = newValue;
         synchedActorData->mData->mDirtyFlags->set(static_cast<size_t>(ActorDataIDs::Value));
@@ -184,7 +156,7 @@ LL_TYPE_INSTANCE_HOOK(
     }
 
     int oldDamage    = originalTarget.getDamageValue();
-    int oldOrbValue  = this->getValue();
+    int oldOrbValue  = getOrbValue(*this);
     int repairAmount = std::min(oldDamage, oldOrbValue * 2);
     if (repairAmount <= 0) {
         return origin(player);
@@ -243,7 +215,7 @@ LL_TYPE_INSTANCE_HOOK(
             std::move(finalItem),
             finalRepairAmount,
             oldOrbValue,
-            this->getValue()
+            getOrbValue(*this)
         );
         bus.publish(afterEvent);
         return;
@@ -258,7 +230,7 @@ LL_TYPE_INSTANCE_HOOK(
     switch (target->containerId) {
     case ContainerID::Inventory:
         player.mTransactionManager->_createServerSideAction(originalTarget, repairedItem);
-        player.mInventory->mInventory->setItem(target->slot, repairedItem);
+        player.setSelectedItem(repairedItem);
         break;
     case ContainerID::Offhand:
         player.setOffhandSlot(repairedItem);
@@ -284,6 +256,7 @@ LL_TYPE_INSTANCE_HOOK(
     if (finalRepairAmount <= 0) {
         return;
     }
+    int finalOrbValue = getOrbValue(*this);
 
     PlayerMendingRepairAfterEvent afterEvent(
         player,
@@ -295,7 +268,7 @@ LL_TYPE_INSTANCE_HOOK(
         std::move(finalItem),
         finalRepairAmount,
         oldOrbValue,
-        this->getValue()
+        finalOrbValue
     );
     bus.publish(afterEvent);
 }
@@ -307,3 +280,4 @@ CATALYST_HOOKED_EVENT_PAIR(
 )
 
 } // namespace Catalyst
+

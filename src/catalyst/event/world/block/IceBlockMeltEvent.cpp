@@ -16,10 +16,12 @@
 #include "mc/world/level/block/IceBlock.h"
 #include "mc/world/level/block/VanillaBlockTypeIds.h"
 #include "mc/world/level/block/registry/BlockTypeRegistry.h"
+#include "mc/world/level/dimension/DimensionType.h"
 #include "mc/world/level/dimension/VanillaDimensions.h"
 
 #include "mc/deps/nbt/CompoundTag.h"
 #include "ll/api/event/EventRefObjSerializer.h"
+#include <optional>
 
 namespace Catalyst {
 
@@ -72,7 +74,8 @@ LL_STATIC_HOOK(
             pos.center(),
             -1,
             ActorSoundIdentifier{},
-            false
+            false,
+            ::std::nullopt
         );
 
         Vec3 particlePos{

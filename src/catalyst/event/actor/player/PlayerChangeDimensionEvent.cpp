@@ -30,7 +30,7 @@ LL_TYPE_INSTANCE_HOOK(
     ChangeDimensionRequest&& changeRequest
 ) {
     int  fromId    = player.getDimensionId();
-    int  toId      = changeRequest.mToDimensionId->id;
+    int  toId      = changeRequest.mToDimensionId->mValue;
     bool respawn   = changeRequest.mRespawn;
     bool usePortal = changeRequest.mUsePortal;
 

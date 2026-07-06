@@ -11,6 +11,7 @@
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/Actor.h"
 #include "mc/world/level/BlockSource.h"
+#include "mc/world/level/Level.h"
 #include "mc/world/level/PortalForcer.h"
 #include "mc/world/level/PortalShape.h"
 #include "mc/world/level/block/BedrockBlockNames.h"
@@ -21,6 +22,9 @@
 #include "mc/world/level/block/VanillaStates.h"
 #include "mc/world/level/block/registry/BlockTypeRegistry.h"
 #include "mc/world/level/material/Material.h"
+#include "mc/world/level/storage/LevelData.h"
+#include "mc/util/BaseGameVersion.h"
+
 
 namespace std {
 
@@ -123,12 +127,28 @@ static int floorMod(int value, int modulus) {
     return r < 0 ? r + modulus : r;
 }
 
+static bool canPortalReplaceBlock(::BlockSource& source, ::BlockPos const& pos) {
+    auto const& minVersion = ::PortalForcer::MIN_PORTAL_REPLACE_BLOCK_FIX_VERSION();
+    auto const& worldVersion = source.getLevel().getLevelData().getBaseGameVersion();
+    if (!minVersion.isCompatibleWith(worldVersion)) {
+        return source.isEmptyBlock(pos);
+    }
+
+    auto const& block = source.getBlock(pos);
+    if (block.getMaterial().isSolid()) {
+        return false;
+    }
+
+    auto const& extraBlock = source.getExtraBlock(pos);
+    return !extraBlock.getMaterial().isSolid() && block.canBeBuiltOver(source, pos);
+}
+
 static int settleCandidateY(::BlockSource& source, int x, int y, int z, int minY) {
-    if (!::PortalForcer::canPortalReplaceBlock(source, BlockPos{x, y, z})) {
+    if (!canPortalReplaceBlock(source, BlockPos{x, y, z})) {
         return std::numeric_limits<int>::min();
     }
 
-    while (y > minY && ::PortalForcer::canPortalReplaceBlock(source, BlockPos{x, y - 1, z})) {
+    while (y > minY && canPortalReplaceBlock(source, BlockPos{x, y - 1, z})) {
         --y;
     }
     return y;
@@ -185,7 +205,7 @@ static bool validatePortalVolumeFirstPass(
                     if (!hasSolidMaterial(source, blockX, blockY, blockZ)) {
                         return false;
                     }
-                } else if (!::PortalForcer::canPortalReplaceBlock(source, BlockPos{blockX, blockY, blockZ})) {
+                } else if (!canPortalReplaceBlock(source, BlockPos{blockX, blockY, blockZ})) {
                     return false;
                 }
             }
@@ -213,7 +233,7 @@ static bool validatePortalVolumeSecondPass(
                 if (!hasSolidMaterial(source, blockX, blockY, blockZ)) {
                     return false;
                 }
-            } else if (!::PortalForcer::canPortalReplaceBlock(source, BlockPos{blockX, blockY, blockZ})) {
+            } else if (!canPortalReplaceBlock(source, BlockPos{blockX, blockY, blockZ})) {
                 return false;
             }
         }
@@ -552,8 +572,9 @@ LL_TYPE_INSTANCE_HOOK(
     }
     placePortalBlocks(source, candidate.pos, candidate.stepX, candidate.stepZ);
 
-    PortalShape shape{};
-    shape.mAxis = axisFromStep(candidate.stepX, candidate.stepZ);
+    auto        axis = axisFromStep(candidate.stepX, candidate.stepZ);
+    PortalShape shape{source, candidate.pos, axis};
+    shape.mAxis = axis;
     shape.evaluate(candidate.pos, source);
 
     auto dimensionId = source.getDimensionId();
