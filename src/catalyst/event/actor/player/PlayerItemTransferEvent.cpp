@@ -3,9 +3,8 @@
 #include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
-#include "mc/world/actor/player/Inventory.h"
 #include "mc/world/actor/player/Player.h"
-#include "mc/world/actor/player/PlayerInventory.h"
+#include "mc/world/containers/managers/IContainerManager.h"
 #include "mc/world/inventory/network/ItemStackNetManagerBase.h"
 #include "mc/world/inventory/network/ItemStackNetManagerServer.h"
 #include "mc/world/inventory/network/ItemStackNetResult.h"
@@ -59,9 +58,15 @@ LL_TYPE_INSTANCE_HOOK(
     auto const& srcSlotInfo = transferAction.mSrc.get();
     auto const& dstSlotInfo = transferAction.mDst.get();
 
-    // 获取源槽位和目标槽位的物品
-    ItemStack const& srcItem = player.mInventory->mInventory->getItem(srcSlotInfo.mSlot);
-    ItemStack const& dstItem = player.mInventory->mInventory->getItem(dstSlotInfo.mSlot);
+    auto containerManager = player.getContainerManager().lock();
+    if (!containerManager) {
+        return origin(requestAction);
+    }
+
+    // 槽位编号是各 FullContainerName 内的局部索引，必须由当前容器管理器解析。
+    // 在执行请求前复制快照，确保 AfterEvent 仍能表示本次实际转移的物品。
+    ItemStack srcItem = containerManager->getFullContainerSlot(srcSlotInfo.mSlot, srcSlotInfo.mFullContainerName);
+    ItemStack dstItem = containerManager->getFullContainerSlot(dstSlotInfo.mSlot, dstSlotInfo.mFullContainerName);
 
     auto& bus = ll::event::EventBus::getInstance();
 
@@ -86,10 +91,6 @@ LL_TYPE_INSTANCE_HOOK(
     auto result = origin(requestAction);
 
     if (result == ItemStackNetResult::Success) {
-        // AfterEvent 获取转移后的物品状态
-        ItemStack const& newSrcItem = player.mInventory->mInventory->getItem(srcSlotInfo.mSlot);
-        ItemStack const& newDstItem = player.mInventory->mInventory->getItem(dstSlotInfo.mSlot);
-
         PlayerItemTransferAfterEvent afterEvent(
             player,
             actionType,
@@ -98,8 +99,8 @@ LL_TYPE_INSTANCE_HOOK(
             dstSlotInfo.mFullContainerName,
             dstSlotInfo.mSlot,
             transferAction.mAmount,
-            newSrcItem,
-            newDstItem,
+            srcItem,
+            dstItem,
             screenContext
         );
         bus.publish(afterEvent);

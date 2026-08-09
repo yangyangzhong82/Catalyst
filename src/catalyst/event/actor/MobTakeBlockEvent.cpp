@@ -1,3 +1,8 @@
+#if defined(__clang__)
+// The generated vector storage header requires this otherwise-unused type to be complete.
+struct NamedMolangScript {};
+#endif
+
 #include "MobTakeBlockEvent.h"
 
 #include "catalyst/event/EmitterRegistration.h"
