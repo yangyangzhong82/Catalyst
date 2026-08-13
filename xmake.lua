@@ -36,7 +36,7 @@ target("Catalyst")
     add_headerfiles("src/(catalyst/**.h)")
     add_files("src/**.cpp")
     add_includedirs("src")
-    
+    set_symbols("debug")
     after_build(function (target)
         local lang_src = path.join(os.projectdir(), "lang")
         local lang_dst = path.join(os.projectdir(), "bin", target:name())

@@ -3,7 +3,9 @@
 #include "catalyst/event/EmitterRegistration.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/memory/Hook.h"
+#include "mc/world/actor/player/Inventory.h"
 #include "mc/world/actor/player/Player.h"
+#include "mc/world/actor/player/PlayerInventory.h"
 #include "mc/world/containers/managers/IContainerManager.h"
 #include "mc/world/inventory/network/ItemStackNetManagerBase.h"
 #include "mc/world/inventory/network/ItemStackNetManagerServer.h"
@@ -63,10 +65,21 @@ LL_TYPE_INSTANCE_HOOK(
         return origin(requestAction);
     }
 
-    // 槽位编号是各 FullContainerName 内的局部索引，必须由当前容器管理器解析。
+    // 玩家背包类请求使用绝对背包槽号；ContainerModel 会再次应用区域偏移，不能交给它解析。
+    // 其他 UI 容器仍由当前容器管理器按 FullContainerName 解析。
+    auto getItemSnapshot = [&](auto const& slotInfo) -> ItemStack {
+        auto containerName = slotInfo.mFullContainerName.mName;
+        if (containerName == ContainerEnumName::InventoryContainer
+            || containerName == ContainerEnumName::HotbarContainer
+            || containerName == ContainerEnumName::CombinedHotbarAndInventoryContainer) {
+            return player.mInventory->mInventory->getItem(slotInfo.mSlot);
+        }
+        return containerManager->getFullContainerSlot(slotInfo.mSlot, slotInfo.mFullContainerName);
+    };
+
     // 在执行请求前复制快照，确保 AfterEvent 仍能表示本次实际转移的物品。
-    ItemStack srcItem = containerManager->getFullContainerSlot(srcSlotInfo.mSlot, srcSlotInfo.mFullContainerName);
-    ItemStack dstItem = containerManager->getFullContainerSlot(dstSlotInfo.mSlot, dstSlotInfo.mFullContainerName);
+    ItemStack srcItem = getItemSnapshot(srcSlotInfo);
+    ItemStack dstItem = getItemSnapshot(dstSlotInfo);
 
     auto& bus = ll::event::EventBus::getInstance();
 
